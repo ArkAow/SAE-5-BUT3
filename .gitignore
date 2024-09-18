@@ -21,3 +21,14 @@
 /app/npm-debug.log*
 /app/yarn-debug.log*
 /app/yarn-error.log*
+
+### ----- Backend -----
+###> symfony/framework-bundle ###
+/backend/.env.local
+/backend/.env.local.php
+/backend/.env.*.local
+/backend/config/secrets/prod/prod.decrypt.private.php
+/backend/public/bundles/
+/backend/var/
+/backend/vendor/
+###< symfony/framework-bundle ###
