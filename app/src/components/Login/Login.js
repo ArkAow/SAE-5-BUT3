@@ -17,7 +17,7 @@ const Login = () => {
     }
 
     // Logique de connexion (exemple)
-    if (email === "admin@example.com" && password === "password123") {
+    if (email === "admin@example.com" && password === "password") {
       alert("Connexion réussie !");
       setError("");
     } else {
@@ -30,8 +30,7 @@ const Login = () => {
     <div className="body-container">
       <div className="login-header"><LoginHeader />
       </div>
-      <div className="login-container">
-        {error && <p className="error">{error}</p>}
+      <div className="login-container">ç
         <form onSubmit={handleSubmit}>
         <div className="profile-image">
         </div>
@@ -56,6 +55,9 @@ const Login = () => {
             />
           </div>
           <button type="submit">Se connecter</button>
+          <p className="error" style={{visibility: error ? "visible" : "hidden"}}>
+            {error}
+          </p>
         </form>
       </div>
     </div>

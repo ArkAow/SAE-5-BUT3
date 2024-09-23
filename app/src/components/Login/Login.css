@@ -2,7 +2,6 @@
     max-width: 400px;
     margin: 0 auto;
     margin-top: 2%;
-    padding: 20px;
     background: rgba(0, 0, 0, .7);    /*  70% opaque green */
     border-radius: 50px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -13,15 +12,16 @@
     display: flex;
     align-items: center;
     align-content: center;
-    justify-content: space-around;
+    justify-content: center;
+    border : solid red 10px;
   }
-  
+
   h2 {
     text-align: center;
     margin-bottom: 20px;
     color: white;
   }
-  
+
   .form-group {
     margin-bottom: 25px;
     padding-top: 15%;
@@ -32,14 +32,14 @@
     display: flex;
     flex-direction: column;
   }
-  
+
 
   label {
     display: block;
     margin-bottom: 5px;
     color: white;
   }
-  
+
   input {
     width: 100%;
     padding: 8px;
@@ -47,7 +47,7 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
-  
+
   button {
     width: 100%;
     padding: 10px;
@@ -59,17 +59,17 @@
     font-weight: bold;
     font-size: large;
   }
-  
+
   button:hover {
-    cursor: pointe;;
+    cursor: pointer;
   }
-  
-  .error {
-    color: red;
-    text-align: center;
-    margin-bottom: 15px;
-  }
-  
+
+.error {
+  color: red;
+  text-align: end;
+  min-height: auto;
+}
+
 .header-container {
   background-color: red;
   display: flex;
@@ -101,7 +101,7 @@ html {
   border-radius:50%;
   width:160px;
   height:160px;
-  flex-flow: center;
+  flex-flow: column;
   margin-bottom: 30%;
   background-image: url(../../images/profile_picture_anonym.png);
   background-position: center;
@@ -112,6 +112,7 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: solid red 10px;
 }
 
 .logo {
