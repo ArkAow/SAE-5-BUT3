@@ -2,6 +2,7 @@
   "name": "app",
   "version": "0.1.0",
   "private": true,
+  "main": "main.js",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -13,7 +14,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "electron-start": "concurrently \"npm:start\" \"wait-on http://localhost:3000 && electron ./electron/main.js\"",
     "build": "react-scripts build",
+    "electron-build": "npm run build && electron-builder",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -34,5 +37,24 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "electron": "^33.0.2",
+    "electron-builder": "^24.6.0",
+    "wait-on": "^7.2.0"
+  },
+  "files": [
+    "build/**/*",
+    "main.js"
+  ],
+  "win": {
+    "target": "nsis"
+  },
+  "mac": {
+    "target": "dmg"
+  },
+  "linux": {
+    "target": "AppImage"
   }
 }
