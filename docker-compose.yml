@@ -8,8 +8,8 @@ services:
     ports:
       - "8700:3000"
     volumes:
-      - ./app:/app
-    command: sh -c "npm install && CHOKIDAR_USEPOLLING=true npm start"
+      - ./app:/appl
+    command: sh -c "npm install && npm run electron-start"
     networks:
       - sae_previsionnel
     restart: always
