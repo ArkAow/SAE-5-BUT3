@@ -31,7 +31,7 @@ const Login = () => {
     <div className="body-container">
       <div className="login-header"><LoginHeader />
       </div>
-      <div className="login-container">ç
+      <div className="login-container">
         <form onSubmit={handleSubmit}>
         <div className="profile-image">
         </div>
