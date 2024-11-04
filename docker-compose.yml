@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: node:22.9
+    container_name: frontend_container
+    working_dir: /app
+    ports:
+      - "8700:8700"
+    volumes:
+      - ./app:/app
+    command: sh -c "npm i && npm start -- --port 8700"
+    networks:
+      - app_network
+    restart: always
+
+  backend:
+    image: php:8.2-fpm
+    container_name: backend_container
+    working_dir: /backend
+    ports:
+      - "8600:8600"
+    volumes:
+      - ./backend:/backend
+    command: sh -c "composer install && php -S localhost:8600"
+    networks:
+      - app_network
+    restart: always
+
+networks:
+  app_network:
+    driver: bridge
