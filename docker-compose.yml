@@ -6,7 +6,7 @@ services:
     container_name: frontend_container
     working_dir: /app
     ports:
-      - "8700:8700"
+      - "8700:3000"
     volumes:
       - ./app:/app
     command: sh -c "npm i && npm start -- --port 8700"
@@ -15,14 +15,16 @@ services:
     restart: always
 
   backend:
-    image: php:8.2-fpm
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: backend_container
     working_dir: /backend
     ports:
       - "8600:8600"
     volumes:
       - ./backend:/backend
-    command: sh -c "composer install && php -S localhost:8600"
+    command: sh -c "composer install && php -S 0.0.0.0:8600 -t public"
     networks:
       - app_network
     restart: always
