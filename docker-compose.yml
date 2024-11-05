@@ -10,6 +10,27 @@ services:
     volumes:
       - ./backend:/app
     command: sh -c "composer install && php -S 0.0.0.0:8600 -t public"
+    environment:
+      DB_HOST: iutinfo-2410-01.unilim.fr
+      DB_PORT: 3306
+      DB_DATABASE: nom_de_votre_base
+      DB_USERNAME: votre_nom_utilisateur
+      DB_PASSWORD: votre_mot_de_passe
+    networks:
+      - sae_previsionnel
+    restart: always
+
+  # Optionnel: Ajout d'un conteneur MySQL local (si besoin de tests en local avec un MySQL dans Docker)
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: local_database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306"
     networks:
       - sae_previsionnel
     restart: always
