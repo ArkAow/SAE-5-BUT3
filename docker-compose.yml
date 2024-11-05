@@ -11,26 +11,39 @@ services:
       - ./backend:/app
     command: sh -c "composer install && php -S 0.0.0.0:8600 -t public"
     environment:
-      DB_HOST: iutinfo-2410-01.unilim.fr
+      DB_HOST: db  # "db" doit correspondre au nom du service MySQL
       DB_PORT: 3306
-      DB_DATABASE: nom_de_votre_base
-      DB_USERNAME: votre_nom_utilisateur
-      DB_PASSWORD: votre_mot_de_passe
+      DB_DATABASE: db_sae_previ
+      DB_USERNAME: phpmyadmin
+      DB_PASSWORD: G389d}i^6uGJ-6K)n
     networks:
       - sae_previsionnel
     restart: always
 
-  # Optionnel: Ajout d'un conteneur MySQL local (si besoin de tests en local avec un MySQL dans Docker)
-  mysql:
+  db:
     image: mysql:8.0
     container_name: mysql_container
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: local_database
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_USER: phpmyadmin
+      MYSQL_PASSWORD: G389d}i^6uGJ-6K)n
     ports:
-      - "3307:3306"
+      - "3306:3306"
+    networks:
+      - sae_previsionnel
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin_container
+    environment:
+      PMA_HOST: db  # Utilisez le nom de service "db" pour accéder au conteneur MySQL
+      PMA_PORT: 3306
+      PMA_USER: phpmyadmin
+      PMA_PASSWORD: G389d}i^6uGJ-6K)n
+    ports:
+      - "8080:80"
     networks:
       - sae_previsionnel
     restart: always
@@ -38,3 +51,6 @@ services:
 networks:
   sae_previsionnel:
     driver: bridge
+
+volumes:
+  db_data:
