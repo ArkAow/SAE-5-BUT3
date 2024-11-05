@@ -1,19 +1,4 @@
 services:
-  frontend:
-    build:
-      context: ./app
-      dockerfile: .docker/Dockerfile
-    container_name: frontend_container
-    working_dir: /app
-    ports:
-      - "8700:3000"
-    volumes:
-      - ./app:/appl
-    command: sh -c "npm install && npm run electron-start"
-    networks:
-      - sae_previsionnel
-    restart: always
-
   backend:
     build:
       context: ./backend
