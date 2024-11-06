@@ -78,7 +78,7 @@ const MainGrid = () => {
               onChange={(e) => setSelectedColor(e.target.value)}
             />
           </div>
-          <button onClick={addItem}>Ajouter</button>
+          <button className="maingrid-button" onClick={addItem}>Ajouter</button>
         </div>
 
         <div className="grid">

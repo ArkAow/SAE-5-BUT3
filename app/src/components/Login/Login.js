@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import LoginHeader from '../header/header.js'; // Pour le style de base si nécessaire
-import './login.css'; // Pour le style de base si nécessaire
+import './Login.css'; // Pour le style de base si nécessaire
 
 const Login = ({ setIsAuthenticated }) => {  // Passe setIsAuthenticated par props pour la gestion globale de l'authentification
   const [email, setEmail] = useState("");
