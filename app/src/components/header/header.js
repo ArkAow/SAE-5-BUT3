@@ -1,17 +1,17 @@
 import React from "react";
-import './header.css'; 
+import './header.css'; // Pour ajouter un style de base si nécessaire
 import logo from '../../images/Universite_de_Limoges_white.png';
 
-const LoginHeader = () => {
+const Header = () => {
 
 return (
     <div className="header-container">
-        <div>
-            <h1 className="Title">Prévisionnel IUT du Limousin</h1>
+        <div className="header-title">
+            <h1 className="Title">Prévisionnelle IUT du Limousin</h1>
         </div>
         <img src={logo} alt="Profile" className="logo"></img>
     </div>
     );
 };
 
-export default LoginHeader;
+export default Header;
