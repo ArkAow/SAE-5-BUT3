@@ -1,19 +1,67 @@
 .login-container {
-  max-width: 400px;
+  max-width: 60%;
   margin: 0 auto;
   margin-top: 2%;
   background: rgba(0, 0, 0, .7);
   border-radius: 50px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), 0 0 0 10px rgba(0, 0, 0, 0.1);
-  padding-top: 5%;
-  padding-left: 35%;
-  padding-right: 35%;
-  padding-bottom: 10%;
+  padding-top: 5%;  /* Position des labels par rapport au cadre noir */
   display: flex;
   align-items: center;
   align-content: center;
   justify-content: center;
-  flex-direction: column; /* Ajouter cette ligne pour l'alignement vertical */
+}
+
+.profile-image{
+  background:red;
+  border-radius:50%;
+  width:6rem;
+  height:6rem;
+  flex-flow: column;
+  margin-bottom: 10%;
+  background-image: url(../../images/profile_picture_anonym.png);
+  background-position: center;
+  background-size: 100%;
+}
+
+.form-group {
+  align-items: center;
+  margin-bottom: 5%;
+  padding-top: 10%;
+  padding-bottom: 3%;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: white;
+}
+
+input {
+  width: 130%;
+  padding: 8px;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+  
+button {
+  margin-top: 15%;
+  width: 100%;
+  padding: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: large;
+}
+
+button:hover {
+  cursor: pointer;
 }
 
 .error {
@@ -28,76 +76,15 @@
   visibility: visible; /* Affiche le message d'erreur lorsqu'il y a une erreur */
 }
 
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: white;
-  }
-
-  .form-group {
-    margin-bottom: 25px;
-    padding-top: 15%;
-    padding-left: 0%;
-    padding-right: 0%;
-    padding-bottom: 15%;
-    width: 200%;
-    display: flex;
-    flex-direction: column;
-  }
-
-
-  label {
-    display: block;
-    margin-bottom: 5px;
-    color: white;
-  }
-
-  input {
-    width: 100%;
-    padding: 8px;
-    margin: 0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: large;
-  }
-
-  button:hover {
-    cursor: pointer;
-  }
 
 
 
-.header-container {
-  background-color: red;
-  display: flex;
-  justify-content: start;
-  align-items: flex-start;
-}
-  header-title {
-    color: white;
-    font-size: 24px;
-    padding: 10px;
-  }
 
-  .Title {
-    color: white;
-    font-size: 24px;
-    padding: 10px;
-    font-weight: normal;
-    font-size: medium;
-  }
+
+
+
+
+
 
 html {
   background-image: url(../../images/paysage.png);
@@ -105,17 +92,7 @@ html {
   height: 100%;
 }
 
-.profile-image{
-  background:red;
-  border-radius:50%;
-  width:160px;
-  height:160px;
-  flex-flow: column;
-  margin-bottom: 30%;
-  background-image: url(../../images/profile_picture_anonym.png);
-  background-position: center;
-  background-size: 100%;
-}
+
 
 form {
   display: flex;
@@ -123,11 +100,3 @@ form {
   align-items: center;
 }
 
-.logo {
-  order: -1;
-  width: 3%;
-  height: 3%;
-  margin-right: 10px;
-  margin-top: 10px;
-  margin-left: 5px;
-}

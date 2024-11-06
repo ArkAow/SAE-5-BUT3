@@ -1,0 +1,23 @@
+.header-container {
+    background-color: red;
+    display: flex;
+    justify-content: start;
+    align-items: flex-start;
+}
+
+.Title {
+    color: white;
+    font-size: 24px;
+    padding: 10px;
+    font-weight: normal;
+    font-size: medium;
+}
+
+.logo {
+    order: -1;
+    width: 3%;
+    height: 3%;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-left: 5px;
+}
