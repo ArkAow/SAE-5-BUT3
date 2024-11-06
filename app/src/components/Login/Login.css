@@ -1,15 +1,16 @@
 .login-container {
+  align-items: center;
+  align-content: center;
+  justify-content: center;
   max-width: 60%;
   margin: 0 auto;
   margin-top: 30px; /* Espace entre le header et le rectangle noir, doit rester fixe. */
+  margin-bottom: 10px; /* Espace entre le header et le rectangle noir, doit rester fixe. */
   background: rgba(0, 0, 0, .7);
   border-radius: 50px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), 0 0 0 10px rgba(0, 0, 0, 0.1);
   padding-top: 5%;  /* Position des labels par rapport au cadre noir */
   display: flex;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
 }
 
 .profile-image{
