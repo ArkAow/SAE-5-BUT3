@@ -1,8 +1,8 @@
 import React from "react";
-import './Login.css'; // Pour ajouter un style de base si nécessaire
+import './header.css'; // Pour ajouter un style de base si nécessaire
 import logo from '../../images/Universite_de_Limoges_white.png';
 
-const LoginHeader = () => {
+const Header = () => {
 
 return (
     <div className="header-container">
@@ -14,4 +14,4 @@ return (
     );
 };
 
-export default LoginHeader;
+export default Header;
