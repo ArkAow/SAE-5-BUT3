@@ -19,7 +19,7 @@
   height:6rem;
   flex-flow: column;
   margin-bottom: 10%;
-  background-image: url(../../images/profile_picture_anonym.png);
+  background-image: url(../../../public/images/profile_picture_anonym.png);
   background-position: center;
   background-size: 100%;
 }
@@ -70,38 +70,20 @@ button:hover {
   cursor: pointer;
 }
 
-  html {
-    background-image: url(../../images/paysage.png);
-    background-size: cover;
-    height: 100%;
-  }
-  
-  .profile-image{
-    background:red;
-    border-radius:50%;
-    width:160px;
-    height:160px;
-    flex-flow: column;
-    margin-bottom: 30%;
-    background-image: url(../../images/profile_picture_anonym.png);
-    background-position: center;
-    background-size: 100%;
-  }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .error {
-    color: red;
-    text-align: end;
-    font-size: small;
-    min-height: 10px; /* Réserve un espace pour le message d'erreur */
-    visibility: hidden; /* Le message d'erreur est caché par défaut */
-  }
-  
-  .error.visible {
-    visibility: visible; /* Affiche le message d'erreur lorsqu'il y a une erreur */
-  }
+html {
+  background-image: url(../../../public/images/paysage.png);
+  background-size: cover;
+  height: 100%;
+}
+
+.error {
+  color: red;
+  text-align: end;
+  font-size: small;
+  min-height: 10px; /* Réserve un espace pour le message d'erreur */
+  visibility: hidden; /* Le message d'erreur est caché par défaut */
+}
+
+.error.visible {
+  visibility: visible; /* Affiche le message d'erreur lorsqu'il y a une erreur */
+}
