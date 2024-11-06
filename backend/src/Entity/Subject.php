@@ -20,6 +20,11 @@ class Subject
      * @ORM\Column(type="string", length=50, unique=true)
      */
     private string $name;
+    
+    /**
+     * @ORM\Column(type="string", length=50, unique=true)
+     */
+    private string $code;
 
     // Getters and Setters
 
@@ -36,6 +41,17 @@ class Subject
     public function setName(string $name): self
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
         return $this;
     }
 }
