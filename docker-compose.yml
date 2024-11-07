@@ -11,7 +11,7 @@ services:
       - ./backend:/app
     command: sh -c "composer install && php -S 0.0.0.0:8600 -t public"
     environment:
-      DB_HOST: iutinfo-2410-01.unilim.fr
+      DB_HOST: 164.81.120.68
       DB_PORT: 3306
       DB_DATABASE: db_sae_previ
       DB_USERNAME: phpmyadmin
