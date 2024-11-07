@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import Grid from './MainGrid';
-import Header from '../header/header';
-import './MainPreviEdit.css'; // Pour ajouter un style de base si nécessaire
-
+import Header from '../Header/Header';
 
 
 const MainPreviEdit = () => {
