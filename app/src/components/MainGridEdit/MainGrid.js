@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import './MainGrid.css';
 
-const GRID_ROW_LENGTH = 4; // Nombre de lignes
-const GRID_COL_LENGTH = 8; // Nombre de colonnes
+const GRID_ROW_LENGTH = 4;
+const GRID_COL_LENGTH = 8;
 const ITEM_TYPE = 'rectangle';
 
 const MainGrid = () => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
-  const [selectedColor, setSelectedColor] = useState('#FFD700'); // Couleur par défaut
+  const [selectedColor, setSelectedColor] = useState('#FFD700');
 
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
@@ -47,43 +46,51 @@ const MainGrid = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="container">
-        <div className="sidebar">
-          <h3>Ajouter un rectangle</h3>
-          <div>
-            <label>Ligne :</label>
+      <div className="min-h-screen flex justify-center items-start bg-cover bg-center bg-landscape py-10">
+        <div className="mr-5 p-5 bg-gray-200 rounded-lg shadow-md">
+          <h3 className="mb-5">Ajouter un rectangle</h3>
+          <div className='flex flex-row'>
+            <label className="mr-2 text-clip text-nowrap">Ligne :</label>
             <input
               type="number"
               min="0"
               max={GRID_ROW_LENGTH - 1}
               value={selectedRow}
               onChange={(e) => setSelectedRow(Number(e.target.value))}
+              className="mb-5 w-full"
             />
           </div>
-          <div>
-            <label>Colonne :</label>
+          <div className='flex flex-row'>
+            <label className="mr-2 text-clip text-nowrap">Colonne :</label>
             <input
               type="number"
               min="0"
               max={GRID_COL_LENGTH - 1}
               value={selectedCol}
               onChange={(e) => setSelectedCol(Number(e.target.value))}
+              className="mb-5 w-full"
             />
           </div>
-          <div>
-            <label>Couleur :</label>
+          <div className='flex flex-row'>
+            <label className="mr-2 text-clip text-nowrap">Couleur :</label>
             <input
               type="color"
               value={selectedColor}
               onChange={(e) => setSelectedColor(e.target.value)}
+              className="mb-5 w-full"
             />
           </div>
-          <button onClick={addItem}>Ajouter</button>
+          <button
+            onClick={addItem}
+            className="px-3 py-2 w-full bg-green-500 transition-colors duration-300 text-white rounded cursor-pointer hover:bg-green-600"
+          >
+            Ajouter
+          </button>
         </div>
 
-        <div className="grid">
+        <div className="flex flex-col items-center">
           {grid.map((row, rowIndex) => (
-            <div key={rowIndex} className="grid-row">
+            <div key={rowIndex} className="flex">
               {row.map((node, nodeIndex) => {
                 const positionKey = `${node.row}-${node.col}`;
                 const item = items[positionKey];
@@ -117,7 +124,10 @@ const Node = ({ positionKey, item, moveItem }) => {
   });
 
   return (
-    <div ref={drop} className="node">
+    <div
+      ref={drop}
+      className="w-20 h-20 bg-white border border-opacity-75 border-gray-300 flex justify-center items-center relative"
+    >
       {item && <DraggableRectangle color={item.color} positionKey={positionKey} />}
     </div>
   );
@@ -136,7 +146,7 @@ const DraggableRectangle = ({ color, positionKey }) => {
   return (
     <div
       ref={drag}
-      className="grid-item"
+      className="w-16 h-16 rounded border-2 border-black cursor-grab transition-opacity duration-200"
       style={{
         backgroundColor: color,
         opacity: isDragging ? 0.5 : 1,
