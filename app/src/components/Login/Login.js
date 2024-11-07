@@ -1,67 +1,85 @@
 import React, { useState } from "react";
-import LoginHeader from './header.js'; // Pour ajouter un style de base si nécessaire
-import './Login.css'; // Pour ajouter un style de base si nécessaire
+import { useNavigate } from "react-router-dom";
+import LoginHeader from "../Header/Header.js"; // Composant de l'en-tête
+import '../../styles.css'
 
-const Login = () => {
+const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    navigate("/MainPreviEdit");
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validation simple pour vérifier que les champs ne sont pas vides
     if (!email || !password) {
       setError("Veuillez remplir tous les champs.");
       return;
     }
 
-    // Logique de connexion (exemple)
-    if (email === "admin@example.com" && password === "password") {
-      alert("Connexion réussie !");
-      setError("");
+    if (email === "a@a" && password === "password") {
+      handleLogin();
     } else {
-      setError("Email ou mot de passe incorrect.");
+      setError("Identifiant ou mot de passe incorrect.");
     }
   };
 
   return (
     <>
-  
-    <div className="body-container">
-      <div className="login-header"><LoginHeader />
-      </div>
-      <div className="login-container">ç
-        <form onSubmit={handleSubmit}>
-        <div className="profile-image">
+      <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col items-center">
+        <div className="w-full">
+          <LoginHeader />
         </div>
-          <div className="form-group">
-            <label htmlFor="email">Identifiant:</label>
-            <input
-              type="email"
-              id="identifiant"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+        <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-8 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="flex flex-col items-center w-full">
+            <div
+              className="bg-primary rounded-full w-32 h-32 mb-12 bg-center bg-cover bg-pfp"
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Mot de passe:</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit">Se connecter</button>
-          <p className="error" style={{visibility: error ? "visible" : "hidden"}}>
-            {error}
-          </p>
-        </form>
+            <div className="flex flex-col items-center mb-6">
+              <label htmlFor="email" className="text-white mb-2">
+                Identifiant :
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-[130%] px-4 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="flex flex-col items-center mb-6">
+              <label htmlFor="password" className="text-white mb-2">
+                Mot de passe :
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-[130%] px-4 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn-primary"
+            >
+              Se connecter
+            </button>
+            <p
+              className={`text-red-500 text-right text-sm mt-4 h-6 ${error ? "visible" : "invisible"}`}>
+              {error}
+            </p>
+          </form>
+        </div>
       </div>
-    </div>
     </>
   );
 };
