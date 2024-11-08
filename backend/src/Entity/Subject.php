@@ -26,6 +26,11 @@ class Subject
      */
     private string $code;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private string $duration;
+
     // Getters and Setters
 
     public function getId(): ?int
@@ -52,6 +57,17 @@ class Subject
     public function setCode(string $code): self
     {
         $this->code = $code;
+        return $this;
+    }
+
+    public function getDuration(): int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(int $duration): self
+    {
+        $this->duration = $duration;
         return $this;
     }
 }
