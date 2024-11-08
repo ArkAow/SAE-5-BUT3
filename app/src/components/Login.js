@@ -6,36 +6,23 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-  
+
+    // Validation simple pour vérifier que les champs ne sont pas vides
     if (!email || !password) {
       setError("Veuillez remplir tous les champs.");
       return;
     }
-  
-    try {
-      const response = await fetch("http://localhost:8600/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        alert("Connexion réussie !");
-        setError("");
-      } else {
-        setError(data.error || "Une erreur est survenue.");
-      }
-    } catch (error) {
-      setError("Erreur de connexion au serveur.");
+
+    // Logique de connexion (exemple)
+    if (email === "admin@example.com" && password === "password123") {
+      alert("Connexion réussie !");
+      setError("");
+    } else {
+      setError("Email ou mot de passe incorrect.");
     }
   };
-  
 
   return (
     <div className="login-container">
