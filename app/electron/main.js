@@ -7,6 +7,7 @@ function createWindow() {
         minWidth: 1000,
         minHeight: 700,
         frame: false,
+        icon: path.join(__dirname,"logo-previ.png"),
         webPreferences: {
           preload: path.join(__dirname, 'preload.js'),  // Assurez-vous que le chemin est correct
           nodeIntegration: false,
