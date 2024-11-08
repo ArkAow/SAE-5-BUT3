@@ -10,23 +10,24 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241107092349 extends AbstractMigration
+final class Version20241108095603 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create a Table for the Professors with an inheritance of Teacher';
+        return 'Creation of the table CourseType (TP/TD/CM)';
     }
 
     public function up(Schema $schema): void
     {
-        $table = $schema->createTable('Professor');
-        $table->addColumn('id', 'integer');
+        $table = $schema->createTable('CourseType');
+        $table->addColumn('id','integer',['autoincrement' => true]);
+        $table->addColumn('name','string',['length' => 10]);
+        $table->addColumn('color','string',['length' => 7]);
         $table->setPrimaryKey(['id']);
-        $table->addForeignKeyConstraint('Teacher', ['id'], ['id'], ['onDelete' => 'CASCADE']);
     }
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable('Professor');
+        $schema->dropTable('CourseType');
     }
 }
