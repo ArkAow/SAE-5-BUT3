@@ -1,27 +1,48 @@
 import React, { useState } from 'react';
-import { HashRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from '../components/Login/Login'; // La page de login
-import MainPreviEdit from '../components/MainGridEdit/MainPreviEdit'; // La page principale
-import ProtectedRoute from './ProtectedRoutes'; // Composant pour les routes protégées
+import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from '../components/Login/Login';
+import HomePage from '../components/homePage/homePage';
+import MainPreviEdit from '../components/MainGridEdit/MainPreviEdit';
+import ProtectedRoute from './ProtectedRoutes';
 
 const AppRoutes = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // État pour l'authentification
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Gestion de l’authentification
 
   return (
     <Router>
       <Routes>
-        {/* Route pour la page de login */}
-        <Route path="/" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+        {/* Route de Connexion */}
+        <Route 
+          path="/" 
+          element={
+            isAuthenticated 
+              ? <Navigate to="/homePage" replace /> // Redirige vers HomePage si authentifié
+              : <Login setIsAuthenticated={setIsAuthenticated} />
+          } 
+        />
 
-        {/* Route protégée pour la page d'accueil */}
+        {/* Page d’Accueil (protégée) */}
+        <Route 
+          path="/homePage" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <HomePage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Page MainPreviEdit (protégée) */}
         <Route
           path="/MainPreviEdit"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <MainPreviEdit /> 
+              <MainPreviEdit />
             </ProtectedRoute>
           }
         />
+
+        {/* Route Inconnue (404) */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
