@@ -20,11 +20,11 @@ const Header = () => {
         </h1>
       </div>
 
-      <div className="flex space-x-2">
+      <div className="flex space-x-2" style={{ WebkitAppRegion: "no-drag"}}>
         <img
           src="/images/underline.svg"
           alt="Minimize"
-          className="btn-header"
+          className="btn-header" 
           onClick={() => handleWindowControl('minimize')}
         />
         <img

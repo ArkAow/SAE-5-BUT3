@@ -32,7 +32,7 @@ const Login = ({ setIsAuthenticated }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col items-center">
+      <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col items-center" style={{ WebkitAppRegion: "no-drag"}}>
         <div className="w-full">
           <LoginHeader />
         </div>

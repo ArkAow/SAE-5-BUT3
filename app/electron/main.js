@@ -4,10 +4,8 @@ const path = require('path');
 function createWindow() {
     // Crée la fenêtre principale
     const win = new BrowserWindow({
-        minWidth: 800,
-        minHeight: 600,
-        fullscreen: true,
-         
+        minWidth: 1000,
+        minHeight: 700,
         frame: false,
         webPreferences: {
           preload: path.join(__dirname, 'preload.js'),  // Assurez-vous que le chemin est correct
