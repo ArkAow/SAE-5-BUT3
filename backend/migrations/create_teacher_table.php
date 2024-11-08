@@ -19,14 +19,16 @@ final class create_teacher_table extends AbstractMigration
     }
 
     public function up(Schema $schema): void
-    {
-        $table = $schema->createTable('Teacher');
-        $table->addColumn('id','integer',['autoincrement' => true]);
-        $table->addColumn('first_name', 'string', ['length' => 50]);
-        $table->addColumn('last_name', 'string', ['length' => 50]);
-        $table->addColumn('code', 'string', ['length' => 5]);
-        $table->setPrimaryKey(['id']);
-    }
+{
+    $table = $schema->createTable('Teacher');
+    $table->addColumn('id', 'integer', ['autoincrement' => true]);
+    $table->addColumn('first_name', 'string', ['length' => 50]);
+    $table->addColumn('last_name', 'string', ['length' => 50]);
+    $table->addColumn('code', 'string', ['unique' => true]);
+    $table->setPrimaryKey(['id']);
+
+}
+
 
     public function down(Schema $schema): void
     {

@@ -19,7 +19,7 @@ final class create_class_table extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $table = $schema->createTable('Class');
+        $table = $schema->createTable('Promo');
         $table->addColumn('id','integer',['autoincrement'=>true]);
         $table->addColumn('name','string',['length' => 25]);
         $table->addColumn('group_id','integer');
@@ -29,6 +29,6 @@ final class create_class_table extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable('Class');
+        $schema->dropTable('Promo');
     }
 }
