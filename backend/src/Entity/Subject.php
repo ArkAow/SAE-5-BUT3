@@ -29,7 +29,7 @@ class Subject
     /**
      * @ORM\Column(type="integer")
      */
-    private string $duration;
+    private int $duration;
 
     // Getters and Setters
 
