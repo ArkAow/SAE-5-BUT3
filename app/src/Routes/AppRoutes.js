@@ -7,7 +7,9 @@ import {
 } from "react-router-dom";
 import Login from "../components/Login/Login";
 import HomePage from "../components/homePage/homePage";
-import MainPreviEdit from "../components/MainGridEdit/MainPreviEdit";
+import PreviEdit from "../components/MainGridEdit/PreviEdit";
+import SeePrevi from "../components/SeePrevi/SeePrevi";
+import InsertM3C from "../components/InsertM3C/InsertM3C";
 import ProtectedRoute from "./ProtectedRoutes";
 
 const AppRoutes = () => {
@@ -36,10 +38,26 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/MainPreviEdit"
+          path="/PreviEdit"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <MainPreviEdit />
+              <PreviEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/SeePrevi"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <SeePrevi />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/InsertM3C"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <InsertM3C />
             </ProtectedRoute>
           }
         />

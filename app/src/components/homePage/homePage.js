@@ -6,15 +6,24 @@ import "./homePage.css";
 const HomePage = () => {
   const navigate = useNavigate();
 
-  const goToMainPreviEdit = () => {
-    navigate("/MainPreviEdit");
+  const goToPreviEdit = () => {
+    navigate("/PreviEdit");
   };
+
+  const goToSeePrevi = () => {
+    navigate("/SeePrevi");
+  };
+
+  const goToInsertM3C = () => {
+    navigate("/InsertM3C");
+  };
+
   return (
     <>
       <Header />
       <div className="homePage">
         <div className="body-container">
-          <div className="Block" onClick={goToMainPreviEdit}>
+          <div className="Block" onClick={goToPreviEdit}>
             <div className="RedSquare">
               <div className="Image">
                 <svg
@@ -33,13 +42,13 @@ const HomePage = () => {
             </div>
             <p className="Explanation">Modifier le prévisionnel</p>
           </div>
-          <div className="Block">
+          <div className="Block" onClick={goToInsertM3C}>
             <div className="RedSquare">
               <div className="Image">M3C</div>
             </div>
             <p className="Explanation">Inserer un M3C</p>
           </div>
-          <div className="Block">
+          <div className="Block" onClick={goToSeePrevi}>
             <div className="RedSquare">
               <div className="Image">
                 <svg
