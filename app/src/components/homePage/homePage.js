@@ -1,14 +1,20 @@
 import React from "react";
-import Header from "../header/header";
+import { useNavigate } from "react-router-dom";
+import Header from "../Header/Header";
 import "./homePage.css";
 
-const homePage = () => {
+const HomePage = () => {
+  const navigate = useNavigate();
+
+  const goToMainPreviEdit = () => {
+    navigate("/MainPreviEdit");
+  };
   return (
     <>
       <Header />
       <div className="homePage">
         <div className="body-container">
-          <div className="Block">
+          <div className="Block" onClick={goToMainPreviEdit}>
             <div className="RedSquare">
               <div className="Image">
                 <svg
@@ -65,4 +71,4 @@ const homePage = () => {
   );
 };
 
-export default homePage;
+export default HomePage;

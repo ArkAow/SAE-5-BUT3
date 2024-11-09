@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import LoginHeader from '../header/header.js'; // Pour le style de base si nécessaire
-import './Login.css'; // Pour le style de base si nécessaire
+import { useNavigate } from "react-router-dom";
+import LoginHeader from "../Header/Header.js"; // Pour le style de base si nécessaire
+import "./Login.css"; // Pour le style de base si nécessaire
 
-const Login = ({ setIsAuthenticated }) => {  // Passe setIsAuthenticated par props pour la gestion globale de l'authentification
+const Login = ({ setIsAuthenticated }) => {
+  // Passe setIsAuthenticated par props pour la gestion globale de l'authentification
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,8 +13,8 @@ const Login = ({ setIsAuthenticated }) => {  // Passe setIsAuthenticated par pro
 
   const handleLogin = () => {
     // Action à réaliser si l'authentification réussit
-    setIsAuthenticated(true); 
-    navigate('/MainPreviEdit'); // Redirige vers la page principale
+    setIsAuthenticated(true);
+    navigate("/homePage"); // Redirige vers la page principale
   };
 
   const handleSubmit = (e) => {
@@ -65,7 +66,10 @@ const Login = ({ setIsAuthenticated }) => {  // Passe setIsAuthenticated par pro
               />
             </div>
             <button type="submit">Se connecter</button>
-            <p className="error" style={{ visibility: error ? "visible" : "hidden" }}>
+            <p
+              className="error"
+              style={{ visibility: error ? "visible" : "hidden" }}
+            >
               {error}
             </p>
           </form>
