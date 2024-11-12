@@ -1,21 +1,52 @@
 import React, { useState } from "react";
 import Header from "../header/header";
+import routes from "../../Routes/routes";
 
 const InsertM3C = () => {
   const [error, setError] = useState("");
+  const [file, setFile] = useState(null);
 
   const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+    const uploadedFile = e.target.files[0];
     const allowedExtensions = ["csv", "xls", "xlsx"];
 
-    if (file) {
-      const fileExtension = file.name.split(".").pop().toLowerCase();
+    if (uploadedFile) {
+      const fileExtension = uploadedFile.name.split(".").pop().toLowerCase();
       if (allowedExtensions.includes(fileExtension)) {
         setError("");
-        console.log("Fichier accepté :", file);
+        setFile(uploadedFile);
+        console.log("Fichier accepté :", uploadedFile);
       } else {
         setError("Veuillez sélectionner un fichier tableur.");
+        setFile(null);
       }
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!file) {
+      setError("Veuillez sélectionner un fichier valide avant de soumettre.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(routes.insertM3C.dev, {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de l'envoi du fichier.");
+      }
+
+      console.log("Fichier envoyé avec succès !");
+      setError("");
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du fichier :", error);
+      setError("Erreur lors de l'envoi du fichier.");
     }
   };
 
@@ -30,11 +61,18 @@ const InsertM3C = () => {
             type="file"
             accept=".csv, .xls, .xlsx"
             onChange={handleFileUpload}
-            className="mb-2 text-gray-500"/>
+            className="mb-2 text-gray-500"
+          />
           
-          {error && <p className="text-red-500">{error}</p>}        
+          {error && <p className="text-red-500 mb-2">{error}</p>}
+          
+          <button
+            onClick={handleSubmit}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Envoyer le fichier
+          </button>
         </div>
-
       </div>
     </>
   );
