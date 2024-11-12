@@ -1,16 +1,37 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow,ipcMain } = require('electron');
 const path = require('path');
 
 function createWindow() {
     // Crée la fenêtre principale
     const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        minWidth: 1000,
+        minHeight: 700,
+        frame: false,
+        icon: path.join(__dirname,"logo-previ.png"),
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: true,
-            contextIsolation: false // Permet `require` dans le code React
+          preload: path.join(__dirname, 'preload.js'),  // Assurez-vous que le chemin est correct
+          nodeIntegration: false,
+          contextIsolation: true,  // Important pour utiliser `contextBridge`
         }
+    });
+    ipcMain.on('window-control', (event, action) => {
+      switch (action) {
+        case 'minimize':
+          win.minimize();
+          break;
+        case 'maximize':
+          if (win.isMaximized()) {
+            win.unmaximize();
+          } else {
+            win.maximize();
+          }
+          break;
+        case 'close':
+          win.close();
+          break;
+        default:
+          break;
+      }
     });
 
     // Charge l'application React en fonction du mode

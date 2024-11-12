@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Grid from './MainGrid';
-import Header from '../Header/Header';
+import Header from '../header/header';
 
 
 const MainPreviEdit = () => {

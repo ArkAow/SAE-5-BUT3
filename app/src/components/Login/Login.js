@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LoginHeader from "../Header/Header.js"; // Composant de l'en-tête
+import LoginHeader from "../header/header.js"; // Composant de l'en-tête
 import '../../styles.css'
 
 const Login = ({ setIsAuthenticated }) => {
@@ -69,7 +69,7 @@ const Login = ({ setIsAuthenticated }) => {
             </div>
             <button
               type="submit"
-              className="btn-primary"
+              className="btn-primary transition duration-300"
             >
               Se connecter
             </button>
