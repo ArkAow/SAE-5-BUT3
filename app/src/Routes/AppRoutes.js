@@ -1,27 +1,67 @@
-import React, { useState } from 'react';
-import { HashRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from '../components/Login/Login'; // La page de login
-import MainPreviEdit from '../components/MainGridEdit/MainPreviEdit'; // La page principale
-import ProtectedRoute from './ProtectedRoutes'; // Composant pour les routes protégées
+import React, { useState } from "react";
+import {
+  HashRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import Login from "../components/Login/Login";
+import HomePage from "../components/homePage/homePage";
+import PreviEdit from "../components/MainGridEdit/PreviEdit";
+import SeePrevi from "../components/SeePrevi/SeePrevi";
+import InsertM3C from "../components/InsertM3C/InsertM3C";
+import ProtectedRoute from "./ProtectedRoutes";
 
 const AppRoutes = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // État pour l'authentification
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  console.log("Is Authenticated:", isAuthenticated);
 
   return (
     <Router>
       <Routes>
-        {/* Route pour la page de login */}
-        <Route path="/" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-
-        {/* Route protégée pour la page d'accueil */}
         <Route
-          path="/MainPreviEdit"
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/homePage" replace />
+            ) : (
+              <Login setIsAuthenticated={setIsAuthenticated} />
+            )
+          }
+        />
+        <Route
+          path="/homePage"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <MainPreviEdit /> 
+              <HomePage />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/PreviEdit"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <PreviEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/SeePrevi"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <SeePrevi />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/InsertM3C"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <InsertM3C />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
