@@ -5,11 +5,11 @@ import routes from "../../Routes/routes";
 const InsertM3C = () => {
   const [error, setError] = useState("");
   const [file, setFile] = useState(null);
-  const [fileContent, setFileContent] = useState(null);
+  const [message, setMessage] = useState("");
 
   const handleFileUpload = (e) => {
     const uploadedFile = e.target.files[0];
-    const allowedExtensions = ["csv", "xlsx"];
+    const allowedExtensions = ["csv", "xls", "xlsx"];
 
     if (uploadedFile) {
       const fileExtension = uploadedFile.name.split(".").pop().toLowerCase();
@@ -17,13 +17,14 @@ const InsertM3C = () => {
         setError("");
         setFile(uploadedFile);
       } else {
-        setError("Veuillez sélectionner un fichier .csv ou .xlsx.");
+        setError("Veuillez sélectionner un fichier de type .csv, .xls ou .xlsx.");
         setFile(null);
       }
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!file) {
       setError("Veuillez sélectionner un fichier valide avant de soumettre.");
       return;
@@ -43,15 +44,12 @@ const InsertM3C = () => {
       }
 
       const data = await response.json();
-      if (data.success) {
-        setFileContent(data.data);
-        setError("");
-      } else {
-        setError(data.error || "Erreur lors de la lecture du fichier.");
-      }
+      setMessage("Fichier envoyé et enregistré avec succès !");
+      setError("");
     } catch (error) {
       console.error("Erreur lors de l'envoi du fichier :", error);
       setError("Erreur lors de l'envoi du fichier.");
+      setMessage("");
     }
   };
 
@@ -64,12 +62,13 @@ const InsertM3C = () => {
           
           <input
             type="file"
-            accept=".csv, .xlsx"
+            accept=".csv, .xls, .xlsx"
             onChange={handleFileUpload}
             className="mb-2 text-gray-500"
           />
           
           {error && <p className="text-red-500 mb-2">{error}</p>}
+          {message && <p className="text-green-500 mb-2">{message}</p>}
           
           <button
             onClick={handleSubmit}
@@ -77,26 +76,6 @@ const InsertM3C = () => {
           >
             Envoyer le fichier
           </button>
-
-          {/* Afficher le contenu du fichier */}
-          {fileContent && (
-            <div className="mt-6 bg-white p-4 rounded shadow-md">
-              <h2 className="text-lg font-bold mb-2">Contenu du fichier :</h2>
-              <table className="table-auto w-full">
-                <tbody>
-                  {fileContent.map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
-                        <td key={cellIndex} className="border px-2 py-1">
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
         </div>
       </div>
     </>
