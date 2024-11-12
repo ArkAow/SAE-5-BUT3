@@ -1,11 +1,11 @@
 import React from "react";
-import Header from "../Header/Header";
+import Header from "../header/header";
 
 const SeePrevi = () => {
   return (
     <>
       <Header />
-      <div>
+      <div className="min-h-screen bg-cover bg-center bg-landscape">
         <h1>SeePrevi</h1>
       </div>
     </>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LoginHeader from "../header/header.js"; // Composant de l'en-tête
+import LoginHeader from "../header/header"; // Composant de l'en-tête
 import '../../styles.css'
 
 const Login = ({ setIsAuthenticated }) => {
