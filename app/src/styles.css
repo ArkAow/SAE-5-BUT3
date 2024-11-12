@@ -1,0 +1,15 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer components {
+    .btn-primary {
+      @apply w-[220px] py-2 mt-6 bg-primary text-white font-bold text-lg rounded-md transform hover:scale-105;
+    }
+    .btn-header {
+      @apply w-6 h-6 cursor-pointer hover:opacity-50 ;
+    }
+  }
+  
+
+  
