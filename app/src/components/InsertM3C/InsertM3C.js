@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Header from "../header/header";
+import Header from "../header/header.js";
 import routes from "../../Routes/routes";
 
 const InsertM3C = () => {
