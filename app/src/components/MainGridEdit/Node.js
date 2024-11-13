@@ -16,37 +16,49 @@ const Node = ({ positionKey, items, moveItem }) => {
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const visibleItem = items[0];
-  const hiddenItemsCount = items.length - 1;
+  const visibleItems = items.slice(0, 3);
+  const remainingItemsCount = items.length > 3 ? items.length - 3 : 0;
 
   return (
     <div
       ref={drop}
-      className="w-20 h-20 bg-white border border-opacity-75 border-gray-300 flex justify-center items-center relative"
+      className="w-20 h-20 bg-white border border-opacity-75 border-gray-300 relative p-1"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {visibleItem && (
+      {items.length === 1 && (
         <DraggableRectangle
-          key={visibleItem.id}
-          color={visibleItem.color}
+          color={items[0].color}
           positionKey={positionKey}
         />
       )}
 
-      {hiddenItemsCount > 0 && (
-        <div className="absolute bottom-0 right-0 text-xs text-gray-600 bg-white rounded-full px-1">
-          +{hiddenItemsCount}
+      {items.length > 1 && (
+        <div className="w-full h-full grid grid-cols-2 grid-rows-2 gap-1 relative">
+          {visibleItems.map((item, index) => (
+            <div
+              key={item.id}
+              className="w-full h-full rounded-md border border-black"
+              style={{
+                backgroundColor: item.color,
+              }}
+            ></div>
+          ))}
+
+          {remainingItemsCount > 0 && (
+            <div className="w-full h-full flex items-center justify-center text-black text-xs font-bold">
+              +{remainingItemsCount}
+            </div>
+          )}
         </div>
       )}
 
       {isHovered && items.length > 0 && (
-        <div className="absolute top-0 left-full ml-2 p-2 bg-gray-700 text-white text-xs rounded shadow-lg z-10 w-32 opacity-75">
+        <div className="absolute top-0 left-full ml-2 p-2 bg-gray-700 text-white text-xs rounded shadow-lg z-10 w-32">
           {items.map((item) => (
             <div key={item.id} className="mb-1">
               <strong>ID:</strong> {item.id} <br />
-              <strong>Color:</strong> {item.color}<br />
-              <strong>----------</strong>
+              <strong>Color:</strong> {item.color}
             </div>
           ))}
         </div>
