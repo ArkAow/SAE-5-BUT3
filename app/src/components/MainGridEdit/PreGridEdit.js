@@ -10,10 +10,10 @@ const PreGridEdit = () => {
   };
 
   return (
-    <>
+    <div>
       <Header />
       <div className="min-h-screen flex justify-center items-start bg-cover bg-center bg-landscape py-10">
-        <div className="flex justify-center items-start bg-red-600">
+        <div className="flex justify-center items-start bg-red-600 mt-20">
           <select>
             <option value="A1">A1</option>
             <option value="A2">A2</option>
@@ -29,7 +29,7 @@ const PreGridEdit = () => {
           Confirmer
         </button>
       </div>
-    </>
+    </div>
   );
 };
 
