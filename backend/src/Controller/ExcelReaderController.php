@@ -14,42 +14,80 @@ class ExcelReaderController extends AbstractController
     public function readExcel(string $id): JsonResponse
     {
         $filePath = $this->getParameter('kernel.project_dir') . "/public/uploads/M3C_{$id}.xlsx";
-
         if (!file_exists($filePath)) {
             return new JsonResponse(['error' => "Le fichier M3C_{$id}.xlsx n'existe pas."], Response::HTTP_NOT_FOUND);
         }
 
         $spreadsheet = IOFactory::load($filePath);
-        $worksheet = $spreadsheet->getActiveSheet();                    
+        $worksheet = $spreadsheet->getActiveSheet();
+        $sections = $this->extractSections($worksheet);
 
-        $data = [];
-        foreach ($worksheet->getRowIterator(10, 26) as $row) {
-            $rowData = [
-                'intitule' => $worksheet->getCell('B' . $row->getRowIndex())->getValue(),
-                'code_apogee' => $worksheet->getCell('C' . $row->getRowIndex())->getValue(),
-                'CM' => $worksheet->getCell('E' . $row->getRowIndex())->getValue(),
-                'TD' => $worksheet->getCell('F' . $row->getRowIndex())->getValue(),
-                'TP' => $worksheet->getCell('G' . $row->getRowIndex())->getValue(),
-                'heures_projet' => $worksheet->getCell('H' . $row->getRowIndex())->getValue(),
-                'total' => $worksheet->getCell('I' . $row->getRowIndex())->getCalculatedValue(),
-            ];
-            $data[] = $rowData;
+        return new JsonResponse(['sections' => $sections]);
+    }
+
+    private function extractSections($worksheet)
+    {
+        $sections = [];
+        $currentSection = [];
+        $isSectionActive = false;
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            $rowIndex = $row->getRowIndex();
+            $intitule = $worksheet->getCell('B' . $rowIndex)->getValue();
+
+            if ($this->isStartOfSection($intitule)) {
+                if ($isSectionActive && !empty($currentSection)) {
+                    $sections[] = $currentSection;
+                }
+                $currentSection = [];
+                $isSectionActive = true;
+            }
+
+            if ($isSectionActive && $this->isEndOfSection($intitule)) {
+                $currentSection[] = $this->getRowData($worksheet, $rowIndex);
+                $sections[] = $currentSection;
+                $isSectionActive = false;
+                continue;
+            }
+
+            if ($isSectionActive && $this->isRowUseful($intitule)) {
+                $currentSection[] = $this->getRowData($worksheet, $rowIndex);
+            }
         }
 
-        $data2 = [];
-        foreach ($worksheet->getRowIterator(62, 76) as $row) {
-            $rowData = [
-                'intitule' => $worksheet->getCell('B' . $row->getRowIndex())->getValue(),
-                'code_apogee' => $worksheet->getCell('C' . $row->getRowIndex())->getValue(),
-                'CM' => $worksheet->getCell('E' . $row->getRowIndex())->getValue(),
-                'TD' => $worksheet->getCell('F' . $row->getRowIndex())->getValue(),
-                'TP' => $worksheet->getCell('G' . $row->getRowIndex())->getValue(),
-                'heures_projet' => $worksheet->getCell('H' . $row->getRowIndex())->getValue(),
-                'total' => $worksheet->getCell('I' . $row->getRowIndex())->getCalculatedValue(),
-            ];
-            $data2[] = $rowData;
+        if ($isSectionActive && !empty($currentSection)) {
+            $sections[] = $currentSection;
         }
 
-        return new JsonResponse(['data' => $data, 'data2' => $data2]);
+        return $sections;
+    }
+
+    private function getRowData($worksheet, $rowIndex)
+    {
+        return [
+            'intitule' => $worksheet->getCell('B' . $rowIndex)->getValue(),
+            'code_apogee' => $worksheet->getCell('C' . $rowIndex)->getValue(),
+            'CM' => $worksheet->getCell('E' . $rowIndex)->getValue(),
+            'TD' => $worksheet->getCell('F' . $rowIndex)->getValue(),
+            'TP' => $worksheet->getCell('G' . $rowIndex)->getValue(),
+            'heures_projet' => $worksheet->getCell('H' . $rowIndex)->getValue(),
+            'total' => $worksheet->getCell('I' . $rowIndex)->getCalculatedValue(),
+        ];
+    }
+
+    private function isStartOfSection($intitule)
+    {
+        return strpos($intitule, 'SAE') === 0;
+    }
+
+    private function isEndOfSection($intitule)
+    {
+        return preg_match('/^R\d+\.\d+$/', $intitule);
+    }
+
+    private function isRowUseful($intitule)
+    {
+        $projectKeyword = "SAE";
+        return preg_match("/^($projectKeyword.[1-6]|R[1-6])/", $intitule) || in_array($intitule, ['Stage', 'Portfolio']);        
     }
 }
