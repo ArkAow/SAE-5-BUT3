@@ -36,7 +36,14 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
 
       <div className={`grid grid-rows-4 gap-3 items-center mt-4 transition-all ${
         delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
-        <CourseButton onClick={addItem} setSelectedColor={setSelectedColor}/>
+        <CourseButton 
+          selectedRow={selectedRow}
+          setSelectedRow={setSelectedRow}
+          selectedCol={selectedCol}
+          setSelectedCol={setSelectedCol}
+          selectedColor={selectedColor}
+          setSelectedColor={setSelectedColor}
+          addItem={addItem}/>
         <GroupButton />
         <CommentaryButton />
         <PrintButton />
