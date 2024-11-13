@@ -4,8 +4,8 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel";
 
-const GRID_ROW_LENGTH = 4;
-const GRID_COL_LENGTH = 8;
+const GRID_ROW_LENGTH = 16;
+const GRID_COL_LENGTH = 10;
 
 const MainGrid = () => {
   const [items, setItems] = useState({});
@@ -60,10 +60,9 @@ const MainGrid = () => {
           setSelectedCol={setSelectedCol}
           selectedColor={selectedColor}
           setSelectedColor={setSelectedColor}
-          addItem={addItem}
-        />
+          addItem={addItem}/>
         
-        <div className="flex flex-col items-center mt-10">
+        <div className="flex flex-col items-center mt-10 rounded-lg overflow-auto max-h-[25rem] max-w-[60rem]">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
               {row.map((node, nodeIndex) => {
@@ -74,8 +73,7 @@ const MainGrid = () => {
                     key={nodeIndex}
                     positionKey={positionKey}
                     items={cellItems}
-                    moveItem={moveItem}
-                  />
+                    moveItem={moveItem}/>
                 );
               })}
             </div>
