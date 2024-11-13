@@ -29,6 +29,7 @@ final class create_expected_duration_table extends AbstractMigration
         $table->setPrimaryKey(['id']);
     }
 
+    //Suppression de la table si down des migrations
     public function down(Schema $schema): void
     {
         $schema->dropTable('Expected_Duration');
