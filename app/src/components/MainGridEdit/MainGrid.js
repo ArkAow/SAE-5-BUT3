@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
-import ControlPanel from "./ControlPanel";
+import ControlPanel from "./ControlPanel/ControlPanel";
 
 const GRID_ROW_LENGTH = 16;
 const GRID_COL_LENGTH = 10;
@@ -52,7 +52,7 @@ const MainGrid = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="min-h-screen flex justify-center items-start bg-cover bg-center bg-landscape py-10">
+      <div className="min-h-screen flex pl-6 justify-left items-start bg-cover bg-center bg-landscape py-10">
         <ControlPanel
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
