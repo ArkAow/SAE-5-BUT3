@@ -9,6 +9,9 @@
     .btn-header {
       @apply w-6 h-6 cursor-pointer hover:opacity-50 ;
     }
+    .btn-control-panel {
+      @apply w-16 h-16 bg-secondary rounded-xl flex items-center justify-center
+    }
   }
 
 /* Classe pour personnaliser la scrollbar dans l’infobulle */
