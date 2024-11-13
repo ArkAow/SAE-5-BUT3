@@ -1,5 +1,6 @@
 import React from "react";
 import { useDrag } from "react-dnd";
+import { getShade } from "../../services/colorService";
 
 const ITEM_TYPE = "rectangle";
 
@@ -15,10 +16,11 @@ const DraggableRectangle = ({ color, positionKey }) => {
   return (
     <div
       ref={drag}
-      className="size-16 m-1 rounded border-2 border-black cursor-grab transition-opacity duration-200"
+      className="size-16 m-1 rounded-lg border-2 cursor-grab transition-opacity duration-200"
       style={{
         backgroundColor: color,
         opacity: isDragging ? 0.5 : 1,
+        borderColor: getShade(color),
       }}
     ></div>
   );

@@ -52,7 +52,7 @@ const MainGrid = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="overflow-x-hidden min-h-screen flex justify-center items-start bg-cover bg-center bg-landscape py-10">
+      <div className="min-h-screen flex justify-center items-start bg-cover bg-center bg-landscape py-10">
         <ControlPanel
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}

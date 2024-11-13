@@ -10,6 +10,27 @@
       @apply w-6 h-6 cursor-pointer hover:opacity-50 ;
     }
   }
+
+/* Classe pour personnaliser la scrollbar dans l’infobulle */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Pour Firefox */
+  scrollbar-color: #4a5568 #2d3748; /* Couleurs de la scrollbar et du fond pour Firefox */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Largeur de la scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #2d3748; /* Couleur du fond de la scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4a5568; /* Couleur de la scrollbar */
+  border-radius: 4px; /* Arrondir la scrollbar */
+  border: 2px solid transparent; /* Espace autour du scrollbar */
+  background-clip: padding-box; /* Assure que la bordure est visible */
+}
   
 
   
