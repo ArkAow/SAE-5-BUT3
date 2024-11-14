@@ -20,7 +20,7 @@ export const CourseButton = ({
       </button>
 
       {showTooltip && (
-        <div className="absolute z-10 top-72 left-16 w-52 p-3 bg-white shadow-lg rounded-lg">
+        <div className="absolute z-[5px] top-0 left-16 w-52 p-3 bg-white shadow-lg rounded-lg">
             <h3 className="mb-5">Ajouter un rectangle</h3>
             <div className="flex flex-row">
             <label className="mr-2 text-clip text-nowrap">Ligne :</label>
