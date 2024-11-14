@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 /**
  * @ORM\Entity
  */
+#[ORM\Table(name: 'Group')]
 class Group
 {
     /**

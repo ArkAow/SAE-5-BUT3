@@ -3,30 +3,22 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CourseTypeRepository;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity(repositoryClass: CourseTypeRepository::class)]
+#[ORM\Table(name: 'CourseType')]
 class CourseType
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=20, unique=true)
-     */
+    #[ORM\Column(type: 'string', length: 50, unique: true)]
     private string $name;
 
-    /**
-     * @ORM\Column(type="string", length=7) // Format couleur hexadécimal
-     */
+    #[ORM\Column(type: 'string', length: 7)]
     private string $color;
-
-    // Getters and Setters
 
     public function getId(): ?int
     {

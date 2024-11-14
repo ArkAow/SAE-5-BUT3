@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 /**
  * @ORM\MappedSuperclass
  */
+#[ORM\Table(name: 'Teacher')]
 abstract class Teacher
 {
     /**

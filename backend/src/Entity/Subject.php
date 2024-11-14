@@ -3,35 +3,25 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\SubjectRepository;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity(repositoryClass: SubjectRepository::class)]
+#[ORM\Table(name: 'Subject')]
 class Subject
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=50, unique=true)
-     */
+    #[ORM\Column(type: 'string', length: 50)]
     private string $name;
-    
-    /**
-     * @ORM\Column(type="string", length=50, unique=true)
-     */
+
+    #[ORM\Column(type: 'string', length: 10, unique: true)]
     private string $code;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private int $duration;
-
-    // Getters and Setters
+    #[ORM\Column(type: 'integer')]
+    private int $expectedDuration;
 
     public function getId(): ?int
     {
@@ -60,14 +50,14 @@ class Subject
         return $this;
     }
 
-    public function getDuration(): int
+    public function getExpectedDuration(): int
     {
-        return $this->duration;
+        return $this->expectedDuration;
     }
 
-    public function setDuration(int $duration): self
+    public function setExpectedDuration(int $expectedDuration): self
     {
-        $this->duration = $duration;
+        $this->expectedDuration = $expectedDuration;
         return $this;
     }
 }
