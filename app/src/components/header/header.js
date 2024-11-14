@@ -16,7 +16,7 @@ const Header = () => {
     navigate("/homePage");
   };
   return (
-    <div className="flex w-full fixed top-0 z-20 justify-between items-center bg-primary p-2">
+    <div className="flex w-full fixed top-0 z-20 justify-between items-center bg-primary p-2"style={{ WebkitAppRegion: "drag"}}>
       <div className="flex items-center">
         <img
           src="/images/Universite_de_Limoges_white.png"

@@ -62,7 +62,7 @@ const MainGrid = () => {
           setSelectedColor={setSelectedColor}
           addItem={addItem}/>
         
-        <div className="flex flex-col items-center mt-10 rounded-lg overflow-auto max-h-[25rem] max-w-[60rem]">
+        <div className="flex flex-col items-center mt-10 rounded-lg overflow-auto max-h-[25rem] max-w-[60rem] mr-20">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
               {row.map((node, nodeIndex) => {
