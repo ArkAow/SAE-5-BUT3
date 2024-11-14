@@ -7,14 +7,21 @@ import { PrintButton } from "./PrintButton";
 const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol, selectedColor, setSelectedColor, addItem }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [delayedExpanded, setDelayedExpanded] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleToggleExpand = () => {
-    if (!isExpanded) {
-      setTimeout(() => setDelayedExpanded(true), 300);
-    } else {
-      setDelayedExpanded(false);
-    }
-    setIsExpanded(!isExpanded);
+    if (isButtonDisabled) return;
+    setIsButtonDisabled(true);
+    setIsExpanded((prev) => {
+      const newExpandedState = !prev;
+      if (newExpandedState) {
+        setTimeout(() => setDelayedExpanded(true), 300);
+      } else {
+        setDelayedExpanded(false);
+      }
+      return newExpandedState;
+    });
+    setTimeout(() => setIsButtonDisabled(false), 300);
   };
 
   return (
@@ -27,7 +34,8 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
         className={`${
           isExpanded
             ? "w-10 h-10 bg-secondary rounded-full flex items-center justify-center"
-            : "w-10 h-10 bg-white rounded-lg flex items-center justify-center"}`}>
+            : "w-10 h-10 bg-white rounded-lg flex items-center justify-center"}`}
+        disabled={isButtonDisabled}>
         <img
           src={isExpanded ? "/images/minus.svg" : "/images/plus.svg"}
           alt={isExpanded ? "collapse icon" : "expand icon"}
