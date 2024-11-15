@@ -73,10 +73,10 @@ const MainGrid = () => {
           <div
             className="grid"
             style={{
-              gridTemplateColumns: `60px repeat(${GRID_COL_LENGTH}, minmax(5rem, 1fr))`,
+              gridTemplateColumns: `40px repeat(${GRID_COL_LENGTH}, minmax(5rem, 1fr))`,
             }}>
 
-            <div className="w-20 h-6"></div>
+            <div className="w-10 h-6"></div>
             {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => (
               <div
                 key={`col-label-${colIndex}`}
@@ -87,7 +87,7 @@ const MainGrid = () => {
 
             {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
               <React.Fragment key={`row-${rowIndex}`}>
-                <div className="h-20 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
                   S{rowIndex + 1}
                 </div>
                 {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => {
