@@ -26,7 +26,7 @@ const Node = ({ positionKey, items, moveItem }) => {
   return (
     <div
       ref={drop}
-      className="w-20 h-20 bg-white border border-opacity-75 border-gray-300 relative p-1"
+      className="relative w-20 h-20 bg-white border border-opacity-75 border-gray-300  p-1"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
       {items.length === 1 && (
@@ -38,7 +38,7 @@ const Node = ({ positionKey, items, moveItem }) => {
       )}
 
       {items.length > 1 && (
-        <div className="w-full h-full grid grid-cols-2 grid-rows-2 gap-1 relative">
+        <div className="relative z-[3px] w-full h-full grid grid-cols-2 grid-rows-2 gap-1">
           {visibleItems.map((item, index) => (
             <div
               key={item.id}
@@ -50,7 +50,7 @@ const Node = ({ positionKey, items, moveItem }) => {
             ></div>
           ))}
           {remainingItemsCount > 0 && (
-            <div className="w-full h-full flex items-center justify-center text-black text-xs font-bold">
+            <div className="relative w-full h-full flex items-center justify-center text-black text-xs font-bold">
               +{remainingItemsCount}
             </div>
           )}

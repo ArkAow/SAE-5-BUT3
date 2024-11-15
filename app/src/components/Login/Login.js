@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginHeader from "../header/header"; // Composant de l'en-tête
-import "../../styles.css";
 
 const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
@@ -33,10 +32,8 @@ const Login = ({ setIsAuthenticated }) => {
   return (
     <>
       <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col items-center">
-        <div className="w-full">
-          <LoginHeader />
-        </div>
-        <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-8 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
+        <LoginHeader />
+        <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
           <form
             onSubmit={handleSubmit}
             className="flex flex-col items-center w-full"

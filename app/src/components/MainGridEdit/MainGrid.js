@@ -52,7 +52,7 @@ const MainGrid = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="min-h-screen flex pl-6 justify-left items-start bg-cover bg-center bg-landscape py-10">
+      <div className="min-h-screen flex pl-6 justify-center items-start bg-cover bg-center bg-landscape py-10">
         <ControlPanel
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
@@ -62,7 +62,7 @@ const MainGrid = () => {
           setSelectedColor={setSelectedColor}
           addItem={addItem}/>
         
-        <div className="flex flex-col items-center mt-10 rounded-lg overflow-auto max-h-[25rem] max-w-[60rem]">
+        <div className="flex flex-col items-center mt-10 rounded-lg overflow-auto max-h-[25rem] max-w-[60rem] mr-20">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
               {row.map((node, nodeIndex) => {

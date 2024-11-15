@@ -54,7 +54,7 @@ const InsertM3C = () => {
     <>
       <Header />
       <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col pt-10">
-        <div className="flex flex-col items-center w-1/2 justify-center max-w-[60%] mx-auto mt-8 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
+        <div className="flex flex-col items-center w-1/2 justify-center max-w-[60%] mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
           <h1 className="text-white text-2xl mb-4">Insérez votre fichier MCCC</h1>
           
           <input

@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import Grid from "./MainGrid";
+import React from "react";
+import MainGrid from "./MainGrid";
 import Header from "../header/header";
 
 const MainPreviEdit = () => {
   return (
     <div className="MainPreviEdit">
       <Header />
-      <Grid />
+      <MainGrid />
     </div>
   );
 };
