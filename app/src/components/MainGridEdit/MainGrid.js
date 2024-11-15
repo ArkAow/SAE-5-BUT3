@@ -58,7 +58,7 @@ const MainGrid = () => {
             className="ml-2 w-4 h-4"/>
         </button>
 
-        <select className="w-fit h-10 mt-2 px-4 py-2 text-white bg-primary border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-primarytint focus:outline-none">
+        <select className="w-fit h-10 mt-2 px-4 py-2 text-white bg-primary focus:border focus:border-gray-300 rounded-full shadow-sm">
           <option value="" disabled selected>
             Sélectionnez une ressource
           </option>
@@ -80,14 +80,14 @@ const MainGrid = () => {
             {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => (
               <div
                 key={`col-label-${colIndex}`}
-                className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                className={`w-full h-6 bg-gray-200 ${colIndex==0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
                 G{colIndex + 1}
               </div>
             ))}
 
             {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
               <React.Fragment key={`row-${rowIndex}`}>
-                <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                <div className={`h-20 w-10 bg-gray-200 ${rowIndex==0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
                   S{rowIndex + 1}
                 </div>
                 {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => {
