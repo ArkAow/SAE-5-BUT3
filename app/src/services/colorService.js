@@ -34,3 +34,22 @@ export function convertHexaToDeci(colorHexadecimalCode) {
 
     return decimalColors;
 }
+
+export function isBlack(colorCode) {
+
+    let decimalColors;
+    if (colorCode.startsWith("#")) {
+        decimalColors = convertHexaToDeci(colorCode);
+    } else {
+        decimalColors = colorCode; 
+    }
+
+   
+    const [r, g, b] = decimalColors;
+
+    
+    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+    
+    return luminance < 128;
+}
