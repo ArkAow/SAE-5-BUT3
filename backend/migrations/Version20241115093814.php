@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241114084509 extends AbstractMigration
+final class Version20241115093814 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -25,7 +25,7 @@ final class Version20241114084509 extends AbstractMigration
         $half_group->addColumn('id', 'integer', ['autoincrement' => true]);
         $half_group->addColumn('name', 'string', ['length' => 20]);
         $half_group->setPrimaryKey(['id']);
-          
+        
         // Table Group
 
         $group = $schema->createTable('group');
@@ -115,8 +115,8 @@ final class Version20241114084509 extends AbstractMigration
         // Table Course - Subject
         
         $course_subject = $schema->createTable('course_subject');
-        $course_subject->addColumn('id_course', 'integer');
-        $course_subject->addColumn('id_subject', 'integer');
+        $course_subject->addColumn('course_id', 'integer');
+        $course_subject->addColumn('subject_id', 'integer');
         $course_subject->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
         $course_subject->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
 
@@ -197,7 +197,6 @@ final class Version20241114084509 extends AbstractMigration
         $partTimeTutor->addColumn('id', 'integer');
         $partTimeTutor->addColumn('hourly_constraint', 'string', ['length' => 500]);
         $partTimeTutor->addForeignKeyConstraint($teacher, ['id'], ['id'], ['onDelete' => 'CASCADE']);
-        $partTimeTutor->setPrimaryKey(columnNames: ['id']);
 
         // Table User
 
