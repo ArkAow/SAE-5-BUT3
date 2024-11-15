@@ -5,7 +5,7 @@ import { getShade } from "../../services/colorService";
 
 const ITEM_TYPE = "rectangle";
 
-const Node = ({ positionKey, items, moveItem }) => {
+const Node = ({ positionKey, items, moveItem}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -18,40 +18,27 @@ const Node = ({ positionKey, items, moveItem }) => {
     },
   });
 
-  // Calculer la position (ligne et colonne) à partir de la clé
-  const [row, col] = positionKey.split("-").map(Number);
+  const visibleItems = items?.slice(0, 3) || [];
+  const remainingItemsCount = items?.length > 3 ? items.length - 3 : 0;
 
-  const visibleItems = items.slice(0, 3);
-  const remainingItemsCount = items.length > 3 ? items.length - 3 : 0;
-
-  const showTooltip = isHovered && items.length > 1 && !isDragging;
+  const showTooltip = isHovered && items?.length > 1 && !isDragging;
 
   return (
     <div
       ref={drop}
-      className="relative w-20 h-20 bg-white border border-opacity-75 border-gray-300 p-1"
+      className="relative min-w-20 h-20 bg-white justify-items-center border border-opacity-75 border-gray-300 p-1"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      
-      {col === 0 && (
-        <div className="absolute top-0 left-0 flex items-center justify-center w-6 h-full bg-gray-200 text-black text-sm font-bold border-r border-gray-300">
-          S{row + 1}
-        </div>
-      )}
-
-      {/* Contenu de la cellule */}
-      {items.length === 1 && (
+      onMouseLeave={() => setIsHovered(false)}>
+      {items?.length === 1 && (
         <DraggableRectangle
           color={items[0].color}
           positionKey={positionKey}
           onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setIsDragging(false)}
-        />
+          onDragEnd={() => setIsDragging(false)}/>
       )}
 
-      {items.length > 1 && (
-        <div className="relative z-[3px] w-full h-full grid grid-cols-2 grid-rows-2 gap-1">
+      {items?.length > 1 && (
+        <div className="relative w-full h-full grid grid-cols-2 grid-rows-2 gap-1">
           {visibleItems.map((item, index) => (
             <div
               key={item.id}
@@ -59,8 +46,8 @@ const Node = ({ positionKey, items, moveItem }) => {
               style={{
                 backgroundColor: item.color,
                 borderColor: getShade(item.color),
-              }}
-            ></div>
+              }}>
+            </div>
           ))}
           {remainingItemsCount > 0 && (
             <div className="relative w-full h-full flex items-center justify-center text-black text-xs font-bold">
@@ -70,7 +57,6 @@ const Node = ({ positionKey, items, moveItem }) => {
         </div>
       )}
 
-      {/* Tooltip si nécessaire */}
       {showTooltip && (
         <div
           className="absolute top-0 left-full p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar"
@@ -78,8 +64,7 @@ const Node = ({ positionKey, items, moveItem }) => {
             maxHeight: "300px",
             overflowY: "auto",
             backgroundColor: "rgba(55, 65, 81, 0.90)",
-          }}
-        >
+          }}>
           {items.map((item) => (
             <div key={item.id} className="mb-1 text-white">
               <DraggableRectangle
@@ -88,8 +73,7 @@ const Node = ({ positionKey, items, moveItem }) => {
                 id={item.id}
                 small
                 onDragStart={() => setIsDragging(true)}
-                onDragEnd={() => setIsDragging(false)}
-              />
+                onDragEnd={() => setIsDragging(false)}/>
               <strong>ID:</strong> {item.id} <br />
               <strong>Color:</strong> {item.color}
               <br />

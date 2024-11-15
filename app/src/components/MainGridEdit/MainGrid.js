@@ -4,15 +4,14 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 
-const GRID_ROW_LENGTH = 16;
-const GRID_COL_LENGTH = 16;
+const GRID_ROW_LENGTH = 25;
+const GRID_COL_LENGTH = 10;
 
 const MainGrid = () => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
   const [selectedColor, setSelectedColor] = useState("#FFD700");
-  const [selectedResource, setSelectedResource] = useState("");
 
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
@@ -37,20 +36,6 @@ const MainGrid = () => {
     });
   };
 
-  const createGrid = () => {
-    const grid = [];
-    for (let row = 0; row < GRID_ROW_LENGTH; row++) {
-      const currentRow = [];
-      for (let col = 0; col < GRID_COL_LENGTH; col++) {
-        currentRow.push({ row, col });
-      }
-      grid.push(currentRow);
-    }
-    return grid;
-  };
-
-  const grid = createGrid();
-
   return (
     <div className="min-h-screen bg-cover bg-center bg-landscape py-10">
       <div className="flex items-center justify-start gap-5 h-20 px-10">
@@ -62,7 +47,7 @@ const MainGrid = () => {
             setSelectedCol={setSelectedCol}
             selectedColor={selectedColor}
             setSelectedColor={setSelectedColor}
-            addItem={addItem}/>          
+            addItem={addItem}/>
         </div>
 
         <button className="flex min-w-fit h-10 ml-24 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint focus:outline-none">
@@ -70,8 +55,7 @@ const MainGrid = () => {
           <img
             src="/images/right-arrow.svg"
             alt="Right Arrow"
-            className="ml-2 w-4 h-4"
-          />
+            className="ml-2 w-4 h-4"/>
         </button>
 
         <select className="w-fit h-10 mt-2 px-4 py-2 text-white bg-primary border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-primarytint focus:outline-none">
@@ -85,22 +69,41 @@ const MainGrid = () => {
       </div>
 
       <DndProvider backend={HTML5Backend}>
-        <div className="flex flex-col items-start ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[75vw]">
-          {grid.map((row, rowIndex) => (
-            <div key={rowIndex} className="flex">
-              {row.map((node, nodeIndex) => {
-                const positionKey = `${node.row}-${node.col}`;
-                const cellItems = items[positionKey] || [];
-                return (
-                  <Node
-                    key={nodeIndex}
-                    positionKey={positionKey}
-                    items={cellItems}
-                    moveItem={moveItem}/>
-                );
-              })}
-            </div>
-          ))}
+        <div className="ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[85vw]">
+          <div
+            className="grid"
+            style={{
+              gridTemplateColumns: `40px repeat(${GRID_COL_LENGTH}, minmax(5rem, 1fr))`,
+            }}>
+
+            <div className="w-10 h-6"></div>
+            {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => (
+              <div
+                key={`col-label-${colIndex}`}
+                className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                G{colIndex + 1}
+              </div>
+            ))}
+
+            {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
+              <React.Fragment key={`row-${rowIndex}`}>
+                <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                  S{rowIndex + 1}
+                </div>
+                {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => {
+                  const positionKey = `${rowIndex}-${colIndex}`;
+                  const cellItems = items[positionKey] || [];
+                  return (
+                    <Node
+                      key={positionKey}
+                      positionKey={positionKey}
+                      items={cellItems}
+                      moveItem={moveItem}/>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       </DndProvider>
     </div>
