@@ -33,7 +33,7 @@ const Node = ({ positionKey, items, moveItem }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Afficher l'étiquette si c'est la première colonne */}
+      
       {col === 0 && (
         <div className="absolute top-0 left-0 flex items-center justify-center w-6 h-full bg-gray-200 text-black text-sm font-bold border-r border-gray-300">
           S{row + 1}

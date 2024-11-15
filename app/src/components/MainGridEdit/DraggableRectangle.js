@@ -1,6 +1,6 @@
 import React from "react";
 import { useDrag } from "react-dnd";
-import { getShade } from "../../services/colorService";
+import { getShade, isBlack } from "../../services/colorService";
 
 const ITEM_TYPE = "rectangle";
 
@@ -12,17 +12,31 @@ const DraggableRectangle = ({ color, positionKey }) => {
       isDragging: monitor.isDragging(),
     }),
   });
+  const handleClick = () => {
+    alert("I'm gonna brown ! ");
+    
+  };
 
   return (
     <div
       ref={drag}
-      className="size-16 m-1 rounded-lg border-2 cursor-grab transition-opacity duration-200"
+      className="relative size-16 m-1 rounded-lg border-2 cursor-grab transition-opacity duration-200"
       style={{
         backgroundColor: color,
         opacity: isDragging ? 0.5 : 1,
         borderColor: getShade(color),
       }}
-    ></div>
+    >
+    <img
+    src={`${isBlack(color) ? "images/cogWheel-white.svg" : "images/cogWheel-black.svg"}`}
+    alt="cogWheel"
+    className={`absolute -top-3 -right-2 m-1 w-4 h-4 rounded-full`}
+    style={{ backgroundColor: color }}
+    onClick={handleClick}
+    />
+
+      
+    </div>
   );
 };
 
