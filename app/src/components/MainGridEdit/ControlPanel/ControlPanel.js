@@ -33,7 +33,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
         onClick={handleToggleExpand}
         className={`${
           isExpanded
-            ? "w-10 h-10 bg-secondary rounded-full flex items-center justify-center"
+            ? "w-10 h-10 bg-primaryshade rounded-full flex items-center justify-center"
             : "w-10 h-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
         <img
