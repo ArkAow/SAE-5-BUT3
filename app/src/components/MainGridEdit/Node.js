@@ -18,6 +18,9 @@ const Node = ({ positionKey, items, moveItem }) => {
     },
   });
 
+  // Calculer la position (ligne et colonne) à partir de la clé
+  const [row, col] = positionKey.split("-").map(Number);
+
   const visibleItems = items.slice(0, 3);
   const remainingItemsCount = items.length > 3 ? items.length - 3 : 0;
 
@@ -26,15 +29,25 @@ const Node = ({ positionKey, items, moveItem }) => {
   return (
     <div
       ref={drop}
-      className="relative w-20 h-20 bg-white border border-opacity-75 border-gray-300  p-1"
+      className="relative w-20 h-20 bg-white border border-opacity-75 border-gray-300 p-1"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}>
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Afficher l'étiquette si c'est la première colonne */}
+      {col === 0 && (
+        <div className="absolute top-0 left-0 flex items-center justify-center w-6 h-full bg-gray-200 text-black text-sm font-bold border-r border-gray-300">
+          S{row + 1}
+        </div>
+      )}
+
+      {/* Contenu de la cellule */}
       {items.length === 1 && (
         <DraggableRectangle
           color={items[0].color}
           positionKey={positionKey}
           onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setIsDragging(false)}/>
+          onDragEnd={() => setIsDragging(false)}
+        />
       )}
 
       {items.length > 1 && (
@@ -57,6 +70,7 @@ const Node = ({ positionKey, items, moveItem }) => {
         </div>
       )}
 
+      {/* Tooltip si nécessaire */}
       {showTooltip && (
         <div
           className="absolute top-0 left-full p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar"
@@ -64,7 +78,8 @@ const Node = ({ positionKey, items, moveItem }) => {
             maxHeight: "300px",
             overflowY: "auto",
             backgroundColor: "rgba(55, 65, 81, 0.90)",
-          }}>
+          }}
+        >
           {items.map((item) => (
             <div key={item.id} className="mb-1 text-white">
               <DraggableRectangle
@@ -73,9 +88,11 @@ const Node = ({ positionKey, items, moveItem }) => {
                 id={item.id}
                 small
                 onDragStart={() => setIsDragging(true)}
-                onDragEnd={() => setIsDragging(false)}/>
+                onDragEnd={() => setIsDragging(false)}
+              />
               <strong>ID:</strong> {item.id} <br />
-              <strong>Color:</strong> {item.color}<br />
+              <strong>Color:</strong> {item.color}
+              <br />
               <strong>--------------</strong>
             </div>
           ))}
