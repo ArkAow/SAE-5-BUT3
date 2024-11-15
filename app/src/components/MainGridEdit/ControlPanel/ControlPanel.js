@@ -27,14 +27,14 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
   return (
     <div
       className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col items-center justify-between ${
-        isExpanded ? "h-[25rem] w-20" : "h-20 w-20"}`}>
+        isExpanded ? "h-[78vh] w-20" : "h-20 w-20"}`}>
 
       <button
         onClick={handleToggleExpand}
         className={`${
           isExpanded
-            ? "w-10 h-10 bg-primaryshade rounded-full flex items-center justify-center"
-            : "w-10 h-10 bg-white rounded-lg flex items-center justify-center"}`}
+            ? "size-10 bg-primaryshade rounded-full flex items-center justify-center"
+            : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
         <img
           src={isExpanded ? "/images/minus.svg" : "/images/plus.svg"}
@@ -42,7 +42,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
           className="w-7 h-7 fill-primary"/>
       </button>
 
-      <div className={`grid grid-rows-4 gap-3 items-center mt-4 transition-all ${
+      <div className={`grid grid-rows-4 gap-4 h-fit mt-4 mb-[11vh] items-center transition-all ${
         delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton 
           selectedRow={selectedRow}
