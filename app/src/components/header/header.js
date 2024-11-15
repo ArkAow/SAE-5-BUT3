@@ -17,9 +17,11 @@ const Header = () => {
   };
   return (
     <div className="flex w-full fixed top-0 z-20 justify-between items-center bg-primary p-2"style={{ WebkitAppRegion: "drag"}}>
+      
       <div className="flex items-center">
         <img
           src="/images/Universite_de_Limoges_white.png"
+          style={{ WebkitAppRegion: "no-drag"}}
           alt="Logo"
           className="size-[6%] mr-2 cursor-pointer hover:opacity-50" onClick={goToHomePage}
         />
