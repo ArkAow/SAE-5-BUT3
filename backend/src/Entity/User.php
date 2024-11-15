@@ -4,27 +4,27 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: "App\Repository\UserRepository")]
-#[ORM\Table(name: "User")]
+#[ORM\Entity]
+#[ORM\Table(name: "user")]
 class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
-    private $id;
+    private int $id;
 
-    #[ORM\Column(type: "string", length: 180, unique: true)]
-    private $email;
+    #[ORM\Column(type: "string", length: 150)]
+    private string $email;
 
-    #[ORM\Column(type: "string")]
-    private $password;
+    #[ORM\Column(type: "string", length: 150)]
+    private string $password;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -32,11 +32,10 @@ class User
     public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -44,7 +43,6 @@ class User
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 }

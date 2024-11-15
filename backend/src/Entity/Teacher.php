@@ -6,48 +6,37 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\MappedSuperclass
- */
-#[ORM\Table(name: 'Teacher')]
-abstract class Teacher
+#[ORM\Entity]
+#[ORM\Table(name: "teacher")]
+class Teacher
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: "string", length: 100)]
     private string $firstName;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: "string", length: 100)]
     private string $lastName;
 
-    /**
-     * @ORM\Column(type="string", unique=true)
-     */
+    #[ORM\Column(type: "string", length: 30)]
     private string $code;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Subject")
-     * @ORM\JoinTable(name="teacher_subjects")
-     */
-    private Collection $teachableSubjects;
+    #[ORM\Column(type: "string", length: 1000)]
+    private string $subjectsTaught;
+
+    #[ORM\ManyToMany(targetEntity: Course::class)]
+    #[ORM\JoinTable(name: "course_teacher")]
+    private Collection $courses;
 
     public function __construct()
     {
-        $this->teachableSubjects = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
-    // Getters and Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -85,22 +74,33 @@ abstract class Teacher
         return $this;
     }
 
-    public function getTeachableSubjects(): Collection
+    public function getSubjectsTaught(): string
     {
-        return $this->teachableSubjects;
+        return $this->subjectsTaught;
     }
 
-    public function addTeachableSubject(Subject $subject): self
+    public function setSubjectsTaught(string $subjectsTaught): self
     {
-        if (!$this->teachableSubjects->contains($subject)) {
-            $this->teachableSubjects->add($subject);
+        $this->subjectsTaught = $subjectsTaught;
+        return $this;
+    }
+
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Course $course): self
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses->add($course);
         }
         return $this;
     }
 
-    public function removeTeachableSubject(Subject $subject): self
+    public function removeCourse(Course $course): self
     {
-        $this->teachableSubjects->removeElement($subject);
+        $this->courses->removeElement($course);
         return $this;
     }
 }

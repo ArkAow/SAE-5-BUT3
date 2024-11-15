@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FileUploadController extends AbstractController
 {
+    private DatasInsertController $datasInsertController;
+
     #[Route('/insertM3C', name: 'insert_m3c', methods: ['POST'])]
     public function uploadFile(Request $request): JsonResponse
     {
@@ -27,11 +29,14 @@ class FileUploadController extends AbstractController
         $uploadsDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads';
 
         try {
-            $fileName = 'M3C_' . uniqid() . '.' . $file->guessExtension();
+            $id = uniqid();
+            $fileName = 'M3C_' . $id . '.' . $file->guessExtension();
             $file->move($uploadsDirectory, $fileName);
         } catch (FileException $e) {
             return new JsonResponse(['success' => false, 'error' => 'Erreur lors du téléchargement du fichier.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
+        $dataInsertionResponse = $this->datasInsertController->insertData($id);
 
         return new JsonResponse(['success' => true, 'message' => 'Fichier téléchargé avec succès.', 'filePath' => '/uploads/' . $fileName]);
     }

@@ -6,27 +6,20 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
-#[ORM\Table(name: 'Promo')]
-class Promo
+#[ORM\Entity]
+#[ORM\Table(name: "class")]
+class Clas
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: "string", length: 20)]
     private string $name;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Group", mappedBy="promo", cascade={"persist", "remove"})
-     */
+    #[ORM\ManyToMany(targetEntity: Group::class)]
+    #[ORM\JoinTable(name: "class_group")]
     private Collection $groups;
 
     public function __construct()
@@ -34,9 +27,7 @@ class Promo
         $this->groups = new ArrayCollection();
     }
 
-    // Getters et Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -60,21 +51,14 @@ class Promo
     public function addGroup(Group $group): self
     {
         if (!$this->groups->contains($group)) {
-            $this->groups[] = $group;
-            $group->setPromo($this);
+            $this->groups->add($group);
         }
-
         return $this;
     }
 
     public function removeGroup(Group $group): self
     {
-        if ($this->groups->removeElement($group)) {
-            if ($group->getPromo() === $this) {
-                $group->setPromo(null);
-            }
-        }
-
+        $this->groups->removeElement($group);
         return $this;
     }
 }

@@ -3,46 +3,31 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
-#[ORM\Table(name: 'Curriculum')]
+#[ORM\Entity]
+#[ORM\Table(name: "curriculum")]
 class Curriculum
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: "string", length: 50)]
     private string $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Promo")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private ?Promo $promo = null;
+    #[ORM\ManyToMany(targetEntity: Clas::class)]
+    #[ORM\JoinTable(name: "curriculum_class")]
+    private Collection $classes;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Semester")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private ?Semester $semester1 = null;
+    public function __construct()
+    {
+        $this->classes = new ArrayCollection();
+    }
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Semester")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private ?Semester $semester2 = null;
-
-    // Getters et Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -58,36 +43,23 @@ class Curriculum
         return $this;
     }
 
-    public function getPromo(): ?Promo
+    public function getClasses(): Collection
     {
-        return $this->promo;
+        return $this->classes;
     }
 
-    public function setPromo(?Promo $promo): self
+    public function addClass(Clas $class): self
     {
-        $this->promo = $promo;
+        if (!$this->classes->contains($class)) {
+            $this->classes->add($class);
+        }
         return $this;
     }
 
-    public function getSemester1(): ?Semester
+    public function removeClass(Clas $class): self
     {
-        return $this->semester1;
-    }
-
-    public function setSemester1(Semester $semester): self
-    {
-        $this->semester1 = $semester;
-        return $this;
-    }
-
-    public function getSemester2(): ?Semester
-    {
-        return $this->semester2;
-    }
-
-    public function setSemester2(Semester $semester): self
-    {
-        $this->semester2 = $semester;
+        $this->classes->removeElement($class);
         return $this;
     }
 }
+

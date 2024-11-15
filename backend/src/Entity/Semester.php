@@ -1,43 +1,32 @@
 <?php
-
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
-#[ORM\Table(name: 'Semester')]
+#[ORM\Entity]
+#[ORM\Table(name: "semester")]
 class Semester
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: "string", length: 50)]
     private string $name;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Subject")
-     * @ORM\JoinTable(name="semester_subject")
-     */
-    private Collection $subjects;
+    #[ORM\ManyToMany(targetEntity: Curriculum::class)]
+    #[ORM\JoinTable(name: "curriculum_semester")]
+    private Collection $curriculums;
 
     public function __construct()
     {
-        $this->subjects = new ArrayCollection();
+        $this->curriculums = new ArrayCollection();
     }
 
-    // Getters et Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -53,23 +42,22 @@ class Semester
         return $this;
     }
 
-    public function getSubjects(): Collection
+    public function getCurriculums(): Collection
     {
-        return $this->subjects;
+        return $this->curriculums;
     }
 
-    public function addSubject(Subject $subject): self
+    public function addCurriculum(Curriculum $curriculum): self
     {
-        if (!$this->subjects->contains($subject)) {
-            $this->subjects[] = $subject;
+        if (!$this->curriculums->contains($curriculum)) {
+            $this->curriculums->add($curriculum);
         }
-
         return $this;
     }
 
-    public function removeSubject(Subject $subject): self
+    public function removeCurriculum(Curriculum $curriculum): self
     {
-        $this->subjects->removeElement($subject);
+        $this->curriculums->removeElement($curriculum);
         return $this;
     }
 }

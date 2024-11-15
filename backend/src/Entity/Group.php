@@ -6,33 +6,20 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
-#[ORM\Table(name: 'Group')]
+#[ORM\Entity]
+#[ORM\Table(name: "group")]
 class Group
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: "string", length: 30)]
     private string $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Promo", inversedBy="groups")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private ?Promo $promo = null;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\HalfGroup", mappedBy="group", cascade={"persist", "remove"})
-     */
+    #[ORM\ManyToMany(targetEntity: HalfGroup::class)]
+    #[ORM\JoinTable(name: "group_half_group")]
     private Collection $halfGroups;
 
     public function __construct()
@@ -40,9 +27,7 @@ class Group
         $this->halfGroups = new ArrayCollection();
     }
 
-    // Getters et Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -58,17 +43,6 @@ class Group
         return $this;
     }
 
-    public function getPromo(): ?Promo
-    {
-        return $this->promo;
-    }
-
-    public function setPromo(?Promo $promo): self
-    {
-        $this->promo = $promo;
-        return $this;
-    }
-
     public function getHalfGroups(): Collection
     {
         return $this->halfGroups;
@@ -77,21 +51,14 @@ class Group
     public function addHalfGroup(HalfGroup $halfGroup): self
     {
         if (!$this->halfGroups->contains($halfGroup)) {
-            $this->halfGroups[] = $halfGroup;
-            $halfGroup->setGroup($this);
+            $this->halfGroups->add($halfGroup);
         }
-
         return $this;
     }
 
     public function removeHalfGroup(HalfGroup $halfGroup): self
     {
-        if ($this->halfGroups->removeElement($halfGroup)) {
-            if ($halfGroup->getGroup() === $this) {
-                $halfGroup->setGroup(null);
-            }
-        }
-
+        $this->halfGroups->removeElement($halfGroup);
         return $this;
     }
 }
