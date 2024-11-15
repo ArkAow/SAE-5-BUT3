@@ -26,7 +26,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
 
   return (
     <div
-      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col items-center justify-between ${
+      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${
         isExpanded ? "h-[83.5vh] w-20" : "h-20 w-20"}`}>
 
       <button
@@ -42,7 +42,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
           className="w-7 h-7 fill-primary"/>
       </button>
 
-      <div className={`grid grid-rows-4 gap-4 h-fit mt-4 mb-[11vh] items-center transition-all ${
+      <div className={`grid grid-rows-4 gap-4 min-h-fit mt-4 justify-items-start transition-all ${
         delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton 
           selectedRow={selectedRow}
