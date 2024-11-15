@@ -85,7 +85,7 @@ const MainGrid = () => {
       </div>
 
       <DndProvider backend={HTML5Backend}>
-        <div className="flex flex-col items-start ml-36 rounded-lg overflow-auto max-h-[70vh] min-h-[25rem] max-w-[75vw]">
+        <div className="flex flex-col items-start ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[75vw]">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex">
               {row.map((node, nodeIndex) => {
