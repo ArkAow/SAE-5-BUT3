@@ -1,55 +1,44 @@
 import React, { useState } from "react";
 import Header from "../header/header.js";
 import routes from "../../Routes/routes";
+import Toast from "../Toast/Toast.js";
 
 const InsertM3C = () => {
-  const [error, setError] = useState("");
   const [file, setFile] = useState(null);
-  const [message, setMessage] = useState("");
+  const [toast, setToast] = useState({ message: "", type: "", visible: false });
 
   const handleFileUpload = (e) => {
     const uploadedFile = e.target.files[0];
     const allowedExtensions = ["csv", "xls", "xlsx"];
-
-    if (uploadedFile) {
-      const fileExtension = uploadedFile.name.split(".").pop().toLowerCase();
-      if (allowedExtensions.includes(fileExtension)) {
-        setError("");
-        setFile(uploadedFile);
-      } else {
-        setError("Veuillez sélectionner un fichier de type .csv, .xls ou .xlsx.");
-        setFile(null);
-      }
+    const fileExtension = uploadedFile?.name.split(".").pop().toLowerCase();
+    if (uploadedFile && allowedExtensions.includes(fileExtension)) {
+      setFile(uploadedFile);
+      setToast({ message: "", visible: false });
+    } else {
+      setFile(null);
+      setToast({ message: "Veuillez sélectionner un fichier de type .csv, .xls ou .xlsx.", type: "error", visible: true });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) {
-      setError("Veuillez sélectionner un fichier valide avant de soumettre.");
-      return;
-    }
+    if (!file) return setToast({ message: "Veuillez sélectionner un fichier valide avant de soumettre.", type: "error", visible: true });
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch(routes.insertM3C.dev, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Échec de l'envoi du fichier.");
-      }
-
+      const response = await fetch(routes.insertM3C.dev, { method: "POST", body: formData });
       const data = await response.json();
-      setMessage("Fichier envoyé et enregistré avec succès !");
-      setError("");
+
+      if (response.ok && data.success) {
+        setToast({ message: "Fichier envoyé et enregistré avec succès !", type: "success", visible: true });
+      } else {
+        throw new Error(data.error || "La réponse du serveur indique un échec.");
+      }
     } catch (error) {
       console.error("Erreur lors de l'envoi du fichier :", error);
-      setError("Erreur lors de l'envoi du fichier.");
-      setMessage("");
+      setToast({ message: "Erreur lors de l'envoi du fichier.", type: "error", visible: true });
     }
   };
 
@@ -59,24 +48,10 @@ const InsertM3C = () => {
       <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col pt-10">
         <div className="flex flex-col items-center w-1/2 justify-center max-w-[60%] mx-auto mt-8 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
           <h1 className="text-white text-2xl mb-4">Insérez votre fichier M3C</h1>
-          
-          <input
-            type="file"
-            accept=".csv, .xls, .xlsx"
-            onChange={handleFileUpload}
-            className="mb-2 text-gray-500"
-          />
-          
-          {error && <p className="text-red-500 mb-2">{error}</p>}
-          {message && <p className="text-green-500 mb-2">{message}</p>}
-          
-          <button
-            onClick={handleSubmit}
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Envoyer le fichier
-          </button>
+          <input type="file" accept=".csv, .xls, .xlsx" onChange={handleFileUpload} className="mb-2 text-gray-500" />
+          <button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Envoyer le fichier</button>
         </div>
+        {toast.visible && <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, visible: false })} />}
       </div>
     </>
   );

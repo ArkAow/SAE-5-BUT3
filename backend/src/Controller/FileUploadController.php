@@ -17,11 +17,11 @@ class FileUploadController extends AbstractController
         $file = $request->files->get('file');
 
         if (!$file) {
-            return new JsonResponse(['error' => 'Aucun fichier n\'a été envoyé.'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['success' => false, 'error' => 'Aucun fichier n\'a été envoyé.'], Response::HTTP_BAD_REQUEST);
         }
 
         if (!in_array($file->getClientOriginalExtension(), ['xlsx', 'xls', 'csv'])) {
-            return new JsonResponse(['error' => 'Le fichier doit être au format .xlsx, .xls ou .csv'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['success' => false, 'error' => 'Le fichier doit être au format .xlsx, .xls ou .csv'], Response::HTTP_BAD_REQUEST);
         }
 
         $uploadsDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads';
@@ -30,9 +30,9 @@ class FileUploadController extends AbstractController
             $fileName = 'M3C_' . uniqid() . '.' . $file->guessExtension();
             $file->move($uploadsDirectory, $fileName);
         } catch (FileException $e) {
-            return new JsonResponse(['error' => 'Erreur lors du téléchargement du fichier.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['success' => false, 'error' => 'Erreur lors du téléchargement du fichier.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return new JsonResponse(['success' => 'Fichier téléchargé avec succès.', 'filePath' => '/uploads/' . $fileName]);
+        return new JsonResponse(['success' => true, 'message' => 'Fichier téléchargé avec succès.', 'filePath' => '/uploads/' . $fileName]);
     }
 }
