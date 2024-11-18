@@ -5,14 +5,13 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
 #[ORM\Entity]
 #[ORM\Table(name: "subject")]
 class Subject
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
+    #[ORM\GeneratedValue]
     private int $id;
 
     #[ORM\Column(type: "string", length: 50)]
@@ -24,14 +23,6 @@ class Subject
     #[ORM\Column(type: "float")]
     private float $duration;
 
-    #[ORM\ManyToMany(targetEntity: Semester::class)]
-    #[ORM\JoinTable(name: "subject_semester")]
-    private Collection $semesters;
-
-    public function __construct()
-    {
-        $this->semesters = new ArrayCollection();
-    }
 
     public function getId(): int
     {
@@ -68,25 +59,6 @@ class Subject
     public function setDuration(float $duration): self
     {
         $this->duration = $duration;
-        return $this;
-    }
-
-    public function getSemesters(): Collection
-    {
-        return $this->semesters;
-    }
-
-    public function addSemester(Semester $semester): self
-    {
-        if (!$this->semesters->contains($semester)) {
-            $this->semesters->add($semester);
-        }
-        return $this;
-    }
-
-    public function removeSemester(Semester $semester): self
-    {
-        $this->semesters->removeElement($semester);
         return $this;
     }
 }

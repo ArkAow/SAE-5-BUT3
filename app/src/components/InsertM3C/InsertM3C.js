@@ -22,7 +22,9 @@ const InsertM3C = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return setToast({ message: "Veuillez sélectionner un fichier valide avant de soumettre.", type: "error", visible: true });
+    if (!file) {
+      return setToast({ message: "Veuillez sélectionner un fichier valide avant de soumettre.", type: "error", visible: true });
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -32,13 +34,13 @@ const InsertM3C = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setToast({ message: "Fichier envoyé et enregistré avec succès !", type: "success", visible: true });
+        setToast({ message: data.message || "Fichier traité avec succès !", type: "success", visible: true });
       } else {
-        throw new Error(data.error || "La réponse du serveur indique un échec.");
+        throw new Error(data.error || "Erreur lors du traitement du fichier.");
       }
     } catch (error) {
-      console.error("Erreur lors de l'envoi du fichier :", error);
-      setToast({ message: "Erreur lors de l'envoi du fichier.", type: "error", visible: true });
+      console.error("Erreur :", error);
+      setToast({ message: "Erreur lors du processus.", type: "error", visible: true });
     }
   };
 
@@ -49,7 +51,9 @@ const InsertM3C = () => {
         <div className="flex flex-col items-center w-1/2 justify-center max-w-[60%] mx-auto mt-8 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
           <h1 className="text-white text-2xl mb-4">Insérez votre fichier M3C</h1>
           <input type="file" accept=".csv, .xls, .xlsx" onChange={handleFileUpload} className="mb-2 text-gray-500" />
-          <button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Envoyer le fichier</button>
+          <button onClick={handleSubmit} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Envoyer le fichier
+          </button>
         </div>
         {toast.visible && <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, visible: false })} />}
       </div>

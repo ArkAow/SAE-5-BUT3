@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Subject;
 use App\Entity\CourseType;
 use App\Entity\ExpectedDuration;
+use App\Entity\Curriculum;
+use App\Entity\Semester;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,7 +38,7 @@ class DatasInsertController extends AbstractController
         $sections = json_decode($response->getContent(), true)['sections'];
 
         if ($sections === null) {
-            return new JsonResponse(['error' => "Le fichier avec l'ID {$id} n'existe pas."], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => "Le fichier avec l'ID {$id} n'existe pas ou est vide."], Response::HTTP_NOT_FOUND);
         }
 
         foreach ($sections as $section) {
@@ -52,6 +54,10 @@ class DatasInsertController extends AbstractController
 
     private function addData(array $rowData): void
     {
+        if (empty($rowData['code_apogee']) || empty($rowData['intitule'])) {
+            return;
+        }
+            
         $subject = $this->entityManager->getRepository(Subject::class)
             ->findOneBy(['code' => $rowData['code_apogee']]);
 
@@ -59,23 +65,50 @@ class DatasInsertController extends AbstractController
             $subject = new Subject();
             $subject->setName($rowData['intitule']);
             $subject->setCode($rowData['code_apogee']);
-            $subject->setExpectedDuration($rowData['total']);
+            $subject->setDuration($rowData['total'] ?? 0);
             $this->entityManager->persist($subject);
         } else {
-            $subject->setExpectedDuration($rowData['total']);
+            $subject->setDuration($rowData['total'] ?? $subject->getDuration());
+        }
+
+        if (!empty($rowData['curriculum']) && !empty($rowData['semester'])) {
+            $curriculum = $this->entityManager->getRepository(Curriculum::class)
+                ->findOneBy(['name' => $rowData['curriculum']]);
+
+            if (!$curriculum) {
+                $curriculum = new Curriculum();
+                $curriculum->setName($rowData['curriculum']);
+                $this->entityManager->persist($curriculum);
+            }
+
+            $semester = $this->entityManager->getRepository(Semester::class)
+                ->findOneBy(['name' => $rowData['semester']]);
+
+            if (!$semester) {
+                $semester = new Semester();
+                $semester->setName($rowData['semester']);
+                $this->entityManager->persist($semester);
+            }
+
+            $subject->getSemesters()->add($semester);
+            $semester->getCurriculums()->add($curriculum);
         }
 
         $courseTypes = [
             'CM' => $rowData['CM'],
             'TD' => $rowData['TD'],
             'TP' => $rowData['TP'],
-            'sae' => $rowData['heures_projet'] ?? 0,
+            'SAE' => $rowData['heures_projet'] ?? 0,
         ];
 
         foreach ($courseTypes as $typeName => $duration) {
             if ($duration > 0) {
                 $courseType = $this->entityManager->getRepository(CourseType::class)
                     ->findOneBy(['name' => $typeName]);
+
+                if (!$courseType) {
+                    continue;
+                }
 
                 $expectedDuration = new ExpectedDuration();
                 $expectedDuration->setCourseType($courseType);
@@ -95,7 +128,7 @@ class DatasInsertController extends AbstractController
             'TP' => '#0000FF',
             'CONF' => '#00FF00',
             'CONTROLE' => '#F495F4',
-            'SAE' => '#00FF00'
+            'SAE' => '#00FF00',
         ];
 
         foreach ($courseTypesToAdd as $name => $color) {

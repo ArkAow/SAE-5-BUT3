@@ -19,75 +19,76 @@ class ExcelReaderController extends AbstractController
         }
 
         $spreadsheet = IOFactory::load($filePath);
-        $worksheet = $spreadsheet->getActiveSheet();
-        $sections = $this->extractSections($worksheet);
+        $sheetNames = $spreadsheet->getSheetNames();
+        $allSections = [];
 
-        return new JsonResponse(['sections' => $sections]);
+        foreach ($sheetNames as $sheetName) {
+            $worksheet = $spreadsheet->getSheetByName($sheetName);
+            if ($worksheet) {
+                $sections = $this->extractSections($worksheet);
+                if (!empty($sections)) {
+                    $allSections[$sheetName] = $sections;
+                }
+            }
+        }
+
+        return new JsonResponse(['sheets' => $allSections]);
     }
 
     private function extractSections($worksheet)
     {
         $sections = [];
-        $currentSection = [];
-        $isSectionActive = false;
-
         foreach ($worksheet->getRowIterator() as $row) {
             $rowIndex = $row->getRowIndex();
-            $intitule = $worksheet->getCell('B' . $rowIndex)->getValue();
+            $intitule = $this->getCellValue($worksheet, 'B', $rowIndex);
 
-            if ($this->isStartOfSection($intitule)) {
-                if ($isSectionActive && !empty($currentSection)) {
-                    $sections[] = $currentSection;
-                }
-                $currentSection = [];
-                $isSectionActive = true;
-            }
-
-            if ($isSectionActive && $this->isEndOfSection($intitule)) {
-                $currentSection[] = $this->getRowData($worksheet, $rowIndex);
-                $sections[] = $currentSection;
-                $isSectionActive = false;
+            if (!$this->isValidIntitule($intitule)) {
                 continue;
             }
 
-            if ($isSectionActive && $this->isRowUseful($intitule)) {
-                $currentSection[] = $this->getRowData($worksheet, $rowIndex);
-            }
+            $sections[] = $this->getRowData($worksheet, $rowIndex);
         }
-
-        if ($isSectionActive && !empty($currentSection)) {
-            $sections[] = $currentSection;
-        }
-
         return $sections;
     }
 
     private function getRowData($worksheet, $rowIndex)
     {
         return [
-            'intitule' => $worksheet->getCell('B' . $rowIndex)->getValue(),
-            'code_apogee' => $worksheet->getCell('C' . $rowIndex)->getValue(),
-            'CM' => $worksheet->getCell('E' . $rowIndex)->getValue(),
-            'TD' => $worksheet->getCell('F' . $rowIndex)->getValue(),
-            'TP' => $worksheet->getCell('G' . $rowIndex)->getValue(),
-            'heures_projet' => $worksheet->getCell('H' . $rowIndex)->getValue(),
-            'total' => $worksheet->getCell('I' . $rowIndex)->getCalculatedValue(),
+            'intitule' => $this->getCellValue($worksheet, 'B', $rowIndex),
+            'code_apogee' => $this->getCellValue($worksheet, 'C', $rowIndex),
+            'CM' => $this->convertToInt($this->getCellValue($worksheet, 'E', $rowIndex)),
+            'TD' => $this->convertToInt($this->getCellValue($worksheet, 'F', $rowIndex)),
+            'TP' => $this->convertToInt($this->getCellValue($worksheet, 'G', $rowIndex)),
+            'heures_projet' => $this->convertToInt($this->getCellValue($worksheet, 'H', $rowIndex)),
+            'total' => $this->convertToInt($this->getCellCalculatedValue($worksheet, 'I', $rowIndex)),
         ];
     }
 
-    private function isStartOfSection($intitule)
+    private function getCellValue($worksheet, $column, $rowIndex)
     {
-        return strpos($intitule, 'SAE') === 0;
+        $cell = $worksheet->getCell("{$column}{$rowIndex}");
+        return $cell ? trim((string) $cell->getValue()) : null;
     }
 
-    private function isEndOfSection($intitule)
+    private function getCellCalculatedValue($worksheet, $column, $rowIndex)
     {
-        return preg_match('/^R\d+\.\d+$/', $intitule);
+        $cell = $worksheet->getCell("{$column}{$rowIndex}");
+        return $cell ? $cell->getCalculatedValue() : null;
     }
 
-    private function isRowUseful($intitule)
+    private function convertToInt($value)
     {
-        $projectKeyword = "SAE";
-        return preg_match("/^($projectKeyword.[1-6]|R[1-6])/", $intitule) || in_array($intitule, ['Stage', 'Portfolio']);        
+        return is_numeric($value) ? (int)$value : 0;
+    }
+
+    private function isValidIntitule($intitule)
+    {
+        if (empty($intitule)) {
+            return false;
+        }
+
+        $intitule = trim($intitule);
+
+        return preg_match('/^(SAÉ\s\d+\.\d{2}\s.+|SAE\s\d+\.\d{2}\s.+|R\d+\.\d{2}\s.+|Portfolio)$/i', $intitule);
     }
 }
