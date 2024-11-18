@@ -12,6 +12,11 @@ const MainGrid = () => {
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
   const [selectedColor, setSelectedColor] = useState("#FFD700");
+  const [groups, setGroups] = useState([]);
+
+  const addGroups = (newGroups) => {
+    setGroups(newGroups);
+  };
 
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
@@ -47,7 +52,9 @@ const MainGrid = () => {
             setSelectedCol={setSelectedCol}
             selectedColor={selectedColor}
             setSelectedColor={setSelectedColor}
-            addItem={addItem}/>
+            addItem={addItem}
+            addGroups={addGroups}
+          />
         </div>
 
         <button className="flex min-w-fit h-10 ml-24 mt-2 items-center px-4 py-2 text-white
@@ -70,44 +77,52 @@ const MainGrid = () => {
         </select>
       </div>
 
-      <DndProvider backend={HTML5Backend}>
-        <div className="ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[85vw] -z-10">
-          <div
-            className="grid"
-            style={{
-              gridTemplateColumns: `40px repeat(${GRID_COL_LENGTH}, minmax(5rem, 1fr))`,
-            }}>
-
-            <div className="w-10 h-6"></div>
-            {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => (
-              <div
-                key={`col-label-${colIndex}`}
-                className={`w-full h-6 bg-gray-200 ${colIndex==0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
-                G{colIndex + 1}
-              </div>
-            ))}
-
-            {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
-              <React.Fragment key={`row-${rowIndex}`}>
-                <div className={`h-20 w-10 bg-gray-200 ${rowIndex==0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
-                  S{rowIndex + 1}
-                </div>
-                {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => {
-                  const positionKey = `${rowIndex}-${colIndex}`;
-                  const cellItems = items[positionKey] || [];
-                  return (
-                    <Node
-                      key={positionKey}
-                      positionKey={positionKey}
-                      items={cellItems}
-                      moveItem={moveItem}/>
-                  );
-                })}
-              </React.Fragment>
-            ))}
+      {groups.length === 0 ? (
+        <div className="flex items-center justify-center w-full">
+          <div className="w-1/2 text-center text-primary mt-10 text-lg font-bold p-2 bg-white rounded-full">
+            Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
           </div>
         </div>
-      </DndProvider>
+
+      ) : (
+      
+        <DndProvider backend={HTML5Backend}>
+          <div className="ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[85vw] -z-10">
+            <div
+              className="grid"
+              style={{
+                gridTemplateColumns: `40px repeat(${GRID_COL_LENGTH}, minmax(5rem, 1fr))`,
+              }}>
+              <div className="w-10 h-6"></div>
+              {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => (
+                <div
+                  key={`col-label-${colIndex}`}
+                  className={`w-full h-6 bg-gray-200 ${colIndex === 0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
+                  G{colIndex + 1}
+                </div>
+              ))}
+              {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
+                <React.Fragment key={`row-${rowIndex}`}>
+                  <div className={`h-20 w-10 bg-gray-200 ${rowIndex === 0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
+                    S{rowIndex + 1}
+                  </div>
+                  {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => {
+                    const positionKey = `${rowIndex}-${colIndex}`;
+                    const cellItems = items[positionKey] || [];
+                    return (
+                      <Node
+                        key={positionKey}
+                        positionKey={positionKey}
+                        items={cellItems}
+                        moveItem={moveItem}/>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        </DndProvider>
+      )}
     </div>
   );
 };

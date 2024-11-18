@@ -4,10 +4,11 @@ import { GroupButton } from "./GroupButton";
 import { CommentaryButton } from "./CommentaryButton";
 import { PrintButton } from "./PrintButton";
 
-const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol, selectedColor, setSelectedColor, addItem }) => {
+const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol, selectedColor, setSelectedColor, addItem, addGroups }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [delayedExpanded, setDelayedExpanded] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isNoGroups, setIsNoGroups] = useState(true);
 
   const handleToggleExpand = () => {
     if (isButtonDisabled) return;
@@ -26,9 +27,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
 
   return (
     <div
-      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${
-        isExpanded ? "h-[83.5vh] w-20" : "h-20 w-20"}`}>
-
+      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[83.5vh] w-20" : "h-20 w-20"}`}>
       <button
         onClick={handleToggleExpand}
         className={`${
@@ -36,14 +35,20 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
             ? "size-10 bg-primaryshade rounded-full flex items-center justify-center"
             : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
+
+        <span className={`absolute right-4 top-4 flex h-3 w-3 ${isNoGroups && isExpanded ? "hidden" : ""}`}>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+        </span>
+        
         <img
           src={isExpanded ? "/images/minus.svg" : "/images/plus.svg"}
           alt={isExpanded ? "collapse icon" : "expand icon"}
           className="w-7 h-7 fill-primary"/>
       </button>
 
-      <div className={`grid grid-rows-4 gap-4 min-h-fit mt-4 justify-items-start transition-all ${
-        delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
+      <div className={`grid grid-rows-4 gap-4 min-h-fit mt-4 justify-items-start transition-all 
+        ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton 
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
@@ -52,7 +57,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
           selectedColor={selectedColor}
           setSelectedColor={setSelectedColor}
           addItem={addItem}/>
-        <GroupButton />
+        <GroupButton addGroups={addGroups} />
         <CommentaryButton />
         <PrintButton />
       </div>
