@@ -26,7 +26,7 @@ const Node = ({ positionKey, items, moveItem}) => {
   return (
     <div
       ref={drop}
-      className="relative min-w-20 h-20 bg-white justify-items-center border border-opacity-75 border-gray-300 p-1"
+      className="relative min-w-20 h-20 bg-white justify-items-center border border-opacity-75 border-gray-300 p-1 -z-10"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
       {items?.length === 1 && (

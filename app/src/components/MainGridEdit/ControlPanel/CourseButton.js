@@ -33,7 +33,7 @@ export const CourseButton = ({
             </button>
 
             {isFocused && (
-                <div className="absolute z-50 top-0 right-full mr-5 w-52 p-3 bg-white shadow-lg rounded-lg">
+                <div className="absolute z-50 top-0 left-full ml-5 w-52 p-3 bg-white shadow-lg rounded-lg">
                     <h3 className="mb-5">Ajouter un rectangle</h3>
                     <div className="flex flex-row mb-5">
                         <label className="mr-2 text-clip text-nowrap">Ligne :</label>
