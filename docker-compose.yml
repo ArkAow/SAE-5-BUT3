@@ -1,29 +1,25 @@
 services:
-  db:
-    image: mysql:8.0
-    container_name: phpmyadmin_db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test_db
-      MYSQL_USER: test_user
-      MYSQL_PASSWORD: test_password
+  backend:
+    build:
+      context: ./backend
+      dockerfile: .docker/Dockerfile
+    container_name: backend_container
+    working_dir: /app
     ports:
-      - "3307:3306"
+      - "8600:8600"
     volumes:
-      - db_data:/var/lib/mysql
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
+      - ./backend:/app
+    command: sh -c "composer install && php -S 0.0.0.0:8600 -t public"
     environment:
-      PMA_HOST: db
-      PMA_USER: test_user
-      PMA_PASSWORD: test_password
-      UPLOAD_LIMIT: 300M
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
+      DB_HOST: 164.81.120.68
+      DB_PORT: 3306
+      DB_DATABASE: db_sae_previ
+      DB_USERNAME: phpmyadmin
+      DB_PASSWORD: G389d}i^6uGJ-6K)n
+    networks:
+      - sae_previsionnel
+    restart: always
 
-volumes:
-  db_data:
+networks:
+  sae_previsionnel:
+    driver: bridge
