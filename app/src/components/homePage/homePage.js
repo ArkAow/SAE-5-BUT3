@@ -27,7 +27,7 @@ const HomePage = () => {
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
             onClick={goToPreviEdit}
           >
-            <div className="w-[300px] h-[300px] m-7 bg-[#a1000e] flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
+            <div className="w-[300px] h-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <div className="text-white text-6xl font-bold">
                 <svg
                   width="200"
@@ -53,7 +53,7 @@ const HomePage = () => {
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
             onClick={goToInsertM3C}
           >
-            <div className="w-[300px] h-[300px] m-7 bg-[#a1000e] flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
+            <div className="w-[300px] h-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <div className="text-white text-8xl font-bold">M3C</div>
             </div>
             <p className="text-white text-xl text-center pb-6">
@@ -66,7 +66,7 @@ const HomePage = () => {
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
             onClick={goToSeePrevi}
           >
-            <div className="w-[300px] h-[300px] m-7 bg-[#a1000e] flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
+            <div className="w-[300px] h-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <div className="text-white text-6xl font-bold">
                 <svg
                   width="200"
