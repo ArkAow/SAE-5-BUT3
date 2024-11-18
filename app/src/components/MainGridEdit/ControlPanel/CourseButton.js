@@ -87,7 +87,7 @@ export const CourseButton = ({
 
                         <button
                             onClick={addItem}
-                            className="px-3 py-2 w-full bg-green-500 text-white rounded cursor-pointer hover:bg-green-600 transition-colors duration-300">
+                            className="px-3 py-2 w-full bg-primary text-white rounded cursor-pointer hover:bg-primaryshade active:bg-primarytint transition-colors duration-300">
                             Ajouter
                         </button>
                     </div>

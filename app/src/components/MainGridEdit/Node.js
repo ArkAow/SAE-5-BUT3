@@ -59,7 +59,7 @@ const Node = ({ positionKey, items, moveItem}) => {
 
       {showTooltip && (
         <div
-          className="absolute top-0 left-full p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar"
+          className="absolute top-0 left-full p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar-dark"
           style={{
             maxHeight: "300px",
             overflowY: "auto",
