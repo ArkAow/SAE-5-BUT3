@@ -51,7 +51,9 @@ const MainGrid = () => {
             addItem={addItem}/>
         </div>
 
-        <button className="flex min-w-fit h-10 ml-24 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint focus:outline-none">
+        <button className="flex min-w-fit h-10 ml-24 mt-2 items-center px-4 py-2 text-white
+          bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint
+          border border-white focus:outline-none">
           Passer au suivant
           <img
             src="/images/right-arrow.svg"
@@ -59,7 +61,7 @@ const MainGrid = () => {
             className="ml-2 w-4 h-4"/>
         </button>
 
-        <select className="w-fit h-10 mt-2 px-4 py-2 text-white bg-primary focus:border focus:border-gray-300 rounded-full shadow-sm">
+        <select className="w-fit h-10 mt-2 px-4 py-2 default-select rounded-full font-normal">
           <option value="" disabled selected>
             Sélectionnez une ressource
           </option>

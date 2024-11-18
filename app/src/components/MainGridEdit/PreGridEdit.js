@@ -20,8 +20,8 @@ const PreGridEdit = () => {
           <div className="w-64">
             <label className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white">Cursus :</label>
               <select
-                className="w-full min-w-48 h-28 p-3 text-white text-2xl font-bold 
-                  bg-primary border hover:bg-primaryshade border-white rounded-lg shadow-sm focus:outline-none">
+                className="w-full min-w-48 h-28 p-3 text-2xl
+                  default-select focus:outline-none">
                 <option value="A1">A1</option>
                 <option value="A2">A2</option>
                 <option value="A3">A3 Initial</option>

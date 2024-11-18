@@ -12,6 +12,9 @@
     .btn-control-panel {
       @apply w-16 h-16 bg-primaryshade rounded-xl flex items-center justify-center transition-all duration-200 hover:bg-white
     }
+    .default-select {
+      @apply text-white font-bold bg-primary border hover:bg-primaryshade border-white rounded-lg shadow-sm
+    }
   }
 
 /* Classe pour personnaliser la scrollbar dans l’infobulle */
