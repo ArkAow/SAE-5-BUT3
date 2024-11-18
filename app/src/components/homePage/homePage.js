@@ -27,10 +27,10 @@ const HomePage = () => {
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
             onClick={goToPreviEdit}
           >
-            <div className="size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
+            <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <div className="text-white text-6xl font-bold">
                 <svg
-                  className="size-[100px] lg:size-[200px]"
+                  className="size-[70px] md:size-[100px] lg:size-[200px]"
                   width="200"
                   height="200"
                   viewBox="0 0 200 200"
@@ -51,7 +51,7 @@ const HomePage = () => {
           <div
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
             onClick={goToInsertM3C}>
-            <div className="size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
+            <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <div className="text-white text-6xl lg:text-8xl font-bold">M3C</div>
             </div>
             <p className="text-white text-xl text-center pb-6">
@@ -63,10 +63,10 @@ const HomePage = () => {
           <div
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
             onClick={goToSeePrevi}>
-            <div className="size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
+            <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <div className="text-white text-6xl font-bold">
                 <svg               
-                  className="size-[100px] lg:size-[200px]"
+                  className="size-[70px] md:size-[100px] lg:size-[200px]"
                   width="200"
                   height="200"
                   viewBox="0 0 200 200"

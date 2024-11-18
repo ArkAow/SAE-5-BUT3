@@ -38,7 +38,6 @@ const MainGrid = () => {
 
   return (
     <div className="min-h-screen py-10">
-      <div className="absolute h-screen w-screen bg-cover bg-center bg-landscape -z-10"/>
       <div className="flex items-center justify-start gap-5 h-20 px-10">
         <div className="absolute top-6">
           <ControlPanel
