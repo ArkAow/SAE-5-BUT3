@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
 import DraggableRectangle from "./DraggableRectangle";
 import { getShade } from "../../services/colorService";
 
 const ITEM_TYPE = "rectangle";
 
-const Node = ({ positionKey, items, moveItem}) => {
+const Node = ({ positionKey, items, moveItem }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [tooltipDirection, setTooltipDirection] = useState("right"); // Default direction
 
   const [, drop] = useDrop({
     accept: ITEM_TYPE,
@@ -23,8 +24,24 @@ const Node = ({ positionKey, items, moveItem}) => {
 
   const showTooltip = isHovered && items?.length > 1 && !isDragging;
 
+  const adjustTooltipDirection = () => {
+    const nodeElement = document.getElementById(positionKey); // Ensure unique IDs for nodes
+    if (nodeElement) {
+      const rect = nodeElement.getBoundingClientRect();
+      const screenWidth = window.innerWidth;
+      setTooltipDirection(rect.left > screenWidth / 2 ? "left" : "right");
+    }
+  };
+
+  useEffect(() => {
+    if (isHovered) {
+      adjustTooltipDirection();
+    }
+  }, [isHovered]);
+
   return (
     <div
+      id={positionKey} // Unique ID to identify each node
       ref={drop}
       className="relative min-w-20 h-20 bg-white justify-items-center border border-opacity-75 border-gray-300 p-1"
       onMouseEnter={() => setIsHovered(true)}
@@ -34,20 +51,21 @@ const Node = ({ positionKey, items, moveItem}) => {
           color={items[0].color}
           positionKey={positionKey}
           onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setIsDragging(false)}/>
+          onDragEnd={() => setIsDragging(false)}
+        />
       )}
 
       {items?.length > 1 && (
-        <div className="relative w-full h-full grid grid-cols-2 grid-rows-2 gap-1">
-          {visibleItems.map((item, index) => (
+        <div className="relative w-full max-w-20 h-full grid grid-cols-2 grid-rows-2 gap-1 justify-items-center">
+          {visibleItems.map((item) => (
             <div
               key={item.id}
-              className="w-full h-full rounded-md border-2"
+              className="w-full max-w-10 h-full max-h-10 rounded-md border-2"
               style={{
                 backgroundColor: item.color,
                 borderColor: getShade(item.color),
-              }}>
-            </div>
+              }}
+            ></div>
           ))}
           {remainingItemsCount > 0 && (
             <div className="relative w-full h-full flex items-center justify-center text-black text-xs font-bold">
@@ -59,12 +77,15 @@ const Node = ({ positionKey, items, moveItem}) => {
 
       {showTooltip && (
         <div
-          className="absolute top-0 left-full p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar-dark"
+          className={`absolute top-0 p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar-dark ${
+            tooltipDirection === "left" ? "left-0 -translate-x-full" : "left-full"
+          }`}
           style={{
             maxHeight: "300px",
             overflowY: "auto",
             backgroundColor: "rgba(55, 65, 81, 0.90)",
-          }}>
+          }}
+        >
           {items.map((item) => (
             <div key={item.id} className="mb-1 text-white">
               <DraggableRectangle
@@ -73,7 +94,8 @@ const Node = ({ positionKey, items, moveItem}) => {
                 id={item.id}
                 small
                 onDragStart={() => setIsDragging(true)}
-                onDragEnd={() => setIsDragging(false)}/>
+                onDragEnd={() => setIsDragging(false)}
+              />
               <strong>ID:</strong> {item.id} <br />
               <strong>Color:</strong> {item.color}
               <br />
