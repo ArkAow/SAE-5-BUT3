@@ -25,11 +25,12 @@ class Subject
     private float $duration;
 
     #[ORM\OneToMany(mappedBy: "subject", targetEntity: ExpectedDuration::class, cascade: ["persist", "remove"])]
-    private Collection $expectedDurations;
+    #[ORM\JoinTable(name:"expected_duration_subject")]
+    private Collection $expectedDurationSubject;
 
     public function __construct()
     {
-        $this->expectedDurations = new ArrayCollection();
+        $this->expectedDurationSubject = new ArrayCollection();
     }
 
     public function getId(): int
@@ -70,24 +71,24 @@ class Subject
         return $this;
     }
 
-    public function getExpectedDurations(): Collection
+    public function getExpectedDurationsSubject(): Collection
     {
-        return $this->expectedDurations;
+        return $this->expectedDurationSubject;
     }
 
-    public function addExpectedDuration(ExpectedDuration $expectedDuration): self
+    public function addExpectedDurationsSubject(ExpectedDuration $expectedDuration): self
     {
-        if (!$this->expectedDurations->contains($expectedDuration)) {
-            $this->expectedDurations->add($expectedDuration);
+        if (!$this->expectedDurationSubject->contains($expectedDuration)) {
+            $this->expectedDurationSubject->add($expectedDuration);
             $expectedDuration->setSubject($this);
         }
 
         return $this;
     }
 
-    public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
+    public function removeExpectedDurationsSubject(ExpectedDuration $expectedDuration): self
     {
-        if ($this->expectedDurations->removeElement($expectedDuration)) {
+        if ($this->expectedDurationSubject->removeElement($expectedDuration)) {
             if ($expectedDuration->getSubject() === $this) {
                 $expectedDuration->setSubject(null);
             }

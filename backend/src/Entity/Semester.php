@@ -20,17 +20,8 @@ class Semester
     #[ORM\Column(type: "string", length: 50)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: Curriculum::class)]
-    #[ORM\JoinTable(name: "curriculum_semester")]
-    private Collection $curriculums;
-
-    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: "semesters")]
+    #[ORM\OneToMany(targetEntity: Subject::class, mappedBy: "semesters")]
     private Collection $subjects;
-
-    public function __construct()
-    {
-        $this->curriculums = new ArrayCollection();
-    }
 
     public function getId(): int
     {
@@ -45,25 +36,6 @@ class Semester
     public function setName(string $name): self
     {
         $this->name = $name;
-        return $this;
-    }
-
-    public function getCurriculums(): Collection
-    {
-        return $this->curriculums;
-    }
-
-    public function addCurriculum(Curriculum $curriculum): self
-    {
-        if (!$this->curriculums->contains($curriculum)) {
-            $this->curriculums->add($curriculum);
-        }
-        return $this;
-    }
-
-    public function removeCurriculum(Curriculum $curriculum): self
-    {
-        $this->curriculums->removeElement($curriculum);
         return $this;
     }
 

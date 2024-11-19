@@ -18,7 +18,7 @@ class Group
     #[ORM\Column(type: "string", length: 30)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: HalfGroup::class)]
+    #[ORM\OneToMany(targetEntity: HalfGroup::class,mappedBy: "group")]
     #[ORM\JoinTable(name: "group_half_group")]
     private Collection $halfGroups;
 

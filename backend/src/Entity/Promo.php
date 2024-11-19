@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 #[ORM\Table(name: "class")]
-class Clas
+class Promo
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,7 +18,7 @@ class Clas
     #[ORM\Column(type: "string", length: 20)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: Group::class)]
+    #[ORM\OneToMany(targetEntity: Group::class,mappedBy: "promo")]
     #[ORM\JoinTable(name: "class_group")]
     private Collection $groups;
 
