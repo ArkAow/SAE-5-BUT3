@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Curriculum;
+use App\Entity\Subject;
 
 #[ORM\Entity]
 #[ORM\Table(name: "semester")]
@@ -20,6 +23,9 @@ class Semester
     #[ORM\ManyToMany(targetEntity: Curriculum::class)]
     #[ORM\JoinTable(name: "curriculum_semester")]
     private Collection $curriculums;
+
+    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: "semesters")]
+    private Collection $subjects;
 
     public function __construct()
     {
@@ -58,6 +64,26 @@ class Semester
     public function removeCurriculum(Curriculum $curriculum): self
     {
         $this->curriculums->removeElement($curriculum);
+        return $this;
+    }
+
+    public function getSubjects(): Collection
+    {
+        return $this->subjects;
+    }
+
+    public function addSubject(Subject $subject): self
+    {
+        if (!$this->subjects->contains($subject)) {
+            $this->subjects[] = $subject;
+        }
+
+        return $this;
+    }
+
+    public function removeSubject(Subject $subject): self
+    {
+        $this->subjects->removeElement($subject);
         return $this;
     }
 }

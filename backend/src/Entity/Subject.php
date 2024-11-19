@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
 #[ORM\Entity]
 #[ORM\Table(name: "subject")]
 class Subject
@@ -23,6 +24,13 @@ class Subject
     #[ORM\Column(type: "float")]
     private float $duration;
 
+    #[ORM\OneToMany(mappedBy: "subject", targetEntity: ExpectedDuration::class, cascade: ["persist", "remove"])]
+    private Collection $expectedDurations;
+
+    public function __construct()
+    {
+        $this->expectedDurations = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -59,6 +67,32 @@ class Subject
     public function setDuration(float $duration): self
     {
         $this->duration = $duration;
+        return $this;
+    }
+
+    public function getExpectedDurations(): Collection
+    {
+        return $this->expectedDurations;
+    }
+
+    public function addExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if (!$this->expectedDurations->contains($expectedDuration)) {
+            $this->expectedDurations->add($expectedDuration);
+            $expectedDuration->setSubject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if ($this->expectedDurations->removeElement($expectedDuration)) {
+            if ($expectedDuration->getSubject() === $this) {
+                $expectedDuration->setSubject(null);
+            }
+        }
+
         return $this;
     }
 }

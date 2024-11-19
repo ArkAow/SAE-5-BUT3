@@ -15,7 +15,7 @@ class CourseType
     #[ORM\GeneratedValue]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 50)]
+    #[ORM\Column(type: "string", length: 120)]
     private string $name;
 
     #[ORM\Column(type: "string", length: 50)]

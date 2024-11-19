@@ -1,26 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 const Toast = ({ message, type, onClose }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [onClose]);
+  const toastStyle = type === "success" ? "bg-green-500" : "bg-red-500";
 
   return (
     <div
-      className={`fixed top-4 right-4 p-4 rounded shadow-lg text-white ${
-        type === "success" ? "bg-green-500" : "bg-red-500"
-      }`}
+      className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 text-white rounded shadow ${toastStyle}`}
     >
-      <div className="flex items-center">
-        <span>{message}</span>
-        <button onClick={onClose} className="ml-4 text-xl font-bold">
-          &times;
-        </button>
-      </div>
+      {message}
+      <button onClick={onClose} className="ml-4 text-gray-200">
+        ✕
+      </button>
     </div>
   );
 };

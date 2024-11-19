@@ -17,12 +17,13 @@ class ExpectedDuration
     private float $expectedDuration;
 
     #[ORM\ManyToOne(targetEntity: Subject::class, inversedBy: "expectedDurations")]
-    #[ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private Subject $subject;
+    #[ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
+    private ?Subject $subject = null;    
 
-    #[ORM\ManyToOne(targetEntity: CourseType::class, inversedBy: "expectedDurations")]
+    #[ORM\ManyToOne(targetEntity: CourseType::class)]
     #[ORM\JoinColumn(name: "course_type_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private CourseType $courseType;
+
 
     public function getId(): ?int
     {
@@ -45,7 +46,7 @@ class ExpectedDuration
         return $this->subject;
     }
 
-    public function setSubject(Subject $subject): self
+    public function setSubject(?Subject $subject): self
     {
         $this->subject = $subject;
         return $this;

@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241115093814 extends AbstractMigration
+final class Version20241118161929 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -23,14 +23,14 @@ final class Version20241115093814 extends AbstractMigration
 
         $half_group = $schema->createTable('half_group');
         $half_group->addColumn('id', 'integer', ['autoincrement' => true]);
-        $half_group->addColumn('name', 'string', ['length' => 20]);
+        $half_group->addColumn('name', 'string', ['length' => 50]); 
         $half_group->setPrimaryKey(['id']);
         
         // Table Group
 
         $group = $schema->createTable('group');
         $group->addColumn('id', 'integer', ['autoincrement' => true]);
-        $group->addColumn('name', 'string', ['length' => 30]);
+        $group->addColumn('name', 'string', ['length' => 50]); 
         $group->setPrimaryKey(['id']);
      
         // Table Group - Half_Group
@@ -45,7 +45,7 @@ final class Version20241115093814 extends AbstractMigration
 
         $class = $schema->createTable('class');
         $class->addColumn('id', 'integer', ['autoincrement' => true]);
-        $class->addColumn('name', 'string', ['length' => 20]);
+        $class->addColumn('name', 'string', ['length' => 50]); 
         $class->setPrimaryKey(['id']);
         
         // Table Class - Group
@@ -126,7 +126,7 @@ final class Version20241115093814 extends AbstractMigration
         $course_type->addColumn('id', 'integer');
         $course_type->addColumn('name', 'string', ['length' => 50]);
         $course_type->addColumn('color', 'string', ['length' => 50]);
-        $course_type->addColumn('scope', 'string', ['length' => 500]);
+        $course_type->addColumn('scope', 'string', ['length' => 500, 'default' => 'class', 'notnull' => true]);
         $course_type->setPrimaryKey(['id']);
         // ADD scope VARCHAR(800)
 
@@ -143,7 +143,7 @@ final class Version20241115093814 extends AbstractMigration
 
         $expected_duration = $schema->createTable('expected_duration');
         $expected_duration->addColumn('id', 'integer');
-        $expected_duration->addColumn('name', 'string', ['length' => 80]);                    // Matière
+        $expected_duration->addColumn('name', 'string', ['length' => 120]);                    // Matière
         $expected_duration->addColumn('type', 'string', ['length' => 80]);                    // Type
         $expected_duration->addColumn('expected_duration', 'float');                                    // Durée
         $expected_duration->addForeignKeyConstraint($subject, ['name'], ['name'], ['onDelete' => 'CASCADE']);
@@ -202,9 +202,9 @@ final class Version20241115093814 extends AbstractMigration
 
         $user = $schema->createTable('user');
         $user->addColumn('id', 'integer', ['autoincrement' => true]);
-        $user->addColumn('email', 'integer', ['length' => 150]);
-        $user->addColumn('password', 'integer', ['length' => 150]);
-        $partTimeTutor->setPrimaryKey(['id']);
+        $user->addColumn('email', 'string', ['length' => 150]);
+        $user->addColumn('password', 'string', ['length' => 150]);
+        $user->setPrimaryKey(['id']);
     }
 
     public function down(Schema $schema): void

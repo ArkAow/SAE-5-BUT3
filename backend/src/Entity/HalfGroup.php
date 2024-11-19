@@ -13,7 +13,7 @@ class HalfGroup
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 20)]
+    #[ORM\Column(type: "string", length: 50)]
     private string $name;
 
     public function getId(): int

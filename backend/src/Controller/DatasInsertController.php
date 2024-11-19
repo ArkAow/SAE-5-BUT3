@@ -35,14 +35,15 @@ class DatasInsertController extends AbstractController
             return $response;
         }
 
-        $sections = json_decode($response->getContent(), true)['sections'];
-
-        if ($sections === null) {
+        $data = json_decode($response->getContent(), true);
+        if (!isset($data['sheets'])) {
             return new JsonResponse(['error' => "Le fichier avec l'ID {$id} n'existe pas ou est vide."], Response::HTTP_NOT_FOUND);
         }
 
-        foreach ($sections as $section) {
-            foreach ($section as $rowData) {
+        $sheets = $data['sheets'];
+
+        foreach ($sheets as $sheetName => $rows) {
+            foreach ($rows as $rowData) {
                 $this->addData($rowData);
             }
         }
@@ -57,7 +58,7 @@ class DatasInsertController extends AbstractController
         if (empty($rowData['code_apogee']) || empty($rowData['intitule'])) {
             return;
         }
-            
+
         $subject = $this->entityManager->getRepository(Subject::class)
             ->findOneBy(['code' => $rowData['code_apogee']]);
 
@@ -72,32 +73,47 @@ class DatasInsertController extends AbstractController
         }
 
         if (!empty($rowData['curriculum']) && !empty($rowData['semester'])) {
-            $curriculum = $this->entityManager->getRepository(Curriculum::class)
-                ->findOneBy(['name' => $rowData['curriculum']]);
-
-            if (!$curriculum) {
-                $curriculum = new Curriculum();
-                $curriculum->setName($rowData['curriculum']);
-                $this->entityManager->persist($curriculum);
-            }
-
-            $semester = $this->entityManager->getRepository(Semester::class)
-                ->findOneBy(['name' => $rowData['semester']]);
-
-            if (!$semester) {
-                $semester = new Semester();
-                $semester->setName($rowData['semester']);
-                $this->entityManager->persist($semester);
-            }
-
-            $subject->getSemesters()->add($semester);
-            $semester->getCurriculums()->add($curriculum);
+            $this->processCurriculumAndSemester($rowData);
         }
 
+        $this->processCourseTypes($rowData, $subject);
+    }
+
+    private function processCurriculumAndSemester(array $rowData): void
+    {
+        $curriculum = $this->entityManager->getRepository(Curriculum::class)
+            ->findOneBy(['name' => $rowData['curriculum']]);
+
+        if (!$curriculum) {
+            $curriculum = new Curriculum();
+            $curriculum->setName($rowData['curriculum']);
+            $this->entityManager->persist($curriculum);
+        }
+
+        $semester = $this->entityManager->getRepository(Semester::class)
+            ->findOneBy(['name' => $rowData['semester']]);
+
+        if (!$semester) {
+            $semester = new Semester();
+            $semester->setName($rowData['semester']);
+            $this->entityManager->persist($semester);
+        }
+
+        $this->entityManager->getConnection()->executeStatement(
+            'INSERT IGNORE INTO curriculum_semester (curriculum_id, semester_id) VALUES (:curriculum, :semester)',
+            [
+                'curriculum' => $curriculum->getId(),
+                'semester' => $semester->getId(),
+            ]
+        );
+    }
+
+    private function processCourseTypes(array $rowData, Subject $subject): void
+    {
         $courseTypes = [
-            'CM' => $rowData['CM'],
-            'TD' => $rowData['TD'],
-            'TP' => $rowData['TP'],
+            'CM' => $rowData['CM'] ?? 0,
+            'TD' => $rowData['TD'] ?? 0,
+            'TP' => $rowData['TP'] ?? 0,
             'SAE' => $rowData['heures_projet'] ?? 0,
         ];
 
@@ -106,16 +122,14 @@ class DatasInsertController extends AbstractController
                 $courseType = $this->entityManager->getRepository(CourseType::class)
                     ->findOneBy(['name' => $typeName]);
 
-                if (!$courseType) {
-                    continue;
+                if ($courseType) {
+                    $expectedDuration = new ExpectedDuration();
+                    $expectedDuration->setCourseType($courseType);
+                    $expectedDuration->setSubject($subject);
+                    $expectedDuration->setExpectedDuration($duration);
+
+                    $this->entityManager->persist($expectedDuration);
                 }
-
-                $expectedDuration = new ExpectedDuration();
-                $expectedDuration->setCourseType($courseType);
-                $expectedDuration->setSubject($subject);
-                $expectedDuration->setExpectedDuration($duration);
-
-                $this->entityManager->persist($expectedDuration);
             }
         }
     }
@@ -123,22 +137,23 @@ class DatasInsertController extends AbstractController
     private function initializeCourseTypes(): void
     {
         $courseTypesToAdd = [
-            'CM' => '#FFFF00',
-            'TD' => '#FF0000',
-            'TP' => '#0000FF',
-            'CONF' => '#00FF00',
-            'CONTROLE' => '#F495F4',
-            'SAE' => '#00FF00',
+            'CM' => ['color' => '#FFFF00', 'scope' => 'class'],
+            'TD' => ['color' => '#FF0000', 'scope' => 'group'],
+            'TP' => ['color' => '#0000FF', 'scope' => 'half_group'],
+            'CONF' => ['color' => '#00FF00', 'scope' => 'class group half_group'],
+            'CONTROLE' => ['color' => '#F495F4', 'scope' => 'class group half_group'],
+            'SAE' => ['color' => '#00FF00', 'scope' => 'class group half_group'],
         ];
 
-        foreach ($courseTypesToAdd as $name => $color) {
+        foreach ($courseTypesToAdd as $name => $details) {
             $existingCourseType = $this->entityManager->getRepository(CourseType::class)
                 ->findOneBy(['name' => $name]);
 
             if (!$existingCourseType) {
                 $courseType = new CourseType();
                 $courseType->setName($name);
-                $courseType->setColor($color);
+                $courseType->setColor($details['color']);
+                $courseType->setScope($details['scope']);
                 $this->entityManager->persist($courseType);
             }
         }
