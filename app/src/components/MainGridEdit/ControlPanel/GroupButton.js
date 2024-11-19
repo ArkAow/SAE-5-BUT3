@@ -36,16 +36,21 @@ export const GroupButton = ({ addGroups }) => {
   const handleAddGroup = () => {
     if (groupName.trim() !== "") {
       const newGroup = { name: groupName, subGroups: [] };
-      setGroups([...groups, newGroup]);
+      const updatedGroups = [...groups, newGroup];
+      setGroups(updatedGroups);
       setGroupName("");
+      addGroups(updatedGroups);
     }
   };
-
+  
   const handleAddSubGroup = (index) => {
     if (subGroupName.trim() !== "") {
       const updatedGroups = [...groups];
-      updatedGroups[index].subGroups.push(subGroupName);
+      const parentGroup = updatedGroups[index];
+      const newSubGroupName = `${parentGroup.name}${subGroupName}`;
+      parentGroup.subGroups.push(newSubGroupName);
       setGroups(updatedGroups);
+      addGroups(updatedGroups);
       setSubGroupName("");
     }
   };

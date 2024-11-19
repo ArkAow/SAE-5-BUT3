@@ -4,9 +4,6 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 
-const GRID_ROW_LENGTH = 25;
-const GRID_COL_LENGTH = 10;
-
 const MainGrid = () => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
@@ -27,6 +24,22 @@ const MainGrid = () => {
     }));
   };
 
+  const getGroupList = () => {
+    const mainGroups = [];
+    const subGroups = [];
+  
+    groups.forEach((group) => {
+      mainGroups.push(group.name);
+      group.subGroups.forEach((subGroup) => {
+        subGroups.push(subGroup);
+      });
+    });
+    if (mainGroups.length > 0) {
+      return ["Tous", ...mainGroups, ...subGroups];
+    }
+    return [];
+  };
+
   const moveItem = (fromKey, toKey) => {
     setItems((prevItems) => {
       const fromItems = [...(prevItems[fromKey] || [])];
@@ -40,6 +53,9 @@ const MainGrid = () => {
       };
     });
   };
+
+  const GRID_ROW_LENGTH = 25;
+  const groupList = getGroupList();
 
   return (
     <div className="min-h-screen py-10">
@@ -91,22 +107,22 @@ const MainGrid = () => {
             <div
               className="grid"
               style={{
-                gridTemplateColumns: `40px repeat(${GRID_COL_LENGTH}, minmax(5rem, 1fr))`,
+                gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
               }}>
               <div className="w-10 h-6"></div>
-              {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => (
+              {groupList.map((groupName, colIndex) => (
                 <div
                   key={`col-label-${colIndex}`}
-                  className={`w-full h-6 bg-gray-200 ${colIndex === 0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
-                  G{colIndex + 1}
+                  className={`w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold`}>
+                  {groupName}
                 </div>
               ))}
               {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
                 <React.Fragment key={`row-${rowIndex}`}>
-                  <div className={`h-20 w-10 bg-gray-200 ${rowIndex === 0 ? "rounded-tl-md" : ""} flex items-center justify-center text-black text-sm font-bold`}>
+                  <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
                     S{rowIndex + 1}
                   </div>
-                  {Array.from({ length: GRID_COL_LENGTH }).map((_, colIndex) => {
+                  {groupList.map((_, colIndex) => {
                     const positionKey = `${rowIndex}-${colIndex}`;
                     const cellItems = items[positionKey] || [];
                     return (
