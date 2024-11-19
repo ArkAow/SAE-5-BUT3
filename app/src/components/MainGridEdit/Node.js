@@ -94,9 +94,6 @@ const Node = ({ positionKey, items, moveItem }) => {
                 small
                 onDragStart={() => setIsDragging(true)}
                 onDragEnd={() => setIsDragging(false)}/>
-              <strong>ID:</strong> {item.id} <br />
-              <strong>Color:</strong> {item.color}
-              <br />
               <strong>--------------</strong>
             </div>
           ))}

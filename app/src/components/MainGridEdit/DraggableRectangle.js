@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDrag } from "react-dnd";
 import { getShade, isBlack } from "../../services/colorService";
 
@@ -14,10 +14,29 @@ const DraggableRectangle = ({ color, positionKey, professor, courseType, duratio
   });
 
   const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
+        setShowTooltip(false);
+      }
+    };
+
+    if (showTooltip) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showTooltip]);
 
   const handleCogClick = (event) => {
-    event.stopPropagation(); // Prevent click events from propagating to parent elements
-    setShowTooltip(!showTooltip); // Toggle the tooltip
+    event.stopPropagation();
+    setShowTooltip(true);
   };
 
   return (
@@ -31,16 +50,16 @@ const DraggableRectangle = ({ color, positionKey, professor, courseType, duratio
       }}
     >
       <div className="w-full bg-white h-4 text-xs text-black rounded px-2 mb-0.5">
-        CM
+        {courseType}
       </div>
       <div className="w-full bg-white h-4 text-xs text-black rounded px-2 mb-0.5">
-        AP
+        {professor}
       </div>
       <div className="w-full bg-white h-4 text-xs text-black rounded px-2">
-        2h
+        {duration}
       </div>
 
-
+      {/* Paramètres */}
       <img
         src={`${isBlack(color) ? "images/cogWheel-white.svg" : "images/cogWheel-black.svg"}`}
         alt="cogWheel"
@@ -49,25 +68,19 @@ const DraggableRectangle = ({ color, positionKey, professor, courseType, duratio
         onClick={handleCogClick}
       />
 
+      {/* Tooltip */}
       {showTooltip && (
         <div
-          className="absolute top-0 right-0 mt-5 mr-5 p-2 bg-gray-800 text-white rounded shadow-lg z-10 flex flex-col space-y-2"
-          style={{
-            width: "120px",
-            backgroundColor: "rgba(55, 65, 81, 0.90)",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
+          ref={tooltipRef}
+          className="absolute -top-3 -right-8 mt-5 mr-5 p-2 bg-gray-800 bg-opacity-75 text-white rounded shadow-lg z-10 flex flex-col space-y-2">
           <button
             onClick={onEdit}
-            className="w-full py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-xs"
-          >
+            className="w-full py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-xs">
             Modifier
           </button>
           <button
             onClick={onDelete}
-            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs"
-          >
+            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs">
             Supprimer
           </button>
         </div>
