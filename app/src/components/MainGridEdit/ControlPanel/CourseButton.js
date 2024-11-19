@@ -52,7 +52,7 @@ export const CourseButton = ({
                 <NodePortal>
                     <div
                         ref={tooltipRef}
-                        className="absolute z-50 top-32 left-32 w-52 p-3 bg-white shadow-lg rounded-lg">
+                        className="absolute z-50 top-32 left-32 w-52 p-3 bg-white shadow-lg rounded-lg text-xs">
                         <h3 className="mb-5">Ajouter un rectangle</h3>
                         <div className="flex flex-row mb-5">
                             <label className="mr-2 text-clip text-nowrap">Ligne :</label>
@@ -87,7 +87,7 @@ export const CourseButton = ({
 
                         <button
                             onClick={addItem}
-                            className="px-3 py-2 w-full bg-primary text-white rounded cursor-pointer hover:bg-primaryshade active:bg-primarytint transition-colors duration-300">
+                            className="px-3 py-2 w-full btn-default">
                             Ajouter
                         </button>
                     </div>

@@ -40,6 +40,7 @@ export const GroupButton = ({ addGroups }) => {
       setGroups(updatedGroups);
       setGroupName("");
       addGroups(updatedGroups);
+      setIsNoGroups(false);
     }
   };
   
@@ -85,11 +86,12 @@ export const GroupButton = ({ addGroups }) => {
             />
             <button
               onClick={handleAddGroup}
-              className="w-full p-2 bg-primary text-white rounded">
+              className="w-full p-2 btn-default">
               Ajouter Groupe
             </button>
 
-            <div className="mt-4 max-h-48 overflow-y-auto custom-scrollbar-light bg-gray-200 rounded-lg p-3">
+            <div className={`mt-4 max-h-48 overflow-y-auto custom-scrollbar-light bg-gray-200 rounded-lg p-3
+              ${isNoGroups ? "hidden" : ""}`}>
               
               {groups.map((group, index) => (
                 <div key={index} className="mb-4 flex items-start justify-between">
@@ -106,7 +108,6 @@ export const GroupButton = ({ addGroups }) => {
                     <div className="flex flex-col items-start mt-2">
                       <input
                         type="text"
-                        placeholder="Nom du sous-groupe"
                         value={subGroupName}
                         onChange={(e) => setSubGroupName(e.target.value)}
                         maxLength="8"
@@ -114,7 +115,7 @@ export const GroupButton = ({ addGroups }) => {
                       />
                       <button
                         onClick={() => handleAddSubGroup(index)}
-                        className="w-36 p-2 bg-primary text-white rounded">
+                        className="w-36 p-2 btn-default">
                         Ajouter Sous-Groupe
                       </button>
                     </div>
