@@ -86,7 +86,7 @@ export const GroupButton = ({ addGroups }) => {
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
 
-        <img src="/images/group.svg" alt="group icon" className="w-10 h-10" />
+        <img src="/images/group.svg" alt="group icon" className="w-10 h-10" draggable="false"/>
       </button>
 
       {/* Tooltip rendu dans le portail global */}

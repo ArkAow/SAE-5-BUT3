@@ -44,7 +44,7 @@ export const CourseButton = ({
             <button
                 onClick={() => setIsFocused((prev) => !prev)}
                 className={`btn-control-panel ${isFocused ? "bg-white shadow-lg" : ""} transition duration-300`}>
-                <img src="/images/book.svg" alt="book icon" className="w-10 h-10 fill-primary" />
+                <img src="/images/book.svg" alt="book icon" className="w-10 h-10 fill-primary" draggable="false" />
             </button>
 
             {/* Tooltip rendu dans le portail global */}

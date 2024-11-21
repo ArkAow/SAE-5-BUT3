@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { CourseButton } from "./CourseButton";
 import { GroupButton } from "./GroupButton";
-import { CommentaryButton } from "./CommentaryButton";
 import { PrintButton } from "./PrintButton";
 
 const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol, selectedColor, setSelectedColor, addItem, addGroups }) => {
@@ -44,7 +43,8 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
         <img
           src={isExpanded ? "/images/minus.svg" : "/images/plus.svg"}
           alt={isExpanded ? "collapse icon" : "expand icon"}
-          className="w-7 h-7 fill-primary"/>
+          className="w-7 h-7 fill-primary"
+          draggable="false"/>
       </button>
 
       <div className={`grid grid-rows-4 gap-4 min-h-fit mt-4 justify-items-start transition-all 
@@ -57,8 +57,8 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
           selectedColor={selectedColor}
           setSelectedColor={setSelectedColor}
           addItem={addItem}/>
-        <GroupButton addGroups={addGroups} />
-        <CommentaryButton />
+        <GroupButton 
+          addGroups={addGroups} />
         <PrintButton />
       </div>
     </div>
