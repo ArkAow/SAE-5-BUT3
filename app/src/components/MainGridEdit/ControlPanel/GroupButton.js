@@ -62,19 +62,26 @@ export const GroupButton = ({ addGroups }) => {
     if (updatedGroups.length === 0) setIsNoGroups(true);
   };
 
+  const handleDeleteSubGroup = (groupIndex, subGroupIndex) => {
+    const updatedGroups = [...groups];
+    updatedGroups[groupIndex].subGroups = updatedGroups[groupIndex].subGroups.filter(
+      (_, i) => i !== subGroupIndex
+    );
+    setGroups(updatedGroups);
+    addGroups(updatedGroups);
+  };
+
   return (
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setIsFocused(true)}
         className={`btn-control-panel ${
           isFocused ? "bg-white shadow-lg" : ""
-        } transition duration-300`}
-      >
+        } transition duration-300`}>
         <span
           className={`absolute right-1 top-1 flex h-3 w-3 ${
             !isNoGroups ? "hidden" : ""
-          }`}
-        >
+          }`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
@@ -87,16 +94,14 @@ export const GroupButton = ({ addGroups }) => {
         <NodePortal>
           <div
             className="absolute top-52 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs"
-            ref={tooltipRef}
-          >
+            ref={tooltipRef}>
             <input
               type="text"
               placeholder="Nom du groupe"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               maxLength="8"
-              className="w-full p-2 mb-3 border rounded"
-            />
+              className="w-full p-2 mb-3 border rounded"/>
             <button onClick={handleAddGroup} className="w-full p-2 btn-default">
               Ajouter Groupe
             </button>
@@ -104,47 +109,47 @@ export const GroupButton = ({ addGroups }) => {
             <div
               className={`mt-4 max-h-48 overflow-y-auto custom-scrollbar-light bg-gray-200 rounded-lg p-3 ${
                 isNoGroups ? "hidden" : ""
-              }`}
-            >
+              }`}>
               {groups.map((group, index) => (
                 <div
                   key={index}
-                  className="mb-4 flex items-start justify-between"
-                >
-                  <div className="font-semibold text-lg">
+                  className="mb-4 flex items-start justify-between">
+                  <div className="font-semibold text-lg flex items-center">
                     {group.name}
+                    <button
+                      onClick={() => handleDeleteGroup(index)}
+                      className="size-6 btn-default justify-items-center ml-2">
+                        <img src="images/cross.svg" className="size-5" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col items-start mt-2 w-1/2">
+                    <input
+                      type="text"
+                      value={subGroupName}
+                      onChange={(e) => setSubGroupName(e.target.value)}
+                      maxLength="8"
+                      className="w-full p-2 mb-2 border rounded"/>
+                    <button
+                      onClick={() => handleAddSubGroup(index)}
+                      className="w-full p-2 btn-default">
+                      Ajouter Sous-Groupe
+                    </button>
+
                     {group.subGroups.map((subGroup, subIndex) => (
                       <div
                         key={subIndex}
-                        className="ml-4 text-sm text-gray-600"
-                      >
-                        - {subGroup}
+                        className="flex items-center mt-2 w-full">
+                        <span className="text-sm text-gray-600">{subGroup}</span>
+                        <button
+                          onClick={() =>
+                            handleDeleteSubGroup(index, subIndex)
+                          }
+                          className="size-4 btn-default justify-items-center ml-2">
+                          <img src="images/cross.svg" className="size-3" />
+                        </button>
                       </div>
                     ))}
-                  </div>
-
-                  <div className="flex flex-col items-start ml-4">
-                    <div className="flex flex-col items-start mt-2">
-                      <input
-                        type="text"
-                        value={subGroupName}
-                        onChange={(e) => setSubGroupName(e.target.value)}
-                        maxLength="8"
-                        className="w-36 p-2 mb-2 border rounded"
-                      />
-                      <button
-                        onClick={() => handleAddSubGroup(index)}
-                        className="w-36 p-2 btn-default"
-                      >
-                        Ajouter Sous-Groupe
-                      </button>
-                      <button
-                        onClick={() => handleDeleteGroup(index)}
-                        className="w-36 p-2 mt-3 btn-default"
-                      >
-                        Supprimer Groupe
-                      </button>
-                    </div>
                   </div>
                 </div>
               ))}
