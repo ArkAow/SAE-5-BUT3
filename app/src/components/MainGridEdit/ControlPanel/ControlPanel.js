@@ -8,8 +8,12 @@ const ControlPanel = ({
   setSelectedRow,
   selectedCol,
   setSelectedCol,
-  selectedColor,
-  setSelectedColor,
+  selectedCourseType,
+  setSelectedCourseType,
+  selectedTeacher,
+  setSelectedTeacher,
+  selectedDuration,
+  setSelectedDuration,
   addItem,
   addGroups }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -69,8 +73,12 @@ const ControlPanel = ({
           setSelectedRow={setSelectedRow}
           selectedCol={selectedCol}
           setSelectedCol={setSelectedCol}
-          selectedColor={selectedColor}
-          setSelectedColor={setSelectedColor}
+          selectedCourseType={selectedCourseType}
+          setSelectedCourseType={setSelectedCourseType}
+          selectedTeacher={selectedTeacher}
+          setSelectedTeacher={setSelectedTeacher}
+          selectedDuration={selectedDuration}
+          setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
         <GroupButton 
           addGroups={handleUpdateGroups} />

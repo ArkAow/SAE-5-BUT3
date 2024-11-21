@@ -6,14 +6,18 @@ export const CourseButton = ({
     setSelectedRow,
     selectedCol,
     setSelectedCol,
-    selectedColor,
-    setSelectedColor,
+    selectedCourseType,
+    setSelectedCourseType,
+    selectedTeacher,
+    setSelectedTeacher,
+    selectedDuration,
+    setSelectedDuration,
     addItem,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [error, setError] = useState("");
     const containerRef = useRef(null);
     const tooltipRef = useRef(null);
-    const [selectedCourseType, setSelectedCourseType] = useState("");
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -40,10 +44,28 @@ export const CourseButton = ({
         );
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedTeacher) {
+          setError("Veuillez sélectionner un professeur.");
+          return;
+        }
+        setError("");
+        addItem();
+    };
+
     const courseTypes = [
         { name: "CM", color: "#FFD700" },
         { name: "TD", color: "#FF3131" },
         { name: "TP", color: "#38B6FF" },
+    ];
+
+    const teachers = [
+        { name: "AP" },
+        { name: "LD" },
+        { name: "CO" },
+        { name: "SM" },
+        { name: "NM" },
     ];
 
     return (
@@ -60,7 +82,7 @@ export const CourseButton = ({
                     <div
                         className="absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs"
                         ref={tooltipRef}>
-                        <h3 className="mb-5">Ajouter un rectangle</h3>
+                        <h3 className="mb-5 font-bold text-base">Ajouter un cours</h3>
                         <div className="flex flex-row gap-4">
                             <div className="flex flex-row mb-5">
                                 <label className="mr-2 text-clip text-nowrap">Ligne :</label>
@@ -85,25 +107,54 @@ export const CourseButton = ({
                         </div>
 
                         <div className="mb-4">
-                            <label className="block mb-1">Type de cours :</label>
+                            <label className="block mb-1 font-bold">Type de cours :</label>
                             <select
-                                value={selectedCourseType}
-                                onChange={(e) => setSelectedCourseType(e.target.value)}
+                                value={selectedCourseType.name}
+                                onChange={(e) => {
+                                    const selectedType = courseTypes.find((type) => type.name === e.target.value);
+                                    setSelectedCourseType(selectedType);
+                                }}
                                 className="w-full p-2 border rounded">
                                 <option value="" disabled>
-                                Choisir un type
+                                Choisir un type de cours
                                 </option>
                                 {courseTypes.map((type) => (
-                                <option key={type.name} value={type.name}>
-                                    {type.name}
+                                    <option key={type.name} value={type.name}>
+                                        {type.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block mb-1 font-bold">Professeur :</label>
+                            <select
+                                value={selectedTeacher}
+                                onChange={(e) => setSelectedTeacher(e.target.value)}
+                                className="w-full p-2 border rounded">
+                                <option value="" disabled>
+                                Choisir un professeur
+                                </option>
+                                {teachers.map((teacher) => (
+                                <option key={teacher.name} value={teacher.name}>
+                                    {teacher.name}
                                 </option>
                                 ))}
                             </select>
                         </div>
 
-
+                        <div className="mb-4">
+                            <label className="block mb-1 font-bold">Durée (en heure):</label>
+                            <input
+                                type="number"
+                                step="0.5"
+                                value={selectedDuration}
+                                onChange={(e) => setSelectedDuration(Number(e.target.value))}
+                                className="w-full bg-gray-300 rounded-full pl-6"/>
+                        </div>
+                        {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
                         <button
-                            onClick={addItem}
+                            onClick={handleSubmit}
                             className="px-3 py-2 w-full btn-default">
                             Ajouter
                         </button>

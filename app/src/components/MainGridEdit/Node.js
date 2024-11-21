@@ -48,7 +48,10 @@ const Node = ({ positionKey, items, moveItem }) => {
       onMouseLeave={() => setIsHovered(false)}>
       {items?.length === 1 && (
         <DraggableRectangle
+          courseType={items[0].courseType}
           color={items[0].color}
+          teacher={items[0].teacher}
+          duration={items[0].duration}
           positionKey={positionKey}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => setIsDragging(false)}

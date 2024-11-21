@@ -8,7 +8,9 @@ const MainGrid = () => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
-  const [selectedColor, setSelectedColor] = useState("#FFD700");
+  const [selectedCourseType, setSelectedCourseType] = useState({ name: "CM", color: "#FFD700" });
+  const [selectedTeacher, setSelectedTeacher,] = useState("");
+  const [selectedDuration, setSelectedDuration,] = useState(1.0);
   const [groups, setGroups] = useState([]);
 
   const addGroups = (newGroups) => {
@@ -17,7 +19,13 @@ const MainGrid = () => {
 
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
-    const newItem = { color: selectedColor, id: Date.now() };
+    const newItem = { 
+      color: selectedCourseType.color,
+      courseType: selectedCourseType.name,
+      teacher: selectedTeacher,
+      duration: selectedDuration,
+      id: Date.now()
+    };
     setItems((prevItems) => ({
       ...prevItems,
       [positionKey]: [...(prevItems[positionKey] || []), newItem],
@@ -25,8 +33,8 @@ const MainGrid = () => {
   };
 
   const getGroupList = () => {
-    const mainGroups = [];
-    const subGroups = [];
+    const mainGroups = ["G6", "G7"];
+    const subGroups = ["G6A", "G6B", "G7A", "G7B"];
   
     groups.forEach((group) => {
       mainGroups.push(group.name);
@@ -66,8 +74,12 @@ const MainGrid = () => {
             setSelectedRow={setSelectedRow}
             selectedCol={selectedCol}
             setSelectedCol={setSelectedCol}
-            selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
+            selectedCourseType={selectedCourseType}
+            setSelectedCourseType={setSelectedCourseType}
+            selectedTeacher={selectedTeacher}
+            setSelectedTeacher={setSelectedTeacher}
+            selectedDuration={selectedDuration}
+            setSelectedDuration={setSelectedDuration}
             addItem={addItem}
             addGroups={addGroups}
           />
