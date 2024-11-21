@@ -36,7 +36,10 @@ export function convertHexaToDeci(colorHexadecimalCode) {
 }
 
 export function isBlack(colorCode) {
-
+    const redFactor = 0.2;
+    const greenFactor = 0.4;
+    const blueFactor = 0.1;
+    
     let decimalColors;
     if (colorCode.startsWith("#")) {
         decimalColors = convertHexaToDeci(colorCode);
@@ -44,12 +47,8 @@ export function isBlack(colorCode) {
         decimalColors = colorCode; 
     }
 
-   
     const [r, g, b] = decimalColors;
+    const luminance = redFactor * r + greenFactor * g + blueFactor * b;
 
-    
-    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-
-    
     return luminance < 128;
 }
