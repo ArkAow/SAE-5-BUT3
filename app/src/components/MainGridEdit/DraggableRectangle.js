@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDrag } from "react-dnd";
 import { getShade, isBlack } from "../../services/colorService";
+import { formatDuration } from "../../services/durationService";
 
 const ITEM_TYPE = "rectangle";
 
@@ -56,7 +57,7 @@ const DraggableRectangle = ({ color, positionKey, professor, courseType, duratio
         {professor}
       </div>
       <div className="w-full bg-white h-4 text-xs text-black rounded px-2">
-        {duration}
+        {formatDuration(duration)}
       </div>
 
       {/* Paramètres */}

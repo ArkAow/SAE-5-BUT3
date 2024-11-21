@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom";  // Importer createPortal pour rendre l'élément dans un conteneur global
+import { createPortal } from "react-dom";
 
 export const CourseButton = ({
     selectedRow,
@@ -13,6 +13,7 @@ export const CourseButton = ({
     const [isFocused, setIsFocused] = useState(false);
     const containerRef = useRef(null);
     const tooltipRef = useRef(null);
+    const [selectedCourseType, setSelectedCourseType] = useState("");
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -39,6 +40,12 @@ export const CourseButton = ({
         );
     };
 
+    const courseTypes = [
+        { name: "CM", color: "#FFD700" },
+        { name: "TD", color: "#FF3131" },
+        { name: "TP", color: "#38B6FF" },
+    ];
+
     return (
         <div className="relative" ref={containerRef}>
             <button
@@ -51,39 +58,49 @@ export const CourseButton = ({
             {isFocused && (
                 <NodePortal>
                     <div
-                        ref={tooltipRef}
-                        className="absolute z-50 top-32 left-32 w-52 p-3 bg-white shadow-lg rounded-lg text-xs">
+                        className="absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs"
+                        ref={tooltipRef}>
                         <h3 className="mb-5">Ajouter un rectangle</h3>
-                        <div className="flex flex-row mb-5">
-                            <label className="mr-2 text-clip text-nowrap">Ligne :</label>
-                            <input
-                                type="number"
-                                min="0"
-                                max="3"
-                                value={selectedRow}
-                                onChange={(e) => setSelectedRow(Number(e.target.value))}
-                                className="w-full bg-gray-300 rounded-full pl-6"/>
+                        <div className="flex flex-row gap-4">
+                            <div className="flex flex-row mb-5">
+                                <label className="mr-2 text-clip text-nowrap">Ligne :</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="3"
+                                    value={selectedRow}
+                                    onChange={(e) => setSelectedRow(Number(e.target.value))}
+                                    className="w-14 bg-gray-300 rounded-full pl-6"/>
+                            </div>
+                            <div className="flex flex-row mb-5">
+                                <label className="mr-2 text-clip text-nowrap">Colonne :</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="7"
+                                    value={selectedCol}
+                                    onChange={(e) => setSelectedCol(Number(e.target.value))}
+                                    className="w-14 bg-gray-300 rounded-full pl-6"/>
+                            </div>                            
                         </div>
 
-                        <div className="flex flex-row mb-5">
-                            <label className="mr-2 text-clip text-nowrap">Colonne :</label>
-                            <input
-                                type="number"
-                                min="0"
-                                max="7"
-                                value={selectedCol}
-                                onChange={(e) => setSelectedCol(Number(e.target.value))}
-                                className="w-full bg-gray-300 rounded-full pl-6"/>
+                        <div className="mb-4">
+                            <label className="block mb-1">Type de cours :</label>
+                            <select
+                                value={selectedCourseType}
+                                onChange={(e) => setSelectedCourseType(e.target.value)}
+                                className="w-full p-2 border rounded">
+                                <option value="" disabled>
+                                Choisir un type
+                                </option>
+                                {courseTypes.map((type) => (
+                                <option key={type.name} value={type.name}>
+                                    {type.name}
+                                </option>
+                                ))}
+                            </select>
                         </div>
 
-                        <div className="flex flex-row mb-5">
-                            <label className="mr-2 text-clip text-nowrap">Couleur :</label>
-                            <input
-                                type="color"
-                                value={selectedColor}
-                                onChange={(e) => setSelectedColor(e.target.value)}
-                                className="w-full"/>
-                        </div>
 
                         <button
                             onClick={addItem}
