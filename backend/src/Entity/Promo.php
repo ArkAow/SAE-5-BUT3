@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Group;
 
 #[ORM\Entity]
 #[ORM\Table(name: "class")]
@@ -15,10 +16,10 @@ class Promo
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 20)]
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\OneToMany(targetEntity: Group::class,mappedBy: "promo")]
+    #[ORM\ManyToMany(targetEntity: Group::class)]
     #[ORM\JoinTable(name: "class_group")]
     private Collection $groups;
 

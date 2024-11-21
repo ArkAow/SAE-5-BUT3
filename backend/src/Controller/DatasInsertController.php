@@ -22,7 +22,6 @@ class DatasInsertController extends AbstractController
     {
         $this->entityManager = $entityManager;
         $this->excelReaderController = $excelReaderController;
-
         $this->initializeCourseTypes();
     }
 
@@ -36,15 +35,14 @@ class DatasInsertController extends AbstractController
         }
 
         $data = json_decode($response->getContent(), true);
-        if (!isset($data['sheets'])) {
+
+        if (!isset($data['sheets']) || !is_array($data['sheets'])) {
             return new JsonResponse(['error' => "Le fichier avec l'ID {$id} n'existe pas ou est vide."], Response::HTTP_NOT_FOUND);
         }
 
-        $sheets = $data['sheets'];
-
-        foreach ($sheets as $sheetName => $rows) {
+        foreach ($data['sheets'] as $sheetName => $rows) {
             foreach ($rows as $rowData) {
-                $this->addData($rowData);
+                $this->addData($rowData, $sheetName);
             }
         }
 
@@ -53,7 +51,7 @@ class DatasInsertController extends AbstractController
         return new JsonResponse(['status' => 'Les données ont été insérées avec succès']);
     }
 
-    private function addData(array $rowData): void
+    private function addData(array $rowData, string $sheetName): void
     {
         if (empty($rowData['code_apogee']) || empty($rowData['intitule'])) {
             return;
@@ -72,40 +70,39 @@ class DatasInsertController extends AbstractController
             $subject->setDuration($rowData['total'] ?? $subject->getDuration());
         }
 
-        if (!empty($rowData['curriculum']) && !empty($rowData['semester'])) {
-            $this->processCurriculumAndSemester($rowData);
-        }
-
+        $this->processCurriculumAndSemester($rowData, $sheetName, $subject);
         $this->processCourseTypes($rowData, $subject);
     }
 
-    private function processCurriculumAndSemester(array $rowData): void
+    private function processCurriculumAndSemester(array $rowData, string $sheetName, Subject $subject): void
     {
+        $curriculumName = explode(' ', $sheetName)[0];
         $curriculum = $this->entityManager->getRepository(Curriculum::class)
-            ->findOneBy(['name' => $rowData['curriculum']]);
+            ->findOneBy(['name' => $curriculumName]);
 
         if (!$curriculum) {
             $curriculum = new Curriculum();
-            $curriculum->setName($rowData['curriculum']);
+            $curriculum->setName($curriculumName);
             $this->entityManager->persist($curriculum);
         }
 
+        $semesterName = $rowData['semester'] ?? $sheetName;
         $semester = $this->entityManager->getRepository(Semester::class)
-            ->findOneBy(['name' => $rowData['semester']]);
+            ->findOneBy(['name' => $semesterName]);
 
         if (!$semester) {
             $semester = new Semester();
-            $semester->setName($rowData['semester']);
+            $semester->setName($semesterName);
             $this->entityManager->persist($semester);
         }
 
-        $this->entityManager->getConnection()->executeStatement(
-            'INSERT IGNORE INTO curriculum_semester (curriculum_id, semester_id) VALUES (:curriculum, :semester)',
-            [
-                'curriculum' => $curriculum->getId(),
-                'semester' => $semester->getId(),
-            ]
-        );
+        if (!$curriculum->getSemesters()->contains($semester)) {
+            $curriculum->addSemester($semester);
+        }
+
+        if (!$semester->getSubjects()->contains($subject)) {
+            $semester->addSubject($subject);
+        }
     }
 
     private function processCourseTypes(array $rowData, Subject $subject): void
@@ -123,12 +120,18 @@ class DatasInsertController extends AbstractController
                     ->findOneBy(['name' => $typeName]);
 
                 if ($courseType) {
-                    $expectedDuration = new ExpectedDuration();
-                    $expectedDuration->setCourseType($courseType);
-                    $expectedDuration->setSubject($subject);
-                    $expectedDuration->setExpectedDuration($duration);
+                    $expectedDuration = $this->entityManager->getRepository(ExpectedDuration::class)
+                        ->findOneBy(['subject' => $subject, 'courseType' => $courseType]);
 
-                    $this->entityManager->persist($expectedDuration);
+                    if (!$expectedDuration) {
+                        $expectedDuration = new ExpectedDuration();
+                        $expectedDuration->setCourseType($courseType);
+                        $expectedDuration->setSubject($subject);
+                        $expectedDuration->setExpectedDuration($duration);
+                        $this->entityManager->persist($expectedDuration);
+                    } else {
+                        $expectedDuration->setExpectedDuration($duration);
+                    }
                 }
             }
         }

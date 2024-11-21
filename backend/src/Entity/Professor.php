@@ -3,14 +3,16 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Teacher;
 
 #[ORM\Entity]
 #[ORM\Table(name: "professor")]
 class Professor
 {
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: Teacher::class)]
-    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\GeneratedValue]
+    #[ORM\ManyToOne(targetEntity: Teacher::class)]
+    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
     private Teacher $teacher;
 
     public function getTeacher(): Teacher
@@ -24,4 +26,3 @@ class Professor
         return $this;
     }
 }
-

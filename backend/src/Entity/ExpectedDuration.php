@@ -3,29 +3,30 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Subject;
+use App\Entity\CourseType;
 
 #[ORM\Entity]
 #[ORM\Table(name: "expected_duration")]
 class ExpectedDuration
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(type: "float")]
     private float $expectedDuration;
 
-    #[ORM\ManyToOne(targetEntity: Subject::class, inversedBy: "expectedDurations")]
-    #[ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", nullable: true, onDelete: "SET NULL")]
-    private ?Subject $subject = null;    
+    #[ORM\ManyToOne(targetEntity: Subject::class)]
+    #[ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private Subject $subject;
 
     #[ORM\ManyToOne(targetEntity: CourseType::class)]
     #[ORM\JoinColumn(name: "course_type_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private CourseType $courseType;
 
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -46,7 +47,7 @@ class ExpectedDuration
         return $this->subject;
     }
 
-    public function setSubject(?Subject $subject): self
+    public function setSubject(Subject $subject): self
     {
         $this->subject = $subject;
         return $this;

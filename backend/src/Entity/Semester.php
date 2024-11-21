@@ -5,7 +5,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Curriculum;
 use App\Entity\Subject;
 
 #[ORM\Entity]
@@ -17,11 +16,17 @@ class Semester
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 50)]
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\OneToMany(targetEntity: Subject::class, mappedBy: "semesters")]
+    #[ORM\ManyToMany(targetEntity: Subject::class)]
+    #[ORM\JoinTable(name: "subject_semester")]
     private Collection $subjects;
+
+    public function __construct()
+    {
+        $this->subjects = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -47,9 +52,8 @@ class Semester
     public function addSubject(Subject $subject): self
     {
         if (!$this->subjects->contains($subject)) {
-            $this->subjects[] = $subject;
+            $this->subjects->add($subject);
         }
-
         return $this;
     }
 

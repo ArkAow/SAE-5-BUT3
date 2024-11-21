@@ -15,7 +15,7 @@ class Subject
     #[ORM\GeneratedValue]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 50)]
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
     #[ORM\Column(type: "string", length: 10)]
@@ -76,24 +76,17 @@ class Subject
         return $this->expectedDurationSubject;
     }
 
-    public function addExpectedDurationsSubject(ExpectedDuration $expectedDuration): self
+    public function addExpectedDurationSubject(ExpectedDuration $expectedDuration): self
     {
         if (!$this->expectedDurationSubject->contains($expectedDuration)) {
             $this->expectedDurationSubject->add($expectedDuration);
-            $expectedDuration->setSubject($this);
         }
-
         return $this;
     }
 
-    public function removeExpectedDurationsSubject(ExpectedDuration $expectedDuration): self
+    public function removeExpectedDurationSubject(ExpectedDuration $expectedDuration): self
     {
-        if ($this->expectedDurationSubject->removeElement($expectedDuration)) {
-            if ($expectedDuration->getSubject() === $this) {
-                $expectedDuration->setSubject(null);
-            }
-        }
-
+        $this->expectedDurationSubject->removeElement($expectedDuration);
         return $this;
     }
 }

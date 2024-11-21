@@ -3,14 +3,15 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\CourseType;
+use App\Entity\Subject;
 
 #[ORM\Entity]
 #[ORM\Table(name: "course")]
 class Course
 {
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id;
 
@@ -23,14 +24,13 @@ class Course
     #[ORM\Column(type: "integer")]
     private int $positionY;
 
-    #[ORM\ManyToMany(targetEntity: Subject::class)]
-    #[ORM\JoinTable(name: "course_subject")]
-    private Collection $subjects;
+    #[ORM\ManyToOne(targetEntity: CourseType::class)]
+    #[ORM\JoinColumn(name: "course_type_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private CourseType $courseType;
 
-    public function __construct()
-    {
-        $this->subjects = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(targetEntity: Subject::class)]
+    #[ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private Subject $subject;
 
     public function getId(): int
     {
@@ -70,22 +70,25 @@ class Course
         return $this;
     }
 
-    public function getSubjects(): Collection
+    public function getCourseType(): CourseType
     {
-        return $this->subjects;
+        return $this->courseType;
     }
 
-    public function addSubject(Subject $subject): self
+    public function setCourseType(CourseType $courseType): self
     {
-        if (!$this->subjects->contains($subject)) {
-            $this->subjects->add($subject);
-        }
+        $this->courseType = $courseType;
         return $this;
     }
 
-    public function removeSubject(Subject $subject): self
+    public function getSubject(): Subject
     {
-        $this->subjects->removeElement($subject);
+        return $this->subject;
+    }
+
+    public function setSubject(Subject $subject): self
+    {
+        $this->subject = $subject;
         return $this;
     }
 }

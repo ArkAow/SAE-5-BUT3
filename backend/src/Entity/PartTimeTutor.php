@@ -3,16 +3,18 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Teacher;
 
 #[ORM\Entity]
 #[ORM\Table(name: "part_time_tutor")]
 class PartTimeTutor
 {
     #[ORM\Id]
-    #[ORM\OneToOne(targetEntity: Teacher::class)]
-    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\GeneratedValue]
+    #[ORM\ManyToOne(targetEntity: Teacher::class)]
+    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
     private Teacher $teacher;
-
+    
     #[ORM\Column(type: "string", length: 500)]
     private string $hourlyConstraint;
 

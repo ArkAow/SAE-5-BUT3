@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 #[ORM\Table(name: "teacher")]
@@ -26,15 +24,6 @@ class Teacher
 
     #[ORM\Column(type: "string", length: 1000)]
     private string $subjectsTaught;
-
-    #[ORM\ManyToMany(targetEntity: Course::class)]
-    #[ORM\JoinTable(name: "course_teacher")]
-    private Collection $courses;
-
-    public function __construct()
-    {
-        $this->courses = new ArrayCollection();
-    }
 
     public function getId(): int
     {
@@ -82,25 +71,6 @@ class Teacher
     public function setSubjectsTaught(string $subjectsTaught): self
     {
         $this->subjectsTaught = $subjectsTaught;
-        return $this;
-    }
-
-    public function getCourses(): Collection
-    {
-        return $this->courses;
-    }
-
-    public function addCourse(Course $course): self
-    {
-        if (!$this->courses->contains($course)) {
-            $this->courses->add($course);
-        }
-        return $this;
-    }
-
-    public function removeCourse(Course $course): self
-    {
-        $this->courses->removeElement($course);
         return $this;
     }
 }

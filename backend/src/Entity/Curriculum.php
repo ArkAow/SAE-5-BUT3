@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Promo;
+use App\Entity\Semester;
 
 #[ORM\Entity]
 #[ORM\Table(name: "curriculum")]
@@ -15,18 +17,21 @@ class Curriculum
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 50)]
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\OneToMany(mappedBy: "curriculum", targetEntity: Promo::class, cascade: ["persist", "remove"])]
+    #[ORM\ManyToMany(targetEntity: Promo::class)]
+    #[ORM\JoinTable(name: "curriculum_class")]
     private Collection $classes;
 
-    #[ORM\OneToMany(mappedBy: "curriculum", targetEntity: Semester::class, cascade: ["persist", "remove"])]
+    #[ORM\ManyToMany(targetEntity: Semester::class)]
+    #[ORM\JoinTable(name: "curriculum_semester")]
     private Collection $semesters;
 
     public function __construct()
     {
         $this->classes = new ArrayCollection();
+        $this->semesters = new ArrayCollection();
     }
 
     public function getId(): int
@@ -50,17 +55,17 @@ class Curriculum
         return $this->classes;
     }
 
-    public function addClass(Promo $promo): self
+    public function addClass(Promo $class): self
     {
-        if (!$this->classes->contains($promo)) {
-            $this->classes->add($promo);
+        if (!$this->classes->contains($class)) {
+            $this->classes->add($class);
         }
         return $this;
     }
 
-    public function removeClass(Promo $promo): self
+    public function removeClass(Promo $class): self
     {
-        $this->classes->removeElement($promo);
+        $this->classes->removeElement($class);
         return $this;
     }
 
@@ -83,4 +88,3 @@ class Curriculum
         return $this;
     }
 }
-

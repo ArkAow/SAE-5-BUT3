@@ -11,11 +11,11 @@ use Doctrine\Common\Collections\Collection;
 class CourseType
 {
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
     #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 120)]
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
     #[ORM\Column(type: "string", length: 50)]
@@ -23,15 +23,6 @@ class CourseType
 
     #[ORM\Column(type: "string", length: 500)]
     private string $scope;
-
-    #[ORM\ManyToMany(targetEntity: Course::class)]
-    #[ORM\JoinTable(name: "course_type_course")]
-    private Collection $courses;
-
-    public function __construct()
-    {
-        $this->courses = new ArrayCollection();
-    }
 
     public function getId(): int
     {
@@ -68,25 +59,6 @@ class CourseType
     public function setScope(string $scope): self
     {
         $this->scope = $scope;
-        return $this;
-    }
-
-    public function getCourses(): Collection
-    {
-        return $this->courses;
-    }
-
-    public function addCourse(Course $course): self
-    {
-        if (!$this->courses->contains($course)) {
-            $this->courses->add($course);
-        }
-        return $this;
-    }
-
-    public function removeCourse(Course $course): self
-    {
-        $this->courses->removeElement($course);
         return $this;
     }
 }

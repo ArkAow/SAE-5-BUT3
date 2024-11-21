@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\HalfGroup;
 
 #[ORM\Entity]
 #[ORM\Table(name: "group")]
@@ -15,10 +16,10 @@ class Group
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 30)]
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\OneToMany(targetEntity: HalfGroup::class,mappedBy: "group")]
+    #[ORM\ManyToMany(targetEntity: HalfGroup::class)]
     #[ORM\JoinTable(name: "group_half_group")]
     private Collection $halfGroups;
 
