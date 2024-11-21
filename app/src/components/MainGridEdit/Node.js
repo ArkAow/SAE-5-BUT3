@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
-import DraggableRectangle from "./DraggableRectangle";
+import CourseObject from "./CourseObject";
 import { getShade } from "../../services/colorService";
 
 const ITEM_TYPE = "rectangle";
@@ -47,7 +47,7 @@ const Node = ({ positionKey, items, moveItem }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
       {items?.length === 1 && (
-        <DraggableRectangle
+        <CourseObject
           courseType={items[0].courseType}
           color={items[0].color}
           teacher={items[0].teacher}
@@ -90,7 +90,7 @@ const Node = ({ positionKey, items, moveItem }) => {
           }}>
           {items.map((item) => (
             <div key={item.id} className="mb-1 text-white">
-              <DraggableRectangle
+              <CourseObject
                 color={item.color}
                 positionKey={positionKey}
                 id={item.id}
