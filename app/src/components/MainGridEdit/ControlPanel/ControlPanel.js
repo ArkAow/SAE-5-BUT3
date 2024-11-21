@@ -3,7 +3,15 @@ import { CourseButton } from "./CourseButton";
 import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
 
-const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol, selectedColor, setSelectedColor, addItem, addGroups }) => {
+const ControlPanel = ({ 
+  selectedRow,
+  setSelectedRow,
+  selectedCol,
+  setSelectedCol,
+  selectedColor,
+  setSelectedColor,
+  addItem,
+  addGroups }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [delayedExpanded, setDelayedExpanded] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -24,6 +32,13 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
     setTimeout(() => setIsButtonDisabled(false), 300);
   };
 
+  const handleUpdateGroups = (groups) => {
+    setIsNoGroups(groups.length === 0);
+    if (addGroups) {
+      addGroups(groups);
+    }
+  };
+
   return (
     <div
       className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[83.5vh] w-20" : "h-20 w-20"}`}>
@@ -35,7 +50,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
             : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
 
-        <span className={`absolute right-4 top-4 flex h-3 w-3 ${isNoGroups && isExpanded ? "hidden" : ""}`}>
+        <span className={`absolute right-4 top-4 flex h-3 w-3 ${(!isNoGroups || isExpanded) ? "hidden" : ""}`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
@@ -58,7 +73,7 @@ const ControlPanel = ({ selectedRow, setSelectedRow, selectedCol, setSelectedCol
           setSelectedColor={setSelectedColor}
           addItem={addItem}/>
         <GroupButton 
-          addGroups={addGroups} />
+          addGroups={handleUpdateGroups} />
         <PrintButton />
       </div>
     </div>
