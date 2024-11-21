@@ -93,7 +93,7 @@ export const GroupButton = ({ addGroups }) => {
       {isFocused && (
         <NodePortal>
           <div
-            className="absolute top-52 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs"
+            className="absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs"
             ref={tooltipRef}>
             <input
               type="text"
