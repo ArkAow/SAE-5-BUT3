@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CourseButton } from "./CourseButton";
 import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
 
-const ControlPanel = ({ 
+const ControlPanel = ({
+  groups,
   selectedRow,
   setSelectedRow,
   selectedCol,
@@ -21,6 +22,10 @@ const ControlPanel = ({
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
 
+  useEffect(() => {
+    setIsNoGroups(groups.length === 0);
+  }, [groups]);
+
   const handleToggleExpand = () => {
     if (isButtonDisabled) return;
     setIsButtonDisabled(true);
@@ -36,10 +41,9 @@ const ControlPanel = ({
     setTimeout(() => setIsButtonDisabled(false), 300);
   };
 
-  const handleUpdateGroups = (groups) => {
-    setIsNoGroups(groups.length === 0);
+  const handleUpdateGroups = (newGroups) => {
     if (addGroups) {
-      addGroups(groups);
+      addGroups(newGroups);
     }
   };
 
@@ -81,6 +85,8 @@ const ControlPanel = ({
           setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
         <GroupButton 
+          groups={groups}
+          isNoGroups={isNoGroups}
           addGroups={handleUpdateGroups} />
         <PrintButton />
       </div>

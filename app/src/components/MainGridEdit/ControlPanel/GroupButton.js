@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-export const GroupButton = ({ addGroups }) => {
+export const GroupButton = ({ addGroups, isNoGroups, groups }) => {
   const [groupName, setGroupName] = useState("");
   const [subGroupName, setSubGroupName] = useState("");
-  const [groups, setGroups] = useState([]);
-  const [isNoGroups, setIsNoGroups] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
@@ -36,10 +34,8 @@ export const GroupButton = ({ addGroups }) => {
     if (groupName.trim() !== "") {
       const newGroup = { name: groupName, subGroups: [] };
       const updatedGroups = [...groups, newGroup];
-      setGroups(updatedGroups);
       setGroupName("");
       addGroups(updatedGroups);
-      setIsNoGroups(false);
     }
   };
 
@@ -49,7 +45,6 @@ export const GroupButton = ({ addGroups }) => {
       const parentGroup = updatedGroups[index];
       const newSubGroupName = `${parentGroup.name}${subGroupName}`;
       parentGroup.subGroups.push(newSubGroupName);
-      setGroups(updatedGroups);
       addGroups(updatedGroups);
       setSubGroupName("");
     }
@@ -57,9 +52,7 @@ export const GroupButton = ({ addGroups }) => {
 
   const handleDeleteGroup = (index) => {
     const updatedGroups = groups.filter((_, i) => i !== index);
-    setGroups(updatedGroups);
     addGroups(updatedGroups);
-    if (updatedGroups.length === 0) setIsNoGroups(true);
   };
 
   const handleDeleteSubGroup = (groupIndex, subGroupIndex) => {
@@ -67,7 +60,6 @@ export const GroupButton = ({ addGroups }) => {
     updatedGroups[groupIndex].subGroups = updatedGroups[groupIndex].subGroups.filter(
       (_, i) => i !== subGroupIndex
     );
-    setGroups(updatedGroups);
     addGroups(updatedGroups);
   };
 
@@ -93,7 +85,7 @@ export const GroupButton = ({ addGroups }) => {
       {isFocused && (
         <NodePortal>
           <div
-            className="absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs"
+            className="tooltip"
             ref={tooltipRef}>
             <input
               type="text"

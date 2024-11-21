@@ -14,6 +14,20 @@ export const CourseButton = ({
     setSelectedDuration,
     addItem,
 }) => {
+    const courseTypes = [
+        { name: "CM", color: "#FFD700" },
+        { name: "TD", color: "#FF3131" },
+        { name: "TP", color: "#38B6FF" },
+    ];
+
+    const teachers = [
+        { name: "AP" },
+        { name: "LD" },
+        { name: "CO" },
+        { name: "SM" },
+        { name: "NM" },
+    ];
+    
     const [isFocused, setIsFocused] = useState(false);
     const [error, setError] = useState("");
     const containerRef = useRef(null);
@@ -53,20 +67,6 @@ export const CourseButton = ({
         setError("");
         addItem();
     };
-
-    const courseTypes = [
-        { name: "CM", color: "#FFD700" },
-        { name: "TD", color: "#FF3131" },
-        { name: "TP", color: "#38B6FF" },
-    ];
-
-    const teachers = [
-        { name: "AP" },
-        { name: "LD" },
-        { name: "CO" },
-        { name: "SM" },
-        { name: "NM" },
-    ];
 
     return (
         <div className="relative" ref={containerRef}>

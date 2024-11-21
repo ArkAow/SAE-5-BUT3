@@ -91,10 +91,12 @@ const Node = ({ positionKey, items, moveItem }) => {
           {items.map((item) => (
             <div key={item.id} className="mb-1 text-white">
               <CourseObject
+                courseType={item.courseType}
                 color={item.color}
-                positionKey={positionKey}
-                id={item.id}
+                teacher={item.teacher}
+                duration={item.duration}
                 small
+                positionKey={positionKey}
                 onDragStart={() => setIsDragging(true)}
                 onDragEnd={() => setIsDragging(false)}/>
               <strong>--------------</strong>

@@ -5,16 +5,27 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 
 const MainGrid = () => {
+  const initialGroups = [
+    { name: "G6", subGroups: ["G6A", "G6B"] },
+    { name: "G7", subGroups: ["G7A", "G7B"] },
+  ];
+
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
   const [selectedCourseType, setSelectedCourseType] = useState({ name: "CM", color: "#FFD700" });
   const [selectedTeacher, setSelectedTeacher,] = useState("");
   const [selectedDuration, setSelectedDuration,] = useState(1.0);
-  const [groups, setGroups] = useState([]);
+  const [groups, setGroups] = useState(initialGroups);
 
   const addGroups = (newGroups) => {
-    setGroups(newGroups);
+    setGroups((prevGroups) => {
+      const existingGroupNames = prevGroups.map((g) => g.name);
+      const filteredNewGroups = newGroups.filter(
+        (newGroup) => !existingGroupNames.includes(newGroup.name)
+      );
+      return [...prevGroups, ...filteredNewGroups];
+    });
   };
 
   const addItem = () => {
@@ -33,19 +44,9 @@ const MainGrid = () => {
   };
 
   const getGroupList = () => {
-    const mainGroups = ["G6", "G7"];
-    const subGroups = ["G6A", "G6B", "G7A", "G7B"];
-  
-    groups.forEach((group) => {
-      mainGroups.push(group.name);
-      group.subGroups.forEach((subGroup) => {
-        subGroups.push(subGroup);
-      });
-    });
-    if (mainGroups.length > 0) {
-      return ["Tous", ...mainGroups, ...subGroups];
-    }
-    return [];
+    const mainGroups = groups.map((group) => group.name);
+    const subGroups = groups.flatMap((group) => group.subGroups);
+    return ["Tous", ...mainGroups, ...subGroups];
   };
 
   const moveItem = (fromKey, toKey) => {
@@ -70,6 +71,7 @@ const MainGrid = () => {
       <div className="flex items-center justify-start gap-5 h-20 px-10">
         <div className="absolute top-6">
           <ControlPanel
+            groups={groups}
             selectedRow={selectedRow}
             setSelectedRow={setSelectedRow}
             selectedCol={selectedCol}

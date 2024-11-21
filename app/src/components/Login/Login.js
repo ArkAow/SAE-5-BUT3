@@ -67,7 +67,7 @@ const Login = ({ setIsAuthenticated }) => {
             </div>
             <button
               type="submit"
-              className="btn-primary transition duration-300"
+              className="btn-login transition duration-300"
             >
               Se connecter
             </button>
