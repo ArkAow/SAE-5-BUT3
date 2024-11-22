@@ -6,7 +6,9 @@ import { curriculums } from "../../constants";
 const PreGridEdit = () => {
   const [selectedCurriculum, setSelectedCurriculum] = useState({ 
     name: "A1", 
-    ressources: ["R1.01", "R1.02", "R1.03"], 
+    semesters: [
+      { name: "S1", subjects: ["R1.01", "R1.02", "R1.03"] },
+      { name: "S2", subjects: ["R2.01", "R2.02", "R2.03"] },],
     group: [{ name: "G1", subGroups: ["G1A", "G1B"] }, { name: "G2", subGroups: ["G2A", "G2B"] }, { name: "G3", subGroups: ["G3A", "G3B"] }], 
   });
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ const PreGridEdit = () => {
       <div className="flex flex-col items-center justify-center flex-1 space-y-10 py-10">
         <div className="flex space-x-8">
 
-          {/* Champ de selection du Cursus */}
+          {/* Choix Cursus */}
           <div className="w-64">
             <label className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white">Cursus :</label>
             <select

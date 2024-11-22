@@ -5,15 +5,19 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 
 const MainGrid = ({curriculum}) => {
-
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
   const [selectedCourseType, setSelectedCourseType] = useState({ name: "CM", color: "#FFD700" });
   const [selectedTeacher, setSelectedTeacher,] = useState("");
   const [selectedDuration, setSelectedDuration,] = useState(1.0);
+  const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
+  const [selectedSemester, setSelectedSemester] = useState(curriculum.semesters[0]?.name || "");
+  const [availableSubjects, setAvailableSubjects] = useState(curriculum.semesters[0]?.subjects || []);
   const [groups, setGroups] = useState(curriculum.group);
 
+
+  {/* Pour la gestion des groupes */}
   const addGroups = (newGroups) => {
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
@@ -30,7 +34,34 @@ const MainGrid = ({curriculum}) => {
     setGroups(updatedGroups);
   };
   
+  const getGroupList = () => {
+    const mainGroups = groups.map((group) => group.name);
+    const subGroups = groups.flatMap((group) => group.subGroups);
+    return ["Tous", ...mainGroups, ...subGroups];
+  };
 
+  {/* Pour les matières et semestres */}
+  const handleSemesterChange = (e) => {
+    const selected = e.target.value;
+    setSelectedSemester(selected);
+    const semester = curriculum.semesters.find((s) => s.name === selected);
+    setAvailableSubjects(semester ? semester.subjects : []);
+    setCurrentSubjectIndex(0);
+  };
+
+  const handleNextSubject = () => {
+    if (currentSubjectIndex < availableSubjects.length - 1) {
+      setCurrentSubjectIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  const handleSubjectChange = (e) => {
+    const selectedSubject = e.target.value;
+    const subjectIndex = availableSubjects.indexOf(selectedSubject);
+    setCurrentSubjectIndex(subjectIndex);
+  };
+
+  {/* Pour la gestion des cours */}
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
     const newItem = { 
@@ -44,12 +75,6 @@ const MainGrid = ({curriculum}) => {
       ...prevItems,
       [positionKey]: [...(prevItems[positionKey] || []), newItem],
     }));
-  };
-
-  const getGroupList = () => {
-    const mainGroups = groups.map((group) => group.name);
-    const subGroups = groups.flatMap((group) => group.subGroups);
-    return ["Tous", ...mainGroups, ...subGroups];
   };
 
   const moveItem = (fromKey, toKey) => {
@@ -91,26 +116,49 @@ const MainGrid = ({curriculum}) => {
           />
         </div>
 
-        <button className="flex min-w-fit h-10 ml-24 mt-2 items-center px-4 py-2 text-white
-          bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint
-          border border-white focus:outline-none">
+        {/* Choix semestre */}
+        <select
+          className="w-fit min-w-28 max-w-60 h-10 mt-2 ml-24 px-2 before:px-4 py-2 default-select rounded-full font-normal"
+          value={selectedSemester}
+          onChange={handleSemesterChange}>
+          <option value="" disabled>
+            Choisir un semestre
+          </option>
+          {curriculum.semesters.map((semester) => (
+            <option key={semester.name} value={semester.name}>
+              {semester.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Choix matière */}
+        <select
+          className="w-fit min-w-28 max-w-60 h-10 mt-2 px-2 before:px-4 py-2 default-select rounded-full font-normal"
+          value={availableSubjects[currentSubjectIndex] || ""}
+          onChange={handleSubjectChange}>
+          <option value="" disabled>
+            Choisir une matière
+          </option>
+          {availableSubjects.map((subject) => (
+            <option key={subject} value={subject}>
+              {subject}
+            </option>
+          ))}
+        </select>
+
+        {/* Bouton suivant */}
+        <button 
+          onClick={handleNextSubject}
+          disabled={currentSubjectIndex >= availableSubjects.length - 1}
+          className={`flex w-48 h-10 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full
+            shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none
+            ${currentSubjectIndex >= availableSubjects.length - 1 ? "bg-primaryshade cursor-not-allowed" : ""}`}>
           Passer au suivant
           <img
             src="/images/right-arrow.svg"
             alt="Right Arrow"
             className="ml-2 w-4 h-4"/>
         </button>
-
-        <select className="w-fit h-10 mt-2 px-4 py-2 default-select rounded-full font-normal">
-          <option value="" disabled selected>
-            Sélectionnez une ressource
-          </option>
-          {curriculum.ressources.map((ressource) => (
-            <option key={ressource} value={ressource}>
-              {ressource}
-            </option>
-          ))}
-        </select>
       </div>
 
       {groups.length === 0 ? (
