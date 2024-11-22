@@ -16,7 +16,8 @@ const ControlPanel = ({
   selectedDuration,
   setSelectedDuration,
   addItem,
-  addGroups }) => {
+  addGroups,
+  deleteGroups }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [delayedExpanded, setDelayedExpanded] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -87,7 +88,8 @@ const ControlPanel = ({
         <GroupButton 
           groups={groups}
           isNoGroups={isNoGroups}
-          addGroups={handleUpdateGroups} />
+          addGroups={handleUpdateGroups}
+          deleteGroups={deleteGroups} />
         <PrintButton />
       </div>
     </div>

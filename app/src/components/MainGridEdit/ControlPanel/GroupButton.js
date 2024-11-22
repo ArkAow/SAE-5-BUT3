@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-export const GroupButton = ({ addGroups, isNoGroups, groups }) => {
+export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => {
   const [groupName, setGroupName] = useState("");
   const [subGroupName, setSubGroupName] = useState("");
   const [isFocused, setIsFocused] = useState(false);
@@ -51,8 +51,7 @@ export const GroupButton = ({ addGroups, isNoGroups, groups }) => {
   };
 
   const handleDeleteGroup = (index) => {
-    const updatedGroups = groups.filter((_, i) => i !== index);
-    addGroups(updatedGroups);
+    deleteGroups(index)
   };
 
   const handleDeleteSubGroup = (groupIndex, subGroupIndex) => {
@@ -111,7 +110,7 @@ export const GroupButton = ({ addGroups, isNoGroups, groups }) => {
                     <button
                       onClick={() => handleDeleteGroup(index)}
                       className="size-6 btn-default justify-items-center ml-2">
-                        <img src="images/cross.svg" className="size-5" />
+                        <img src="images/cross.svg" alt="cross" className="size-5" />
                     </button>
                   </div>
 
@@ -138,7 +137,7 @@ export const GroupButton = ({ addGroups, isNoGroups, groups }) => {
                             handleDeleteSubGroup(index, subIndex)
                           }
                           className="size-4 btn-default justify-items-center ml-2">
-                          <img src="images/cross.svg" className="size-3" />
+                          <img src="images/cross.svg" alt="cross" className="size-3" />
                         </button>
                       </div>
                     ))}

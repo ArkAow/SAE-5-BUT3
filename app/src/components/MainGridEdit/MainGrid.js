@@ -24,6 +24,13 @@ const MainGrid = ({curriculum}) => {
     });
   };
 
+  const deleteGroups = (index) => {
+    const updatedGroups = groups.filter((_, i) => i !== index);
+    console.log("Groups after deletion:", updatedGroups);
+    setGroups(updatedGroups);
+  };
+  
+
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
     const newItem = { 
@@ -80,6 +87,7 @@ const MainGrid = ({curriculum}) => {
             setSelectedDuration={setSelectedDuration}
             addItem={addItem}
             addGroups={addGroups}
+            deleteGroups={deleteGroups}
           />
         </div>
 
