@@ -3,7 +3,6 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
-import { initialGroups } from "../../constants";
 
 const MainGrid = ({curriculum}) => {
 
@@ -13,7 +12,7 @@ const MainGrid = ({curriculum}) => {
   const [selectedCourseType, setSelectedCourseType] = useState({ name: "CM", color: "#FFD700" });
   const [selectedTeacher, setSelectedTeacher,] = useState("");
   const [selectedDuration, setSelectedDuration,] = useState(1.0);
-  const [groups, setGroups] = useState(initialGroups);
+  const [groups, setGroups] = useState(curriculum.group);
 
   const addGroups = (newGroups) => {
     setGroups((prevGroups) => {
