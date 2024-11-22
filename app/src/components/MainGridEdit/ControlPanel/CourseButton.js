@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { courseTypes, teachers } from "../../../constants";
 
 export const CourseButton = ({
     selectedRow,
@@ -13,21 +14,7 @@ export const CourseButton = ({
     selectedDuration,
     setSelectedDuration,
     addItem,
-}) => {
-    const courseTypes = [
-        { name: "CM", color: "#FFD700" },
-        { name: "TD", color: "#FF3131" },
-        { name: "TP", color: "#38B6FF" },
-    ];
-
-    const teachers = [
-        { name: "AP" },
-        { name: "LD" },
-        { name: "CO" },
-        { name: "SM" },
-        { name: "NM" },
-    ];
-    
+}) => {  
     const [isFocused, setIsFocused] = useState(false);
     const [error, setError] = useState("");
     const containerRef = useRef(null);

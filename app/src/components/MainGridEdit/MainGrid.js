@@ -3,12 +3,9 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
+import { initialGroups } from "../../constants";
 
-const MainGrid = () => {
-  const initialGroups = [
-    { name: "G6", subGroups: ["G6A", "G6B"] },
-    { name: "G7", subGroups: ["G7A", "G7B"] },
-  ];
+const MainGrid = ({curriculum}) => {
 
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
@@ -101,9 +98,11 @@ const MainGrid = () => {
           <option value="" disabled selected>
             Sélectionnez une ressource
           </option>
-          <option value="R1.01">R1.01 - Ressource 1</option>
-          <option value="R2.01">R2.01 - Ressource 2</option>
-          <option value="R3.01">R3.01 - Ressource 3</option>
+          {curriculum.ressources.map((ressource) => (
+            <option key={ressource} value={ressource}>
+              {ressource}
+            </option>
+          ))}
         </select>
       </div>
 
