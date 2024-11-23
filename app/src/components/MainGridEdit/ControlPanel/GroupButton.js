@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => {
   const [groupName, setGroupName] = useState("");
   const [subGroupName, setSubGroupName] = useState("");
+  const [error, setError] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
@@ -31,23 +32,39 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
   };
 
   const handleAddGroup = () => {
-    if (groupName.trim() !== "") {
-      const newGroup = { name: groupName, subGroups: [] };
-      const updatedGroups = [...groups, newGroup];
-      setGroupName("");
-      addGroups(updatedGroups);
+    if (groupName.trim() === "") {
+      setError("Nom de groupe vide");
+      return;
     }
+    const isDuplicateGroup = groups.some((group) => group.name === groupName.trim());
+    if (isDuplicateGroup) {
+      setError("Nom de groupe déja existant");
+      return;
+    }
+    setError("");
+    const newGroup = { name: groupName.trim(), subGroups: [] };
+    const updatedGroups = [...groups, newGroup];
+    setGroupName("");
+    addGroups(updatedGroups);
   };
-
+  
   const handleAddSubGroup = (index) => {
-    if (subGroupName.trim() !== "") {
-      const updatedGroups = [...groups];
-      const parentGroup = updatedGroups[index];
-      const newSubGroupName = `${parentGroup.name}${subGroupName}`;
-      parentGroup.subGroups.push(newSubGroupName);
-      addGroups(updatedGroups);
-      setSubGroupName("");
+    if (subGroupName.trim() === "") {
+      setError("Nom de sous-groupe vide");
+      return;
     }
+    const updatedGroups = [...groups];
+    const parentGroup = updatedGroups[index];
+    const isDuplicateSubGroup = parentGroup.subGroups.includes(`${parentGroup.name}${subGroupName.trim()}`);
+    if (isDuplicateSubGroup) {
+      setError("Nom de sous-groupe déja existant");
+      return;
+    }
+    setError("");
+    const newSubGroupName = `${parentGroup.name}${subGroupName.trim()}`;
+    parentGroup.subGroups.push(newSubGroupName);
+    addGroups(updatedGroups);
+    setSubGroupName("");
   };
 
   const handleDeleteGroup = (index) => {
@@ -86,6 +103,7 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
           <div
             className="tooltip"
             ref={tooltipRef}>
+            {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
             <input
               type="text"
               placeholder="Nom du groupe"
