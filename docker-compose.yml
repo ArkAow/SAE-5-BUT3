@@ -1,25 +1,38 @@
+version: '3.8'
+
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: .docker/Dockerfile
-    container_name: backend_container
-    working_dir: /app
-    ports:
-      - "8600:8600"
-    volumes:
-      - ./backend:/app
-    command: sh -c "composer install && php -S 0.0.0.0:8600 -t public"
-    environment:
-      DB_HOST: 164.81.120.68
-      DB_PORT: 3306
-      DB_DATABASE: db_sae_previ
-      DB_USERNAME: phpmyadmin
-      DB_PASSWORD: G389d}i^6uGJ-6K)n
-    networks:
-      - sae_previsionnel
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
     restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - db_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: user
+      PMA_PASSWORD: password
+    ports:
+      - "8080:80"
+    networks:
+      - db_network
 
 networks:
-  sae_previsionnel:
-    driver: bridge
+  db_network:
+
+volumes:
+  db_data:

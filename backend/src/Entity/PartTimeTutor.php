@@ -3,31 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Teacher;
 
 #[ORM\Entity]
-#[ORM\Table(name: "part_time_tutor")]
-class PartTimeTutor
+class PartTimeTutor extends Teacher
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\ManyToOne(targetEntity: Teacher::class)]
-    #[ORM\JoinColumn(name: "id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
-    private Teacher $teacher;
-    
     #[ORM\Column(type: "string", length: 500)]
     private string $hourlyConstraint;
-
-    public function getTeacher(): Teacher
-    {
-        return $this->teacher;
-    }
-
-    public function setTeacher(Teacher $teacher): self
-    {
-        $this->teacher = $teacher;
-        return $this;
-    }
 
     public function getHourlyConstraint(): string
     {

@@ -25,9 +25,9 @@ class ExcelReaderController extends AbstractController
         foreach ($sheetNames as $sheetName) {
             $worksheet = $spreadsheet->getSheetByName($sheetName);
             if ($worksheet) {
-                $sections = $this->extractSections($worksheet);
-                if (!empty($sections)) {
-                    $allSections[$sheetName] = $sections;
+                $structuredSections = $this->extractStructuredSections($worksheet);
+                if (!empty($structuredSections)) {
+                    $allSections[$sheetName] = $structuredSections;
                 }
             }
         }
@@ -35,20 +35,41 @@ class ExcelReaderController extends AbstractController
         return new JsonResponse(['sheets' => $allSections]);
     }
 
-    private function extractSections($worksheet)
+    private function extractStructuredSections($worksheet)
     {
-        $sections = [];
+        $structuredSections = [];
+        $currentBut = null;
+        $currentSemester = null;
+
         foreach ($worksheet->getRowIterator() as $row) {
             $rowIndex = $row->getRowIndex();
-            $intitule = $this->getCellValue($worksheet, 'B', $rowIndex);
+            $columnA = $this->getCellValue($worksheet, 'A', $rowIndex);
 
-            if (!$this->isValidIntitule($intitule)) {
-                continue;
+            // Détecter les lignes "BUT X - XXXXX"
+            if ($this->isButLine($columnA)) {
+                $currentBut = $columnA;
+                if (!isset($structuredSections[$currentBut])) {
+                    $structuredSections[$currentBut] = [];
+                }
+                $currentSemester = null; // Réinitialiser le semestre
             }
-
-            $sections[] = $this->getRowData($worksheet, $rowIndex);
+            // Détecter les lignes "SEMESTRE X"
+            elseif ($this->isSemesterLine($columnA)) {
+                $currentSemester = $columnA;
+                if ($currentBut && !isset($structuredSections[$currentBut][$currentSemester])) {
+                    $structuredSections[$currentBut][$currentSemester] = [];
+                }
+            }
+            // Ajouter les données pour les lignes valides
+            elseif ($this->isValidRow($worksheet, $rowIndex)) {
+                $rowData = $this->getRowData($worksheet, $rowIndex);
+                if ($currentBut && $currentSemester) {
+                    $structuredSections[$currentBut][$currentSemester][] = $rowData;
+                }
+            }
         }
-        return $sections;
+
+        return $structuredSections;
     }
 
     private function getRowData($worksheet, $rowIndex)
@@ -59,8 +80,8 @@ class ExcelReaderController extends AbstractController
             'CM' => $this->convertToInt($this->getCellValue($worksheet, 'E', $rowIndex)),
             'TD' => $this->convertToInt($this->getCellValue($worksheet, 'F', $rowIndex)),
             'TP' => $this->convertToInt($this->getCellValue($worksheet, 'G', $rowIndex)),
-            'heures_projet' => $this->convertToInt($this->getCellValue($worksheet, 'H', $rowIndex)),
-            'total' => $this->convertToInt($this->getCellCalculatedValue($worksheet, 'I', $rowIndex)),
+            'SAE' => $this->convertToInt($this->getCellValue($worksheet, 'H', $rowIndex)),
+            'total' => $this->convertToInt($this->getCellCalculatedValue($worksheet, 'I', $rowIndex))
         ];
     }
 
@@ -81,14 +102,19 @@ class ExcelReaderController extends AbstractController
         return is_numeric($value) ? (int)$value : 0;
     }
 
-    private function isValidIntitule($intitule)
+    private function isButLine($intitule)
     {
-        if (empty($intitule)) {
-            return false;
-        }
+        return preg_match('/^BUT\s\d+\s-\s.+$/i', $intitule);
+    }
 
-        $intitule = trim($intitule);
+    private function isSemesterLine($intitule)
+    {
+        return preg_match('/^SEMESTRE\s\d+$/i', $intitule);
+    }
 
-        return preg_match('/^(SAÉ\s\d+\.\d{2}\s.+|SAE\s\d+\.\d{2}\s.+|R\d+\.\d{2}\s.+|Portfolio)$/i', $intitule);
+    private function isValidRow($worksheet, $rowIndex)
+    {
+        $intitule = $this->getCellValue($worksheet, 'B', $rowIndex);
+        return !empty($intitule) && preg_match('/^(SAÉ\s\d+\.\d{2}\s.+|SAE\s\d+\.\d{2}\s.+|R\d+\.\d{2}\s.+|Portfolio)$/i', $intitule);
     }
 }

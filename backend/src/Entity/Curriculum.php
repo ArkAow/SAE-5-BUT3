@@ -5,32 +5,30 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Promo;
-use App\Entity\Semester;
 
 #[ORM\Entity]
-#[ORM\Table(name: "curriculum")]
+#[ORM\Table(name: 'curriculum')]
 class Curriculum
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 100)]
+    #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: Promo::class)]
-    #[ORM\JoinTable(name: "curriculum_class")]
-    private Collection $classes;
+    #[ORM\ManyToMany(targetEntity: Promo::class, inversedBy: 'curriculums')]
+    #[ORM\JoinTable(name: 'curriculum_promo')]
+    private Collection $promos;
 
-    #[ORM\ManyToMany(targetEntity: Semester::class)]
-    #[ORM\JoinTable(name: "curriculum_semester")]
+    #[ORM\ManyToMany(targetEntity: Semester::class, inversedBy: 'curriculums')]
+    #[ORM\JoinTable(name: 'curriculum_semester')]
     private Collection $semesters;
 
     public function __construct()
     {
-        $this->classes = new ArrayCollection();
+        $this->promos = new ArrayCollection();
         $this->semesters = new ArrayCollection();
     }
 
@@ -50,22 +48,22 @@ class Curriculum
         return $this;
     }
 
-    public function getClasses(): Collection
+    public function getPromos(): Collection
     {
-        return $this->classes;
+        return $this->promos;
     }
 
-    public function addClass(Promo $class): self
+    public function addPromo(Promo $promo): self
     {
-        if (!$this->classes->contains($class)) {
-            $this->classes->add($class);
+        if (!$this->promos->contains($promo)) {
+            $this->promos->add($promo);
         }
         return $this;
     }
 
-    public function removeClass(Promo $class): self
+    public function removePromo(Promo $promo): self
     {
-        $this->classes->removeElement($class);
+        $this->promos->removeElement($promo);
         return $this;
     }
 

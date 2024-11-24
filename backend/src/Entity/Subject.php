@@ -7,30 +7,34 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Table(name: "subject")]
+#[ORM\Table(name: 'subject')]
 class Subject
 {
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
     #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 100)]
+    #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    #[ORM\Column(type: "string", length: 10)]
+    #[ORM\Column(type: 'string', length: 10)]
     private string $code;
 
-    #[ORM\Column(type: "float")]
+    #[ORM\Column(type: 'float')]
     private float $duration;
 
-    #[ORM\OneToMany(mappedBy: "subject", targetEntity: ExpectedDuration::class, cascade: ["persist", "remove"])]
-    #[ORM\JoinTable(name:"expected_duration_subject")]
-    private Collection $expectedDurationSubject;
+    #[ORM\OneToMany(mappedBy: 'subject', targetEntity: ExpectedDuration::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $expectedDurations;
+
+    #[ORM\ManyToMany(targetEntity: Semester::class, inversedBy: 'subjects')]
+    #[ORM\JoinTable(name: 'subject_semester')]
+    private Collection $semesters;
 
     public function __construct()
     {
-        $this->expectedDurationSubject = new ArrayCollection();
+        $this->expectedDurations = new ArrayCollection();
+        $this->semesters = new ArrayCollection();
     }
 
     public function getId(): int
@@ -71,22 +75,46 @@ class Subject
         return $this;
     }
 
-    public function getExpectedDurationsSubject(): Collection
+    public function getExpectedDurations(): Collection
     {
-        return $this->expectedDurationSubject;
+        return $this->expectedDurations;
     }
 
-    public function addExpectedDurationSubject(ExpectedDuration $expectedDuration): self
+    public function addExpectedDuration(ExpectedDuration $expectedDuration): self
     {
-        if (!$this->expectedDurationSubject->contains($expectedDuration)) {
-            $this->expectedDurationSubject->add($expectedDuration);
+        if (!$this->expectedDurations->contains($expectedDuration)) {
+            $this->expectedDurations->add($expectedDuration);
+            $expectedDuration->setSubject($this);
         }
         return $this;
     }
 
-    public function removeExpectedDurationSubject(ExpectedDuration $expectedDuration): self
+    public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
     {
-        $this->expectedDurationSubject->removeElement($expectedDuration);
+        if ($this->expectedDurations->removeElement($expectedDuration)) {
+            if ($expectedDuration->getSubject() === $this) {
+                $expectedDuration->setSubject(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getSemesters(): Collection
+    {
+        return $this->semesters;
+    }
+
+    public function addSemester(Semester $semester): self
+    {
+        if (!$this->semesters->contains($semester)) {
+            $this->semesters->add($semester);
+        }
+        return $this;
+    }
+
+    public function removeSemester(Semester $semester): self
+    {
+        $this->semesters->removeElement($semester);
         return $this;
     }
 }

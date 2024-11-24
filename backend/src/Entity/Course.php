@@ -3,11 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\CourseType;
-use App\Entity\Subject;
 
 #[ORM\Entity]
-#[ORM\Table(name: "course")]
 class Course
 {
     #[ORM\Id]
@@ -24,13 +21,13 @@ class Course
     #[ORM\Column(type: "integer")]
     private int $positionY;
 
-    #[ORM\ManyToOne(targetEntity: CourseType::class)]
-    #[ORM\JoinColumn(name: "course_type_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private CourseType $courseType;
+    #[ORM\ManyToOne(targetEntity: Teacher::class, inversedBy: "courses")]
+    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
+    private ?Teacher $teacher = null;
 
-    #[ORM\ManyToOne(targetEntity: Subject::class)]
-    #[ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private Subject $subject;
+    #[ORM\ManyToOne(targetEntity: CourseType::class, inversedBy: "courses")]
+    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
+    private ?CourseType $courseType = null;
 
     public function getId(): int
     {
@@ -70,25 +67,25 @@ class Course
         return $this;
     }
 
-    public function getCourseType(): CourseType
+    public function getTeacher(): ?Teacher
+    {
+        return $this->teacher;
+    }
+
+    public function setTeacher(?Teacher $teacher): self
+    {
+        $this->teacher = $teacher;
+        return $this;
+    }
+
+    public function getCourseType(): ?CourseType
     {
         return $this->courseType;
     }
 
-    public function setCourseType(CourseType $courseType): self
+    public function setCourseType(?CourseType $courseType): self
     {
         $this->courseType = $courseType;
-        return $this;
-    }
-
-    public function getSubject(): Subject
-    {
-        return $this->subject;
-    }
-
-    public function setSubject(Subject $subject): self
-    {
-        $this->subject = $subject;
         return $this;
     }
 }

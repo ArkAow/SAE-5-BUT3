@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Table(name: "course_type")]
 class CourseType
 {
     #[ORM\Id]
@@ -23,6 +22,14 @@ class CourseType
 
     #[ORM\Column(type: "string", length: 500)]
     private string $scope;
+
+    #[ORM\OneToMany(mappedBy: "courseType", targetEntity: ExpectedDuration::class, cascade: ["persist", "remove"])]
+    private Collection $expectedDurations;
+
+    public function __construct()
+    {
+        $this->expectedDurations = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -59,6 +66,30 @@ class CourseType
     public function setScope(string $scope): self
     {
         $this->scope = $scope;
+        return $this;
+    }
+
+    public function getExpectedDurations(): Collection
+    {
+        return $this->expectedDurations;
+    }
+
+    public function addExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if (!$this->expectedDurations->contains($expectedDuration)) {
+            $this->expectedDurations[] = $expectedDuration;
+            $expectedDuration->setCourseType($this);
+        }
+        return $this;
+    }
+
+    public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if ($this->expectedDurations->removeElement($expectedDuration)) {
+            if ($expectedDuration->getCourseType() === $this) {
+                $expectedDuration->setCourseType(null);
+            }
+        }
         return $this;
     }
 }

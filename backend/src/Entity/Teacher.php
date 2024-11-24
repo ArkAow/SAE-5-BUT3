@@ -3,9 +3,17 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Table(name: "teacher")]
+#[ORM\InheritanceType("JOINED")]
+#[ORM\DiscriminatorColumn(name: "type", type: "string")]
+#[ORM\DiscriminatorMap([
+    "teacher" => Teacher::class,
+    "professor" => Professor::class,
+    "part_time_tutor" => PartTimeTutor::class
+])]
 class Teacher
 {
     #[ORM\Id]
@@ -22,8 +30,13 @@ class Teacher
     #[ORM\Column(type: "string", length: 30)]
     private string $code;
 
-    #[ORM\Column(type: "string", length: 1000)]
-    private string $subjectsTaught;
+    #[ORM\OneToMany(mappedBy: "teacher", targetEntity: Course::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    private Collection $courses;
+
+    public function __construct()
+    {
+        $this->courses = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -63,14 +76,27 @@ class Teacher
         return $this;
     }
 
-    public function getSubjectsTaught(): string
+    public function getCourses(): Collection
     {
-        return $this->subjectsTaught;
+        return $this->courses;
     }
 
-    public function setSubjectsTaught(string $subjectsTaught): self
+    public function addCourse(Course $course): self
     {
-        $this->subjectsTaught = $subjectsTaught;
+        if (!$this->courses->contains($course)) {
+            $this->courses[] = $course;
+            $course->setTeacher($this);
+        }
+        return $this;
+    }
+
+    public function removeCourse(Course $course): self
+    {
+        if ($this->courses->removeElement($course)) {
+            if ($course->getTeacher() === $this) {
+                $course->setTeacher(null);
+            }
+        }
         return $this;
     }
 }

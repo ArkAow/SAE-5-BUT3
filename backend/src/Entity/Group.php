@@ -5,10 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\HalfGroup;
 
 #[ORM\Entity]
-#[ORM\Table(name: "group")]
 class Group
 {
     #[ORM\Id]
@@ -19,9 +17,12 @@ class Group
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: HalfGroup::class)]
-    #[ORM\JoinTable(name: "group_half_group")]
+    #[ORM\OneToMany(mappedBy: "group", targetEntity: HalfGroup::class, cascade: ["persist", "remove"], orphanRemoval: true)]
     private Collection $halfGroups;
+
+    #[ORM\ManyToOne(targetEntity: Promo::class, inversedBy: "groups")]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Promo $promo = null;
 
     public function __construct()
     {
@@ -52,14 +53,30 @@ class Group
     public function addHalfGroup(HalfGroup $halfGroup): self
     {
         if (!$this->halfGroups->contains($halfGroup)) {
-            $this->halfGroups->add($halfGroup);
+            $this->halfGroups[] = $halfGroup;
+            $halfGroup->setGroup($this);
         }
         return $this;
     }
 
     public function removeHalfGroup(HalfGroup $halfGroup): self
     {
-        $this->halfGroups->removeElement($halfGroup);
+        if ($this->halfGroups->removeElement($halfGroup)) {
+            if ($halfGroup->getGroup() === $this) {
+                $halfGroup->setGroup(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getPromo(): ?Promo
+    {
+        return $this->promo;
+    }
+
+    public function setPromo(?Promo $promo): self
+    {
+        $this->promo = $promo;
         return $this;
     }
 }

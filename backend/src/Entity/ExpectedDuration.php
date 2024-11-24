@@ -3,11 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Subject;
-use App\Entity\CourseType;
 
 #[ORM\Entity]
-#[ORM\Table(name: "expected_duration")]
 class ExpectedDuration
 {
     #[ORM\Id]
@@ -15,52 +12,52 @@ class ExpectedDuration
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "float")]
-    private float $expectedDuration;
+    #[ORM\Column(type: "float", nullable: false)]
+    private float $duration;
 
-    #[ORM\ManyToOne(targetEntity: Subject::class)]
-    #[ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private Subject $subject;
+    #[ORM\ManyToOne(targetEntity: CourseType::class, inversedBy: "expectedDurations")]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?CourseType $courseType = null;
 
-    #[ORM\ManyToOne(targetEntity: CourseType::class)]
-    #[ORM\JoinColumn(name: "course_type_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private CourseType $courseType;
+    #[ORM\ManyToOne(targetEntity: Subject::class, inversedBy: "expectedDurations")]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Subject $subject = null;
 
     public function getId(): int
     {
         return $this->id;
     }
 
-    public function getExpectedDuration(): float
+    public function getDuration(): float
     {
-        return $this->expectedDuration;
+        return $this->duration;
     }
 
-    public function setExpectedDuration(float $expectedDuration): self
+    public function setDuration(float $duration): self
     {
-        $this->expectedDuration = $expectedDuration;
+        $this->duration = $duration;
         return $this;
     }
 
-    public function getSubject(): Subject
-    {
-        return $this->subject;
-    }
-
-    public function setSubject(Subject $subject): self
-    {
-        $this->subject = $subject;
-        return $this;
-    }
-
-    public function getCourseType(): CourseType
+    public function getCourseType(): ?CourseType
     {
         return $this->courseType;
     }
 
-    public function setCourseType(CourseType $courseType): self
+    public function setCourseType(?CourseType $courseType): self
     {
         $this->courseType = $courseType;
+        return $this;
+    }
+
+    public function getSubject(): ?Subject
+    {
+        return $this->subject;
+    }
+
+    public function setSubject(?Subject $subject): self
+    {
+        $this->subject = $subject;
         return $this;
     }
 }
