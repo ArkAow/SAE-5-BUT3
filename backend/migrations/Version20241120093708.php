@@ -103,9 +103,9 @@ final class Version20241120093708 extends AbstractMigration
 
         $subject_semester = $schema->createTable('subject_semester');
         $subject_semester->addColumn('subject_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $subject_semester->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
         $subject_semester->addColumn('semester_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $subject_semester->setPrimaryKey(['subject_id', 'semester_id']);
+        $subject_semester->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
         $subject_semester->addForeignKeyConstraint($semester, ['semester_id'], ['id'], ['onDelete' => 'CASCADE']);
 
         // Table Course
@@ -157,8 +157,8 @@ final class Version20241120093708 extends AbstractMigration
         $expected_duration_subject = $schema->createTable('expected_duration_subject');
         $expected_duration_subject->addColumn('expected_duration_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $expected_duration_subject->addColumn('subject_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $expected_duration_subject->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
         $expected_duration_subject->setPrimaryKey(['expected_duration_id', 'subject_id']);
+        $expected_duration_subject->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
         $expected_duration_subject->addForeignKeyConstraint($expected_duration,['expected_duration_id'],['id'],['onDelete' => 'CASCADE']);
 
         // Table Expected_Duration - Course_Type
@@ -203,7 +203,8 @@ final class Version20241120093708 extends AbstractMigration
         $partTimeTutor->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $partTimeTutor->addColumn('hourly_constraint', 'string', ['length' => 500]);
         $partTimeTutor->addForeignKeyConstraint($teacher, ['id'], ['id'], ['onDelete' => 'CASCADE']);
-
+        $partTimeTutor->setPrimaryKey(['id']);
+        
         // Table User
 
         $user = $schema->createTable('user');
