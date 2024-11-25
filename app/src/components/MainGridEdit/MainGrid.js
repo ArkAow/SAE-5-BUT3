@@ -16,6 +16,7 @@ const MainGrid = ({curriculum}) => {
   const [selectedSemester, setSelectedSemester] = useState(curriculum.semesters[0]?.name || "");
   const [availableSubjects, setAvailableSubjects] = useState(curriculum.semesters[0]?.subjects || []);
   const [groups, setGroups] = useState(curriculum.groups);
+  const [currentCourses, setCurrentCourses] = useState(availableSubjects?.courses || []);
 
 
   {/* Pour la gestion des groupes */}
@@ -46,8 +47,13 @@ const MainGrid = ({curriculum}) => {
     const selected = e.target.value;
     setSelectedSemester(selected);
     const semester = curriculum.semesters.find((s) => s.name === selected);
-    setAvailableSubjects(semester ? semester.subjects : []);
+    const subjects = semester ? semester.subjects : [];
+    setAvailableSubjects(subjects);
     setCurrentSubjectIndex(0);
+    setCurrentCourses(subjects[0]?.courses || []);
+
+    console.log(selectedSemester);
+    console.log(semester);
   };
 
   const handleNextSubject = () => {
@@ -58,7 +64,10 @@ const MainGrid = ({curriculum}) => {
 
   const handleSubjectChange = (e) => {
     const selectedSubject = e.target.value;
-    const subjectIndex = availableSubjects.indexOf(selectedSubject);
+    const semester = curriculum.semesters.find((s) => s.name === selectedSemester);
+    const subject = semester.subjects.find((s) => s.name === selectedSubject);
+
+    const subjectIndex = availableSubjects.indexOf(subject);
     setCurrentSubjectIndex(subjectIndex);
   };
 
@@ -135,13 +144,13 @@ const MainGrid = ({curriculum}) => {
         {/* Choix matière */}
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 px-2 before:px-4 py-2 default-select rounded-full font-normal"
-          value={availableSubjects[currentSubjectIndex].name || ""}
+          value={availableSubjects[currentSubjectIndex]?.name || ""}
           onChange={handleSubjectChange}>
           <option value="" disabled>
             Choisir une matière
           </option>
           {availableSubjects.map((subject) => (
-            <option key={subject} value={subject}>
+            <option key={subject.name} value={subject.name}>
               {subject.name}
             </option>
           ))}
