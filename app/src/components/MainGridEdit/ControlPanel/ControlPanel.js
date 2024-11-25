@@ -18,8 +18,8 @@ const ControlPanel = ({
   addItem,
   addGroups,
   deleteGroups }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [delayedExpanded, setDelayedExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
 
