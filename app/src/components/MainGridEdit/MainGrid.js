@@ -51,9 +51,6 @@ const MainGrid = ({curriculum}) => {
     setAvailableSubjects(subjects);
     setCurrentSubjectIndex(0);
     setCurrentCourses(subjects[0]?.courses || []);
-
-    console.log(selectedSemester);
-    console.log(semester);
   };
 
   const handleNextSubject = () => {
