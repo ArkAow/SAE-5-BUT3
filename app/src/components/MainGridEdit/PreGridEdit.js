@@ -4,13 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { curriculums } from "../../constants";
 
 const PreGridEdit = () => {
-  const [selectedCurriculum, setSelectedCurriculum] = useState({ 
-    name: "A1", 
-    semesters: [
-      { name: "S1", subjects: ["R1.01", "R1.02", "R1.03"] },
-      { name: "S2", subjects: ["R2.01", "R2.02", "R2.03"] },],
-    group: [{ name: "G1", subGroups: ["G1A", "G1B"] }, { name: "G2", subGroups: ["G2A", "G2B"] }, { name: "G3", subGroups: ["G3A", "G3B"] }], 
-  });
+  const [selectedCurriculum, setSelectedCurriculum] = useState(curriculums[0]);
   const navigate = useNavigate();
 
   const goToPreviEdit = () => {

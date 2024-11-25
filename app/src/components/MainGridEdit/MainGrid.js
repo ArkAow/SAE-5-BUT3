@@ -3,18 +3,19 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
+import { courseTypes } from "../../constants";
 
 const MainGrid = ({curriculum}) => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
-  const [selectedCourseType, setSelectedCourseType] = useState({ name: "CM", color: "#FFD700" });
+  const [selectedCourseType, setSelectedCourseType] = useState(courseTypes[0]);
   const [selectedTeacher, setSelectedTeacher,] = useState("");
   const [selectedDuration, setSelectedDuration,] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState(curriculum.semesters[0]?.name || "");
   const [availableSubjects, setAvailableSubjects] = useState(curriculum.semesters[0]?.subjects || []);
-  const [groups, setGroups] = useState(curriculum.group);
+  const [groups, setGroups] = useState(curriculum.groups);
 
 
   {/* Pour la gestion des groupes */}
@@ -134,14 +135,14 @@ const MainGrid = ({curriculum}) => {
         {/* Choix matière */}
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 px-2 before:px-4 py-2 default-select rounded-full font-normal"
-          value={availableSubjects[currentSubjectIndex] || ""}
+          value={availableSubjects[currentSubjectIndex].name || ""}
           onChange={handleSubjectChange}>
           <option value="" disabled>
             Choisir une matière
           </option>
           {availableSubjects.map((subject) => (
             <option key={subject} value={subject}>
-              {subject}
+              {subject.name}
             </option>
           ))}
         </select>
