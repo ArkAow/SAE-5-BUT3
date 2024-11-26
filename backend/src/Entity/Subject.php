@@ -24,7 +24,7 @@ class Subject
     #[ORM\Column(type: 'float')]
     private float $duration;
 
-    #[ORM\OneToMany(mappedBy: 'subject', targetEntity: ExpectedDuration::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, mappedBy: "subjects")]
     private Collection $expectedDurations;
 
     #[ORM\ManyToMany(targetEntity: Semester::class, inversedBy: 'subjects')]
@@ -84,18 +84,18 @@ class Subject
     {
         if (!$this->expectedDurations->contains($expectedDuration)) {
             $this->expectedDurations->add($expectedDuration);
-            $expectedDuration->setSubject($this);
+            $expectedDuration->addSubject($this);
         }
+
         return $this;
     }
 
     public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
     {
         if ($this->expectedDurations->removeElement($expectedDuration)) {
-            if ($expectedDuration->getSubject() === $this) {
-                $expectedDuration->setSubject(null);
-            }
+            $expectedDuration->removeSubject($this);
         }
+
         return $this;
     }
 

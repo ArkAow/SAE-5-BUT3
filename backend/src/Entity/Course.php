@@ -5,28 +5,25 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ORM\Table(name: 'course')]
 class Course
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(type: "float")]
+    #[ORM\Column(type: 'float', nullable: false)]
     private float $duration;
 
-    #[ORM\Column(type: "integer")]
-    private int $positionX;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $positionX = null;
 
-    #[ORM\Column(type: "integer")]
-    private int $positionY;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $positionY = null;
 
-    #[ORM\ManyToOne(targetEntity: Teacher::class, inversedBy: "courses")]
-    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
-    private ?Teacher $teacher = null;
-
-    #[ORM\ManyToOne(targetEntity: CourseType::class, inversedBy: "courses")]
-    #[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
+    #[ORM\ManyToOne(targetEntity: CourseType::class, inversedBy: 'courses')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?CourseType $courseType = null;
 
     public function getId(): int
@@ -45,36 +42,25 @@ class Course
         return $this;
     }
 
-    public function getPositionX(): int
+    public function getPositionX(): ?int
     {
         return $this->positionX;
     }
 
-    public function setPositionX(int $positionX): self
+    public function setPositionX(?int $positionX): self
     {
         $this->positionX = $positionX;
         return $this;
     }
 
-    public function getPositionY(): int
+    public function getPositionY(): ?int
     {
         return $this->positionY;
     }
 
-    public function setPositionY(int $positionY): self
+    public function setPositionY(?int $positionY): self
     {
         $this->positionY = $positionY;
-        return $this;
-    }
-
-    public function getTeacher(): ?Teacher
-    {
-        return $this->teacher;
-    }
-
-    public function setTeacher(?Teacher $teacher): self
-    {
-        $this->teacher = $teacher;
         return $this;
     }
 

@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Subject;
 use App\Entity\Curriculum;
 use App\Entity\Semester;
+use App\Entity\CourseType;
+use App\Entity\ExpectedDuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,7 +27,6 @@ class DatasInsertController extends AbstractController
     #[Route('/insert-data/{id}', name: 'insert_data', methods: ['POST'])]
     public function insertData(string $id): JsonResponse
     {
-        // Fetch data from ExcelReaderController
         $response = $this->excelReaderController->readExcel($id);
 
         if ($response->getStatusCode() !== Response::HTTP_OK) {
@@ -47,7 +48,7 @@ class DatasInsertController extends AbstractController
                     $curriculum->addSemester($semester);
 
                     foreach ($subjects as $subjectData) {
-                        $this->addSubject($subjectData, $semester);
+                        $this->addSubjectWithCourseTypes($subjectData, $semester);
                     }
                 }
             }
@@ -84,7 +85,7 @@ class DatasInsertController extends AbstractController
         return $semester;
     }
 
-    private function addSubject(array $subjectData, Semester $semester): void
+    private function addSubjectWithCourseTypes(array $subjectData, Semester $semester): void
     {
         if (empty($subjectData['code_apogee']) || empty($subjectData['intitule'])) {
             return;
@@ -97,14 +98,59 @@ class DatasInsertController extends AbstractController
             $subject = new Subject();
             $subject->setName($subjectData['intitule']);
             $subject->setCode($subjectData['code_apogee']);
-            $subject->setDuration($subjectData['total'] ?? 0);
+            $subject->setDuration($subjectData['total']);
             $this->entityManager->persist($subject);
-        } else {
-            $subject->setDuration($subjectData['total'] ?? 0);
         }
 
         if (!$semester->getSubjects()->contains($subject)) {
             $semester->addSubject($subject);
+        }
+
+        $this->addCourseTypesAndDurations($subject, $subjectData);
+    }
+
+    private function addCourseTypesAndDurations(Subject $subject, array $subjectData): void
+    {
+        $courseTypes = ['CM', 'TD', 'TP', 'SAE'];
+
+        foreach ($courseTypes as $courseTypeName) {
+            if (isset($subjectData[$courseTypeName])) {
+                $duration = (int) $subjectData[$courseTypeName];
+
+                if ($duration <= 0) {
+                    continue;
+                }
+
+                $courseType = $this->entityManager->getRepository(CourseType::class)
+                    ->findOneBy(['name' => $courseTypeName]);
+
+                if (!$courseType) {
+                    throw new \Exception("Le CourseType '{$courseTypeName}' est introuvable. Veuillez le précharger dans la base de données.");
+                }
+
+                $this->addOrUpdateExpectedDuration($subject, $courseType, $duration);
+            }
+        }
+    }
+
+    private function addOrUpdateExpectedDuration(Subject $subject, CourseType $courseType, int $duration): void
+    {
+        $existingExpectedDuration = $this->entityManager->getRepository(ExpectedDuration::class)
+            ->findOneBy(['duration' => $duration]);
+
+        if ($existingExpectedDuration) {
+            if (!$existingExpectedDuration->getSubjects()->contains($subject)) {
+                $existingExpectedDuration->addSubject($subject);
+            }
+            if (!$existingExpectedDuration->getCourseTypes()->contains($courseType)) {
+                $existingExpectedDuration->addCourseType($courseType);
+            }
+        } else {
+            $expectedDuration = new ExpectedDuration();
+            $expectedDuration->setDuration($duration);
+            $expectedDuration->addSubject($subject);
+            $expectedDuration->addCourseType($courseType);
+            $this->entityManager->persist($expectedDuration);
         }
     }
 }

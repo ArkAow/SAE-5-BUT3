@@ -2,32 +2,37 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ORM\Table(name: 'course_type')]
 class CourseType
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 100)]
+    #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    #[ORM\Column(type: "string", length: 50)]
+    #[ORM\Column(type: 'string', length: 50)]
     private string $color;
 
-    #[ORM\Column(type: "string", length: 500)]
+    #[ORM\Column(type: 'string', length: 500)]
     private string $scope;
 
-    #[ORM\OneToMany(mappedBy: "courseType", targetEntity: ExpectedDuration::class, cascade: ["persist", "remove"])]
+    #[ORM\OneToMany(mappedBy: 'courseType', targetEntity: Course::class, cascade: ['persist', 'remove'])]
+    private Collection $courses;
+
+    #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, mappedBy: "courseTypes")]
     private Collection $expectedDurations;
 
     public function __construct()
     {
+        $this->courses = new ArrayCollection();
         $this->expectedDurations = new ArrayCollection();
     }
 
@@ -69,6 +74,30 @@ class CourseType
         return $this;
     }
 
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Course $course): self
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses->add($course);
+            $course->setCourseType($this);
+        }
+        return $this;
+    }
+
+    public function removeCourse(Course $course): self
+    {
+        if ($this->courses->removeElement($course)) {
+            if ($course->getCourseType() === $this) {
+                $course->setCourseType(null);
+            }
+        }
+        return $this;
+    }
+
     public function getExpectedDurations(): Collection
     {
         return $this->expectedDurations;
@@ -77,8 +106,8 @@ class CourseType
     public function addExpectedDuration(ExpectedDuration $expectedDuration): self
     {
         if (!$this->expectedDurations->contains($expectedDuration)) {
-            $this->expectedDurations[] = $expectedDuration;
-            $expectedDuration->setCourseType($this);
+            $this->expectedDurations->add($expectedDuration);
+            $expectedDuration->addCourseType($this);
         }
         return $this;
     }
@@ -86,9 +115,7 @@ class CourseType
     public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
     {
         if ($this->expectedDurations->removeElement($expectedDuration)) {
-            if ($expectedDuration->getCourseType() === $this) {
-                $expectedDuration->setCourseType(null);
-            }
+            $expectedDuration->removeCourseType($this);
         }
         return $this;
     }
