@@ -62,7 +62,7 @@ const MainGrid = ({ curriculum }) => {
   
     console.log("Initial items structure:", initialItems);
     setItems(initialItems);
-  }, [currentSubjectIndex]);
+  }, [currentSubjectIndex, selectedSemester]);
 
   const handleSemesterChange = (e) => {
     const selectedName = e.target.value;
@@ -108,16 +108,22 @@ const MainGrid = ({ curriculum }) => {
       duration: selectedDuration,
       id: Date.now(),
     };
-    console.log(newItem);
 
     setItems((prevItems) => ({
       ...prevItems,
       [positionKey]: [...(prevItems[positionKey] || []), newItem],
     }));
 
+    const newCourse = {
+      teacher: {name: selectedTeacher},
+      courseType: {name: selectedCourseType.name, color: selectedCourseType.color},
+      duration: selectedDuration,
+      id: Date.now(),
+    };
+
     const updatedSubjects = [...availableSubjects];
     const currentSubject = updatedSubjects[currentSubjectIndex];
-    const updatedCourses = [...currentSubject.courses, newItem];
+    const updatedCourses = [...currentSubject.courses, newCourse];
     currentSubject.courses = updatedCourses;
 
     setAvailableSubjects(updatedSubjects);
