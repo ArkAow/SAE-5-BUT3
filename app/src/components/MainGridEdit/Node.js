@@ -8,7 +8,7 @@ const ITEM_TYPE = "rectangle";
 const Node = ({ positionKey, items, moveItem }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [tooltipDirection, setTooltipDirection] = useState("right"); // Default direction
+  const [tooltipDirection, setTooltipDirection] = useState("right");
 
   const [, drop] = useDrop({
     accept: ITEM_TYPE,
@@ -25,7 +25,7 @@ const Node = ({ positionKey, items, moveItem }) => {
   const showTooltip = isHovered && items?.length > 1 && !isDragging;
 
   const adjustTooltipDirection = () => {
-    const nodeElement = document.getElementById(positionKey); // Ensure unique IDs for nodes
+    const nodeElement = document.getElementById(positionKey);
     if (nodeElement) {
       const rect = nodeElement.getBoundingClientRect();
       const screenWidth = window.innerWidth;

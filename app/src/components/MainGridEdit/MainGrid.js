@@ -16,9 +16,8 @@ const MainGrid = ({ curriculum }) => {
   const [availableSubjects, setAvailableSubjects] = useState(curriculum.semesters[0]?.subjects || []);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
   const [groups, setGroups] = useState(curriculum.groups);
-  const [currentCourses, setCurrentCourses] = useState(availableSubjects?.courses || []);
+  const [currentCourses, setCurrentCourses] = useState(availableSubjects[0]?.courses || []);
 
-  {/* Pour la gestion des groupes */}
   const addGroups = (newGroups) => {
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
@@ -31,7 +30,6 @@ const MainGrid = ({ curriculum }) => {
 
   const deleteGroups = (index) => {
     const updatedGroups = groups.filter((_, i) => i !== index);
-    console.log("Groups after deletion:", updatedGroups);
     setGroups(updatedGroups);
   };
 
@@ -42,35 +40,41 @@ const MainGrid = ({ curriculum }) => {
   };
 
   useEffect(() => {
-    if (currentCourses.length > 0) {
-      const initialItems = {};
-      currentCourses.forEach((course, index) => {
-        const row = Math.floor(index / groups.length);
-        const col = index % groups.length;
-        const positionKey = `${row}-${col}`;
-        if (!initialItems[positionKey]) {
-          initialItems[positionKey] = [];
-        }
-        initialItems[positionKey].push({
-          color: course.courseType.color,
-          courseType: course.courseType.name,
-          teacher: course.teacher.name || "N/A",
-          duration: course.duration || 1.0,
-          id: course.id || Date.now() + index,
-        });
+    const initialItems = {};
+    console.log(currentCourses)
+    currentCourses.forEach((course, index) => {
+      const row = Math.floor(index / groups.length);
+      const col = index % groups.length;
+      const positionKey = `${row}-${col}`;
+  
+      if (!initialItems[positionKey]) {
+        initialItems[positionKey] = [];
+      }
+      
+      initialItems[positionKey].push({
+        color: course.courseType?.color || "#ffffff",
+        courseType: course.courseType.name,
+        teacher: course.teacher.name || "N/A",
+        duration: course.duration || 1.0,
+        id: course.id || Date.now() + index,
       });
-      setItems(initialItems);
-    }
-  }, [currentCourses, groups, selectedCourseType]);
+    });
+  
+    console.log("Initial items structure:", initialItems);
+    setItems(initialItems);
+  }, [currentSubjectIndex]);
 
   const handleSemesterChange = (e) => {
     const selectedName = e.target.value;
     const semester = curriculum.semesters.find((s) => s.name === selectedName);
     setSelectedSemester(semester || {});
+    
     const subjects = semester ? semester.subjects : [];
     setAvailableSubjects(subjects);
     setCurrentSubjectIndex(0);
-    setCurrentCourses(subjects[0]?.courses || []);
+    
+    const firstSubjectCourses = subjects[0]?.courses || [];
+    setCurrentCourses(firstSubjectCourses);
   };
 
   const handleSubjectChange = (e) => {
@@ -88,14 +92,13 @@ const MainGrid = ({ curriculum }) => {
     if (currentSubjectIndex < availableSubjects.length - 1) {
       setCurrentSubjectIndex((prevIndex) => prevIndex + 1);
 
-      setItems({});
-
       const nextSubject = availableSubjects[currentSubjectIndex + 1];
       setCurrentCourses(nextSubject?.courses || []);
+
+      setItems({});
     }
   };
 
-  {/* Pour la gestion des cours */}
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
     const newItem = {
@@ -103,12 +106,22 @@ const MainGrid = ({ curriculum }) => {
       courseType: selectedCourseType.name,
       teacher: selectedTeacher,
       duration: selectedDuration,
-      id: Date.now()
+      id: Date.now(),
     };
+    console.log(newItem);
+
     setItems((prevItems) => ({
       ...prevItems,
       [positionKey]: [...(prevItems[positionKey] || []), newItem],
     }));
+
+    const updatedSubjects = [...availableSubjects];
+    const currentSubject = updatedSubjects[currentSubjectIndex];
+    const updatedCourses = [...currentSubject.courses, newItem];
+    currentSubject.courses = updatedCourses;
+
+    setAvailableSubjects(updatedSubjects);
+    setCurrentCourses(updatedCourses);
   };
 
   const moveItem = (fromKey, toKey) => {
