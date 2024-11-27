@@ -1,23 +1,22 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import { courseTypes } from "../../constants";
 
-const MainGrid = ({curriculum}) => {
+const MainGrid = ({ curriculum }) => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
   const [selectedCourseType, setSelectedCourseType] = useState(courseTypes[0]);
-  const [selectedTeacher, setSelectedTeacher,] = useState("");
-  const [selectedDuration, setSelectedDuration,] = useState(1.0);
-  const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
-  const [selectedSemester, setSelectedSemester] = useState(curriculum.semesters[0]?.name || "");
+  const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [selectedDuration, setSelectedDuration] = useState(1.0);
+  const [selectedSemester, setSelectedSemester] = useState(curriculum.semesters[0] || {});
   const [availableSubjects, setAvailableSubjects] = useState(curriculum.semesters[0]?.subjects || []);
+  const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
   const [groups, setGroups] = useState(curriculum.groups);
   const [currentCourses, setCurrentCourses] = useState(availableSubjects?.courses || []);
-
 
   {/* Pour la gestion des groupes */}
   const addGroups = (newGroups) => {
@@ -35,7 +34,7 @@ const MainGrid = ({curriculum}) => {
     console.log("Groups after deletion:", updatedGroups);
     setGroups(updatedGroups);
   };
-  
+
   const getGroupList = () => {
     const mainGroups = groups.map((group) => group.name);
     const subGroups = groups.flatMap((group) => group.subGroups);
@@ -65,9 +64,9 @@ const MainGrid = ({curriculum}) => {
   }, [currentCourses, groups, selectedCourseType]);
 
   const handleSemesterChange = (e) => {
-    const selected = e.target.value;
-    setSelectedSemester(selected);
-    const semester = curriculum.semesters.find((s) => s.name === selected);
+    const selectedName = e.target.value;
+    const semester = curriculum.semesters.find((s) => s.name === selectedName);
+    setSelectedSemester(semester || {});
     const subjects = semester ? semester.subjects : [];
     setAvailableSubjects(subjects);
     setCurrentSubjectIndex(0);
@@ -76,23 +75,21 @@ const MainGrid = ({curriculum}) => {
 
   const handleSubjectChange = (e) => {
     const selectedSubject = e.target.value;
-    const semester = curriculum.semesters.find((s) => s.name === selectedSemester);
-    const subject = semester.subjects.find((s) => s.name === selectedSubject);
+    const subject = selectedSemester.subjects.find((s) => s.name === selectedSubject);
 
     const subjectIndex = availableSubjects.indexOf(subject);
     setCurrentSubjectIndex(subjectIndex);
     setCurrentCourses(subject?.courses || []);
-    
+
     setItems({});
   };
-
 
   const handleNextSubject = () => {
     if (currentSubjectIndex < availableSubjects.length - 1) {
       setCurrentSubjectIndex((prevIndex) => prevIndex + 1);
-  
+
       setItems({});
-  
+
       const nextSubject = availableSubjects[currentSubjectIndex + 1];
       setCurrentCourses(nextSubject?.courses || []);
     }
@@ -101,7 +98,7 @@ const MainGrid = ({curriculum}) => {
   {/* Pour la gestion des cours */}
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
-    const newItem = { 
+    const newItem = {
       color: selectedCourseType.color,
       courseType: selectedCourseType.name,
       teacher: selectedTeacher,
@@ -156,7 +153,7 @@ const MainGrid = ({curriculum}) => {
         {/* Choix semestre */}
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 ml-24 px-2 before:px-4 py-2 default-select rounded-full font-normal"
-          value={selectedSemester}
+          value={selectedSemester.name || ""}
           onChange={handleSemesterChange}>
           <option value="" disabled>
             Choisir un semestre
@@ -184,7 +181,7 @@ const MainGrid = ({curriculum}) => {
         </select>
 
         {/* Bouton suivant */}
-        <button 
+        <button
           onClick={handleNextSubject}
           disabled={currentSubjectIndex >= availableSubjects.length - 1}
           className={`flex w-48 h-10 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full
@@ -194,7 +191,7 @@ const MainGrid = ({curriculum}) => {
           <img
             src="/images/right-arrow.svg"
             alt="Right Arrow"
-            className="ml-2 w-4 h-4"/>
+            className="ml-2 w-4 h-4" />
         </button>
       </div>
 
@@ -204,9 +201,7 @@ const MainGrid = ({curriculum}) => {
             Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
           </div>
         </div>
-
       ) : (
-      
         <DndProvider backend={HTML5Backend}>
           <div className="ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[85vw] -z-10">
             <div
@@ -235,7 +230,7 @@ const MainGrid = ({curriculum}) => {
                         key={positionKey}
                         positionKey={positionKey}
                         items={cellItems}
-                        moveItem={moveItem}/>
+                        moveItem={moveItem} />
                     );
                   })}
                 </React.Fragment>
