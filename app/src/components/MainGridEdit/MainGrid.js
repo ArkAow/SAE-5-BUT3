@@ -41,12 +41,11 @@ const MainGrid = ({curriculum}) => {
     const subGroups = groups.flatMap((group) => group.subGroups);
     return ["Tous", ...mainGroups, ...subGroups];
   };
-  // Gérer l'affichage automatique des cours et réinitialisation des items
+
   useEffect(() => {
     if (currentCourses.length > 0) {
       const initialItems = {};
       currentCourses.forEach((course, index) => {
-        // Par exemple : assigner les cours sur la ligne 0, colonnes successives
         const row = Math.floor(index / groups.length);
         const col = index % groups.length;
         const positionKey = `${row}-${col}`;
@@ -54,9 +53,9 @@ const MainGrid = ({curriculum}) => {
           initialItems[positionKey] = [];
         }
         initialItems[positionKey].push({
-          color: selectedCourseType.color,
-          courseType: selectedCourseType.name,
-          teacher: course.teacher || "N/A",
+          color: course.courseType.color,
+          courseType: course.courseType.name,
+          teacher: course.teacher.name || "N/A",
           duration: course.duration || 1.0,
           id: course.id || Date.now() + index,
         });
@@ -65,7 +64,6 @@ const MainGrid = ({curriculum}) => {
     }
   }, [currentCourses, groups, selectedCourseType]);
 
-  // Gérer le changement de semestre
   const handleSemesterChange = (e) => {
     const selected = e.target.value;
     setSelectedSemester(selected);
@@ -76,7 +74,6 @@ const MainGrid = ({curriculum}) => {
     setCurrentCourses(subjects[0]?.courses || []);
   };
 
-  // Gérer le changement de matière et réinitialiser le tableau
   const handleSubjectChange = (e) => {
     const selectedSubject = e.target.value;
     const semester = curriculum.semesters.find((s) => s.name === selectedSemester);
@@ -86,7 +83,6 @@ const MainGrid = ({curriculum}) => {
     setCurrentSubjectIndex(subjectIndex);
     setCurrentCourses(subject?.courses || []);
     
-    // Réinitialiser le tableau des items (cours affichés)
     setItems({});
   };
 
@@ -95,10 +91,8 @@ const MainGrid = ({curriculum}) => {
     if (currentSubjectIndex < availableSubjects.length - 1) {
       setCurrentSubjectIndex((prevIndex) => prevIndex + 1);
   
-      // Réinitialiser le tableau des items
       setItems({});
   
-      // Charger les cours de la nouvelle matière
       const nextSubject = availableSubjects[currentSubjectIndex + 1];
       setCurrentCourses(nextSubject?.courses || []);
     }
