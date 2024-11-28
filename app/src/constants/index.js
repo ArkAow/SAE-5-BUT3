@@ -33,7 +33,7 @@ export const curriculums = [
                     {name: "R2.03", courses: []}],               
             },
         ], 
-        groups: [{ name: "G1", subGroups: ["G1A", "G1B"] }, { name: "G2", subGroups: ["G2A", "G2B"] }, { name: "G3", subGroups: ["G3A", "G3B"] }], 
+        groups: [], 
     },
     { 
         name: "A2",
