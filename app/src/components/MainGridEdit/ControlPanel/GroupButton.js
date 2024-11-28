@@ -103,6 +103,7 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
           <div
             className="tooltip"
             ref={tooltipRef}>
+            <h3 className="mb-5 font-bold text-base">Modifier les groupes</h3>
             {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
             <input
               type="text"

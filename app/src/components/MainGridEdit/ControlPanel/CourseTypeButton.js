@@ -14,11 +14,11 @@ export const CourseTypeButton = () => {
       const handleClickOutside = (event) => {
           if (
               containerRef.current &&
-              !containerRef.current.contains(event.target) &&
+              !containerRef.current.contains(event.target) && 
               tooltipRef.current &&
-              !tooltipRef.current.contains(event.target)
+              !tooltipRef.current.contains(event.target) 
           ) {
-              setIsFocused(false);
+              setIsFocused(false); 
           }
       };
 
@@ -29,7 +29,7 @@ export const CourseTypeButton = () => {
   }, []);
 
   return (
-    <div>
+    <div ref={containerRef}>
       <button
         onClick={() => setIsFocused(true)}
         className={`btn-control-panel ${
@@ -42,7 +42,7 @@ export const CourseTypeButton = () => {
           <div
             className="tooltip"
             ref={tooltipRef}>
-            allo
+            <h3 className="mb-5 font-bold text-base">Modifier les types de cours</h3>
           </div>
         </NodePortal>
       )}      
