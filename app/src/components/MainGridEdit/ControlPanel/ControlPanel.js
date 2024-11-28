@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { CourseButton } from "./CourseButton";
 import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
+import { CourseTypeButton } from "./CourseTypeButton"
 
 const ControlPanel = ({
   groups,
@@ -85,11 +86,13 @@ const ControlPanel = ({
           selectedDuration={selectedDuration}
           setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
+        <CourseTypeButton />
         <GroupButton 
           groups={groups}
           isNoGroups={isNoGroups}
           addGroups={handleUpdateGroups}
           deleteGroups={deleteGroups} />
+
         <PrintButton />
       </div>
     </div>

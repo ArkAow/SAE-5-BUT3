@@ -60,14 +60,14 @@ export const CourseButton = ({
             <button
                 onClick={() => setIsFocused((prev) => !prev)}
                 className={`btn-control-panel ${isFocused ? "bg-white shadow-lg" : ""} transition duration-300`}>
-                <img src="/images/book.svg" alt="book icon" className="w-10 h-10 fill-primary" draggable="false" />
+                <img src="/images/add-block.svg" alt="book icon" className="w-10 h-10 fill-primary" draggable="false" />
             </button>
 
             {/* Tooltip rendu dans le portail global */}
             {isFocused && (
                 <NodePortal>
                     <div
-                        className="absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs"
+                        className="tooltip"
                         ref={tooltipRef}>
                         <h3 className="mb-5 font-bold text-base">Ajouter un cours</h3>
                         <div className="flex flex-row gap-4">
