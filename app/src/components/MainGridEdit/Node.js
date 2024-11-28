@@ -14,7 +14,10 @@ const Node = ({ positionKey, items, moveItem }) => {
     accept: ITEM_TYPE,
     drop: (draggedItem) => {
       if (draggedItem.positionKey !== positionKey) {
-        moveItem(draggedItem.positionKey, positionKey);
+        moveItem(draggedItem.positionKey, positionKey, draggedItem.id);
+      }
+      else {
+        console.error("Error: WATAFAK I'M GONNA BROWN")
       }
     },
   });
