@@ -12,11 +12,17 @@ const MainGrid = ({ curriculum }) => {
   const [selectedCourseType, setSelectedCourseType] = useState(courseTypes[0]);
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedDuration, setSelectedDuration] = useState(1.0);
-  const [selectedSemester, setSelectedSemester] = useState(curriculum.semesters[0] || {});
-  const [availableSubjects, setAvailableSubjects] = useState(curriculum.semesters[0]?.subjects || []);
+  const [selectedSemester, setSelectedSemester] = useState(
+    curriculum.semesters[0] || {}
+  );
+  const [availableSubjects, setAvailableSubjects] = useState(
+    curriculum.semesters[0]?.subjects || []
+  );
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
   const [groups, setGroups] = useState(curriculum.groups);
-  const [currentCourses, setCurrentCourses] = useState(availableSubjects[0]?.courses || []);
+  const [currentCourses, setCurrentCourses] = useState(
+    availableSubjects[0]?.courses || []
+  );
 
   const addGroups = (newGroups) => {
     setGroups((prevGroups) => {
@@ -41,16 +47,16 @@ const MainGrid = ({ curriculum }) => {
 
   useEffect(() => {
     const initialItems = {};
-    console.log(currentCourses)
+    console.log(currentCourses);
     currentCourses.forEach((course, index) => {
       const row = course.pos.y;
       const col = course.pos.x;
       const positionKey = `${row}-${col}`;
-  
+
       if (!initialItems[positionKey]) {
         initialItems[positionKey] = [];
       }
-      
+
       initialItems[positionKey].push({
         color: course.courseType?.color || "#ffffff",
         courseType: course.courseType.name,
@@ -59,7 +65,7 @@ const MainGrid = ({ curriculum }) => {
         id: course.id || Date.now() + index,
       });
     });
-  
+
     console.log("Initial items structure:", initialItems);
     setItems(initialItems);
   }, [currentSubjectIndex, selectedSemester]);
@@ -68,18 +74,20 @@ const MainGrid = ({ curriculum }) => {
     const selectedName = e.target.value;
     const semester = curriculum.semesters.find((s) => s.name === selectedName);
     setSelectedSemester(semester || {});
-    
+
     const subjects = semester ? semester.subjects : [];
     setAvailableSubjects(subjects);
     setCurrentSubjectIndex(0);
-    
+
     const firstSubjectCourses = subjects[0]?.courses || [];
     setCurrentCourses(firstSubjectCourses);
   };
 
   const handleSubjectChange = (e) => {
     const selectedSubject = e.target.value;
-    const subject = selectedSemester.subjects.find((s) => s.name === selectedSubject);
+    const subject = selectedSemester.subjects.find(
+      (s) => s.name === selectedSubject
+    );
 
     const subjectIndex = availableSubjects.indexOf(subject);
     setCurrentSubjectIndex(subjectIndex);
@@ -115,10 +123,13 @@ const MainGrid = ({ curriculum }) => {
     }));
 
     const newCourse = {
-      teacher: {name: selectedTeacher},
-      courseType: {name: selectedCourseType.name, color: selectedCourseType.color},
+      teacher: { name: selectedTeacher },
+      courseType: {
+        name: selectedCourseType.name,
+        color: selectedCourseType.color,
+      },
       duration: selectedDuration,
-      pos: {x: selectedCol, y: selectedRow},
+      pos: { x: selectedCol, y: selectedRow },
       id: Date.now(),
     };
 
@@ -131,7 +142,7 @@ const MainGrid = ({ curriculum }) => {
     setCurrentCourses(updatedCourses);
   };
 
-  const moveItem = (fromKey,toKey,id) => {
+  const moveItem = (fromKey, toKey, id) => {
     console.log("Moving item", id, "from", fromKey, "to", toKey);
     setItems((prevItems) => {
       const fromItems = [...(prevItems[fromKey] || [])];
@@ -146,7 +157,6 @@ const MainGrid = ({ curriculum }) => {
       };
     });
   };
-  
 
   const GRID_ROW_LENGTH = 25; // à rendre responsive 🌝
   const groupList = getGroupList();
@@ -177,7 +187,8 @@ const MainGrid = ({ curriculum }) => {
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 ml-24 px-2 before:px-4 py-2 default-select rounded-full font-normal"
           value={selectedSemester.name || ""}
-          onChange={handleSemesterChange}>
+          onChange={handleSemesterChange}
+        >
           <option value="" disabled>
             Choisir un semestre
           </option>
@@ -192,7 +203,8 @@ const MainGrid = ({ curriculum }) => {
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 px-2 before:px-4 py-2 default-select rounded-full font-normal"
           value={availableSubjects[currentSubjectIndex]?.name || ""}
-          onChange={handleSubjectChange}>
+          onChange={handleSubjectChange}
+        >
           <option value="" disabled>
             Choisir une matière
           </option>
@@ -209,19 +221,26 @@ const MainGrid = ({ curriculum }) => {
           disabled={currentSubjectIndex >= availableSubjects.length - 1}
           className={`flex w-48 h-10 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full
             shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none
-            ${currentSubjectIndex >= availableSubjects.length - 1 ? "bg-primaryshade cursor-not-allowed" : ""}`}>
+            ${
+              currentSubjectIndex >= availableSubjects.length - 1
+                ? "bg-primaryshade cursor-not-allowed"
+                : ""
+            }`}
+        >
           Passer au suivant
           <img
             src="/images/right-arrow.svg"
             alt="Right Arrow"
-            className="ml-2 w-4 h-4" />
+            className="ml-2 w-4 h-4"
+          />
         </button>
       </div>
 
       {groups.length === 0 ? (
         <div className="flex items-center justify-center w-full">
           <div className="w-1/2 text-center text-primary mt-10 text-lg font-bold p-2 bg-white rounded-full">
-            Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
+            Il n'y a pas de groupes, veuillez en ajouter pour consulter le
+            tableau.
           </div>
         </div>
       ) : (
@@ -231,12 +250,14 @@ const MainGrid = ({ curriculum }) => {
               className="grid"
               style={{
                 gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
-              }}>
+              }}
+            >
               <div className="w-10 h-6"></div>
               {groupList.map((groupName, colIndex) => (
                 <div
                   key={`col-label-${colIndex}`}
-                  className={`w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold`}>
+                  className={`w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold`}
+                >
                   {groupName}
                 </div>
               ))}
@@ -253,7 +274,8 @@ const MainGrid = ({ curriculum }) => {
                         key={positionKey}
                         positionKey={positionKey}
                         items={cellItems}
-                        moveItem={moveItem} />
+                        moveItem={moveItem}
+                      />
                     );
                   })}
                 </React.Fragment>
