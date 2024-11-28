@@ -41,10 +41,10 @@ export const curriculums = [
             {
                 name: "Semestre 3",
                 subjects: [
-                    {name: "R3.01", courses: [{teacher: teachers[0], duration: 1, courseType: courseTypes[0], pos: {x: 0, y: 0} },
-                                            {teacher: teachers[1], duration: 2, courseType: courseTypes[1], pos: {x: 0, y: 0} }]}, 
-                    {name: "R3.02", courses: [{teacher: teachers[3], duration: 1.5, courseType: courseTypes[2], pos: {x: 0, y: 0} },]}, 
-                    {name: "R3.03", courses: [{teacher: teachers[2], duration: 3, courseType: courseTypes[0], pos: {x: 1, y: 1} },]}],              
+                    {name: "R3.01", courses: [{teacher: teachers[0], duration: 1, courseType: courseTypes[0], pos: {x: 0, y: 0},id: 1 },
+                                            {teacher: teachers[1], duration: 2, courseType: courseTypes[1], pos: {x: 0, y: 0},id: 2 },]}, 
+                    {name: "R3.02", courses: [{teacher: teachers[3], duration: 1.5, courseType: courseTypes[2], pos: {x: 0, y: 0},id: 3 },]}, 
+                    {name: "R3.03", courses: [{teacher: teachers[2], duration: 3, courseType: courseTypes[0], pos: {x: 1, y: 1},id: 4 },]}],              
             },
             {
                 name: "Semestre 4",

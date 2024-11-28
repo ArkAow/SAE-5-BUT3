@@ -131,12 +131,14 @@ const MainGrid = ({ curriculum }) => {
     setCurrentCourses(updatedCourses);
   };
 
-  const moveItem = (fromKey, toKey) => {
+  const moveItem = (fromKey,toKey,id) => {
+    console.log("Moving item", id, "from", fromKey, "to", toKey);
     setItems((prevItems) => {
       const fromItems = [...(prevItems[fromKey] || [])];
       const toItems = [...(prevItems[toKey] || [])];
-      if (fromItems.length === 0) return prevItems;
-      const draggedItem = fromItems.pop();
+      const itemIndex = fromItems.findIndex((item) => item.id === id);
+      if (itemIndex === -1) return prevItems;
+      const [draggedItem] = fromItems.splice(itemIndex, 1);
       return {
         ...prevItems,
         [fromKey]: fromItems,
@@ -144,6 +146,7 @@ const MainGrid = ({ curriculum }) => {
       };
     });
   };
+  
 
   const GRID_ROW_LENGTH = 25; // à rendre responsive 🌝
   const groupList = getGroupList();
