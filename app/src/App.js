@@ -3,7 +3,7 @@ import AppRoutes from './Routes/AppRoutes';
 
 function App() {
   return (
-    <div className="App" style={{ WebkitAppRegion: "drag"}}>
+    <div className="App" style={{ WebkitAppRegion: "no-drag"}}>
       <AppRoutes />
     </div>
   );

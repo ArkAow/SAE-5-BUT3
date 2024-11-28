@@ -1,5 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 const Header = () => {
+
+  const navigate = useNavigate();
+
   const handleWindowControl = (action) => {
     if (window.electronAPI && window.electronAPI.controlWindow) {
       window.electronAPI.controlWindow(action);
@@ -7,16 +11,20 @@ const Header = () => {
       console.error("electronAPI ou controlWindow n'est pas défini.");
     }
   };
+
+  const goToHomePage = () => {
+    navigate("/homePage");
+  };
   return (
-    <div className="flex justify-between items-center bg-primary p-2">
+    <div className="flex w-full fixed top-0 z-20 justify-between items-center bg-primary p-2"style={{ WebkitAppRegion: "drag"}}>
       <div className="flex items-center">
         <img
           src="/images/Universite_de_Limoges_white.png"
           alt="Logo"
-          className="w-[3%] h-[3%] mr-2"
+          className="size-[6%] mr-2 cursor-pointer hover:opacity-50" onClick={goToHomePage}
         />
         <h1 className="font-normal text-base text-white mt-1">
-          Prévisionnelle IUT du Limousin
+          Prévisionnel IUT du Limousin
         </h1>
       </div>
 
