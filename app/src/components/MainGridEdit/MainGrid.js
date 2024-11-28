@@ -43,8 +43,8 @@ const MainGrid = ({ curriculum }) => {
     const initialItems = {};
     console.log(currentCourses)
     currentCourses.forEach((course, index) => {
-      const row = Math.floor(index / groups.length);
-      const col = index % groups.length;
+      const row = course.pos.y;
+      const col = course.pos.x;
       const positionKey = `${row}-${col}`;
   
       if (!initialItems[positionKey]) {
@@ -118,6 +118,7 @@ const MainGrid = ({ curriculum }) => {
       teacher: {name: selectedTeacher},
       courseType: {name: selectedCourseType.name, color: selectedCourseType.color},
       duration: selectedDuration,
+      pos: {x: selectedCol, y: selectedRow},
       id: Date.now(),
     };
 
