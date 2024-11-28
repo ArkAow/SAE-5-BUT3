@@ -131,7 +131,7 @@ const MainGrid = ({ curriculum }) => {
     setCurrentCourses(updatedCourses);
   };
 
-  const moveItem = (fromKey,toKey,id) => {
+  const moveItem = (fromKey, toKey, id) => {
     console.log("Moving item", id, "from", fromKey, "to", toKey);
     setItems((prevItems) => {
       const fromItems = [...(prevItems[fromKey] || [])];

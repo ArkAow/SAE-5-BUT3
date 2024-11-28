@@ -13,11 +13,11 @@ const Node = ({ positionKey, items, moveItem }) => {
   const [, drop] = useDrop({
     accept: ITEM_TYPE,
     drop: (draggedItem) => {
-      if (draggedItem.positionKey !== positionKey) {
+      if (draggedItem.positionKey !== positionKey && draggedItem.id) {
         moveItem(draggedItem.positionKey, positionKey, draggedItem.id);
       }
       else {
-        console.error("Error: WATAFAK I'M GONNA BROWN")
+        console.error("Missing item's ID");
       }
     },
   });
@@ -56,9 +56,9 @@ const Node = ({ positionKey, items, moveItem }) => {
           teacher={items[0].teacher}
           duration={items[0].duration}
           positionKey={positionKey}
+          id={items[0].id}
           onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setIsDragging(false)}
-        />
+          onDragEnd={() => setIsDragging(false)}/>
       )}
 
       {items?.length > 1 && (
