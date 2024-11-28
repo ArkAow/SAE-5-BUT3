@@ -35,7 +35,7 @@ const InsertM3C = () => {
     try {
       const response = await fetch(routes.insertM3C.dev, {
         method: "POST",
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
@@ -55,17 +55,19 @@ const InsertM3C = () => {
       <Header />
       <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col pt-10">
         <div className="flex flex-col items-center w-1/2 justify-center max-w-[60%] mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
-          <h1 className="text-white text-2xl mb-4">Insérez votre fichier MCCC</h1>
-          
+          <h1 className="text-white text-2xl mb-4">
+            Insérez votre fichier MCCC
+          </h1>
+
           <input
             type="file"
             accept=".csv, .xls, .xlsx"
             onChange={handleFileUpload}
             className="mb-2 text-gray-500"
           />
-          
+
           {error && <p className="text-red-500 mb-2">{error}</p>}
-          
+
           <button
             onClick={handleSubmit}
             className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"

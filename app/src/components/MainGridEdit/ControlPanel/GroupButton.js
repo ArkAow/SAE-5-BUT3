@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => {
+export const GroupButton = ({
+  addGroups,
+  deleteGroups,
+  isNoGroups,
+  groups,
+}) => {
   const [groupName, setGroupName] = useState("");
   const [subGroupName, setSubGroupName] = useState("");
   const [error, setError] = useState("");
@@ -36,7 +41,9 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
       setError("Nom de groupe vide");
       return;
     }
-    const isDuplicateGroup = groups.some((group) => group.name === groupName.trim());
+    const isDuplicateGroup = groups.some(
+      (group) => group.name === groupName.trim()
+    );
     if (isDuplicateGroup) {
       setError("Nom de groupe déja existant");
       return;
@@ -47,7 +54,7 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
     setGroupName("");
     addGroups(updatedGroups);
   };
-  
+
   const handleAddSubGroup = (index) => {
     if (subGroupName.trim() === "") {
       setError("Nom de sous-groupe vide");
@@ -55,7 +62,9 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
     }
     const updatedGroups = [...groups];
     const parentGroup = updatedGroups[index];
-    const isDuplicateSubGroup = parentGroup.subGroups.includes(`${parentGroup.name}${subGroupName.trim()}`);
+    const isDuplicateSubGroup = parentGroup.subGroups.includes(
+      `${parentGroup.name}${subGroupName.trim()}`
+    );
     if (isDuplicateSubGroup) {
       setError("Nom de sous-groupe déja existant");
       return;
@@ -68,14 +77,14 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
   };
 
   const handleDeleteGroup = (index) => {
-    deleteGroups(index)
+    deleteGroups(index);
   };
 
   const handleDeleteSubGroup = (groupIndex, subGroupIndex) => {
     const updatedGroups = [...groups];
-    updatedGroups[groupIndex].subGroups = updatedGroups[groupIndex].subGroups.filter(
-      (_, i) => i !== subGroupIndex
-    );
+    updatedGroups[groupIndex].subGroups = updatedGroups[
+      groupIndex
+    ].subGroups.filter((_, i) => i !== subGroupIndex);
     addGroups(updatedGroups);
   };
 
@@ -85,33 +94,41 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
         onClick={() => setIsFocused(true)}
         className={`btn-control-panel ${
           isFocused ? "bg-white shadow-lg" : ""
-        } transition duration-300`}>
+        } transition duration-300`}
+      >
         <span
           className={`absolute right-1 top-1 flex h-3 w-3 ${
             !isNoGroups ? "hidden" : ""
-          }`}>
+          }`}
+        >
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
 
-        <img src="/images/group.svg" alt="group icon" className="w-10 h-10" draggable="false"/>
+        <img
+          src="/images/group.svg"
+          alt="group icon"
+          className="w-10 h-10"
+          draggable="false"
+        />
       </button>
 
       {/* Tooltip rendu dans le portail global */}
       {isFocused && (
         <NodePortal>
-          <div
-            className="tooltip"
-            ref={tooltipRef}>
+          <div className="tooltip" ref={tooltipRef}>
             <h3 className="mb-5 font-bold text-base">Modifier les groupes</h3>
-            {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
+            {error && (
+              <p className="text-red-700 text-sm text-center w-full">{error}</p>
+            )}
             <input
               type="text"
               placeholder="Nom du groupe"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
               maxLength="8"
-              className="w-full p-2 mb-3 border rounded"/>
+              className="w-full p-2 mb-3 border rounded"
+            />
             <button onClick={handleAddGroup} className="w-full p-2 btn-default">
               Ajouter Groupe
             </button>
@@ -119,17 +136,24 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
             <div
               className={`mt-4 max-h-48 overflow-y-auto custom-scrollbar-light bg-gray-200 rounded-lg p-3 ${
                 isNoGroups ? "hidden" : ""
-              }`}>
+              }`}
+            >
               {groups.map((group, index) => (
                 <div
                   key={index}
-                  className="mb-4 flex items-start justify-between">
+                  className="mb-4 flex items-start justify-between"
+                >
                   <div className="font-semibold text-lg flex items-center">
                     {group.name}
                     <button
                       onClick={() => handleDeleteGroup(index)}
-                      className="size-6 btn-default justify-items-center ml-2">
-                        <img src="images/cross.svg" alt="cross" className="size-5" />
+                      className="size-6 btn-default justify-items-center ml-2"
+                    >
+                      <img
+                        src="images/cross.svg"
+                        alt="cross"
+                        className="size-5"
+                      />
                     </button>
                   </div>
 
@@ -139,24 +163,32 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
                       value={subGroupName}
                       onChange={(e) => setSubGroupName(e.target.value)}
                       maxLength="8"
-                      className="w-full p-2 mb-2 border rounded"/>
+                      className="w-full p-2 mb-2 border rounded"
+                    />
                     <button
                       onClick={() => handleAddSubGroup(index)}
-                      className="w-full p-2 btn-default">
+                      className="w-full p-2 btn-default"
+                    >
                       Ajouter Sous-Groupe
                     </button>
 
                     {group.subGroups.map((subGroup, subIndex) => (
                       <div
                         key={subIndex}
-                        className="flex items-center mt-2 w-full">
-                        <span className="text-sm text-gray-600">{subGroup}</span>
+                        className="flex items-center mt-2 w-full"
+                      >
+                        <span className="text-sm text-gray-600">
+                          {subGroup}
+                        </span>
                         <button
-                          onClick={() =>
-                            handleDeleteSubGroup(index, subIndex)
-                          }
-                          className="size-4 btn-default justify-items-center ml-2">
-                          <img src="images/cross.svg" alt="cross" className="size-3" />
+                          onClick={() => handleDeleteSubGroup(index, subIndex)}
+                          className="size-4 btn-default justify-items-center ml-2"
+                        >
+                          <img
+                            src="images/cross.svg"
+                            alt="cross"
+                            className="size-3"
+                          />
                         </button>
                       </div>
                     ))}

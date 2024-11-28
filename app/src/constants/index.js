@@ -1,17 +1,17 @@
 export const courseTypes = [
-    { name: "CM", color: "#FFD700" },
-    { name: "TD", color: "#FF3131" },
-    { name: "TP", color: "#38B6FF" },
-    { name: "SAE", color: "#57B440" },
+  { name: "CM", color: "#FFD700" },
+  { name: "TD", color: "#FF3131" },
+  { name: "TP", color: "#38B6FF" },
+  { name: "SAE", color: "#57B440" },
 ];
 
 export const teachers = [
-    { name: "AP" },
-    { name: "LD" },
-    { name: "CO" },
-    { name: "SM" },
-    { name: "NM" },
-    { name: "--" },
+  { name: "AP" },
+  { name: "LD" },
+  { name: "CO" },
+  { name: "SM" },
+  { name: "NM" },
+  { name: "--" },
 ];
 
 export const curriculums = [
