@@ -5,7 +5,7 @@ import { formatDuration } from "../../services/durationService";
 
 const ITEM_TYPE = "rectangle";
 
-const CourseObject = ({ color, teacher, courseType, duration, positionKey, onDelete, onEdit }) => {
+const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, onDelete, onEdit }) => {
   const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
     item: { positionKey },

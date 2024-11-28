@@ -95,6 +95,7 @@ const Node = ({ positionKey, items, moveItem }) => {
                 color={item.color}
                 teacher={item.teacher}
                 duration={item.duration}
+                id={item.id}
                 small
                 positionKey={positionKey}
                 onDragStart={() => setIsDragging(true)}
