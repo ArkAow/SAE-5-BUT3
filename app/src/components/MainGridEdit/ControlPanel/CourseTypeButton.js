@@ -25,21 +25,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
         setIsFocused(false);
       }
     };
-    const handleClickOutside = (event) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target) &&
-        tooltipRef.current &&
-        !tooltipRef.current.contains(event.target)
-      ) {
-        setIsFocused(false);
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -132,10 +118,8 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
           </div>
         </NodePortal>
       )}
-      )}
     </div>
   );
 };
 
 export default CourseTypeButton;
-

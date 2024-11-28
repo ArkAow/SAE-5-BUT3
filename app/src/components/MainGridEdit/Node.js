@@ -48,8 +48,7 @@ const Node = ({ positionKey, items, moveItem }) => {
       ref={drop}
       className="relative min-w-20 h-20 bg-white justify-items-center border border-opacity-75 border-gray-300 p-1"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+      onMouseLeave={() => setIsHovered(false)}>
       {items?.length === 1 && (
         <CourseObject
           courseType={items[0].courseType}
@@ -71,8 +70,8 @@ const Node = ({ positionKey, items, moveItem }) => {
               style={{
                 backgroundColor: item.color,
                 borderColor: getShade(item.color),
-              }}
-            ></div>
+              }}>
+            </div>
           ))}
           {remainingItemsCount > 0 && (
             <div className="relative w-full h-full flex items-center justify-center text-black text-xs font-bold">
@@ -85,16 +84,13 @@ const Node = ({ positionKey, items, moveItem }) => {
       {showTooltip && (
         <div
           className={`absolute top-0 p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar-dark ${
-            tooltipDirection === "left"
-              ? "left-0 -translate-x-full"
-              : "left-full"
+            tooltipDirection === "left" ? "left-0 -translate-x-full" : "left-full"
           }`}
           style={{
             maxHeight: "300px",
             overflowY: "auto",
             backgroundColor: "rgba(55, 65, 81, 0.90)",
-          }}
-        >
+          }}>
           {items.map((item) => (
             <div key={item.id} className="mb-1 text-white">
               <CourseObject
@@ -106,8 +102,7 @@ const Node = ({ positionKey, items, moveItem }) => {
                 small
                 positionKey={positionKey}
                 onDragStart={() => setIsDragging(true)}
-                onDragEnd={() => setIsDragging(false)}
-              />
+                onDragEnd={() => setIsDragging(false)}/>
               <strong>--------------</strong>
             </div>
           ))}

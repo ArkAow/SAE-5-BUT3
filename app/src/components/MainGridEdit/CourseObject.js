@@ -5,19 +5,10 @@ import { formatDuration } from "../../services/durationService";
 
 const ITEM_TYPE = "rectangle";
 
-const CourseObject = ({
-  color,
-  teacher,
-  courseType,
-  duration,
-  positionKey,
-  id,
-  onDelete,
-  onEdit,
-}) => {
+const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, onDelete, onEdit }) => {
   const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
-    item: { positionKey, id },
+    item: { positionKey,id },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -71,11 +62,7 @@ const CourseObject = ({
 
       {/* Paramètres */}
       <img
-        src={`${
-          isBlack(color)
-            ? "images/cogWheel-white.svg"
-            : "images/cogWheel-black.svg"
-        }`}
+        src={`${isBlack(color) ? "images/cogWheel-white.svg" : "images/cogWheel-black.svg"}`}
         alt="cogWheel"
         className={`absolute -top-3 -right-2 m-1 w-4 h-4 rounded-full cursor-pointer`}
         style={{ backgroundColor: color }}
@@ -86,18 +73,15 @@ const CourseObject = ({
       {showTooltip && (
         <div
           ref={tooltipRef}
-          className="absolute -top-3 -right-8 mt-5 mr-5 p-2 bg-gray-800 bg-opacity-75 text-white rounded shadow-lg z-10 flex flex-col space-y-2"
-        >
+          className="absolute -top-3 -right-8 mt-5 mr-5 p-2 bg-gray-800 bg-opacity-75 text-white rounded shadow-lg z-10 flex flex-col space-y-2">
           <button
             onClick={onEdit}
-            className="w-full py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-xs"
-          >
+            className="w-full py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-xs">
             Modifier
           </button>
           <button
             onClick={onDelete}
-            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs"
-          >
+            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs">
             Supprimer
           </button>
         </div>
