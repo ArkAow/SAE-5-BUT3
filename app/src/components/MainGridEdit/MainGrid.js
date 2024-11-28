@@ -145,7 +145,7 @@ const MainGrid = ({ curriculum }) => {
     });
   };
 
-  const GRID_ROW_LENGTH = 25;
+  const GRID_ROW_LENGTH = 25; // à rendre responsive 🌝
   const groupList = getGroupList();
 
   return (
