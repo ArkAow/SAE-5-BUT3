@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { courseTypes, teachers } from "../../../constants";
+import { teachers } from "../../../constants";
 
 export const CourseButton = ({
     selectedRow,
     setSelectedRow,
     selectedCol,
     setSelectedCol,
+    courseTypes,
     selectedCourseType,
     setSelectedCourseType,
     selectedTeacher,

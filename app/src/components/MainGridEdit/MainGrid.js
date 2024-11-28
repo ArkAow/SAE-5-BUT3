@@ -3,12 +3,13 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
-import { courseTypes } from "../../constants";
+import { courseTypes as initialCourseTypes } from "../../constants";
 
 const MainGrid = ({ curriculum }) => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
+  const [courseTypes, setCourseTypes] = useState(initialCourseTypes);
   const [selectedCourseType, setSelectedCourseType] = useState(courseTypes[0]);
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedDuration, setSelectedDuration] = useState(1.0);
@@ -41,7 +42,6 @@ const MainGrid = ({ curriculum }) => {
 
   useEffect(() => {
     const initialItems = {};
-    console.log(currentCourses)
     currentCourses.forEach((course, index) => {
       const row = course.pos.y;
       const col = course.pos.x;
@@ -59,8 +59,7 @@ const MainGrid = ({ curriculum }) => {
         id: course.id || Date.now() + index,
       });
     });
-  
-    console.log("Initial items structure:", initialItems);
+
     setItems(initialItems);
   }, [currentSubjectIndex, selectedSemester]);
 
@@ -99,6 +98,42 @@ const MainGrid = ({ curriculum }) => {
     }
   };
 
+  const updateCoursesForRemovedType = (removedTypeName) => {
+    setAvailableSubjects((prevSubjects) =>
+      prevSubjects.map((subject) => ({
+        ...subject,
+        courses: subject.courses.map((course) =>
+          course.courseType.name === removedTypeName
+            ? {
+                ...course,
+                courseType: { name: "N/A", color: "#FFFFFF" },
+              }
+            : course
+        ),
+      }))
+    );
+  
+    setCurrentCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course.courseType.name === removedTypeName
+          ? { ...course, courseType: { name: "N/A", color: "#FFFFFF" } }
+          : course
+      )
+    );
+  
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      for (const key in updatedItems) {
+        updatedItems[key] = updatedItems[key].map((item) =>
+          item.courseType === removedTypeName
+            ? { ...item, courseType: "N/A", color: "#FFFFFF" }
+            : item
+        );
+      }
+      return updatedItems;
+    });
+  };
+
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
     const newItem = {
@@ -130,9 +165,8 @@ const MainGrid = ({ curriculum }) => {
     setAvailableSubjects(updatedSubjects);
     setCurrentCourses(updatedCourses);
   };
-
+  
   const moveItem = (fromKey, toKey, id) => {
-    console.log("Moving item", id, "from", fromKey, "to", toKey);
     setItems((prevItems) => {
       const fromItems = [...(prevItems[fromKey] || [])];
       const toItems = [...(prevItems[toKey] || [])];
@@ -147,7 +181,6 @@ const MainGrid = ({ curriculum }) => {
     });
   };
   
-
   const GRID_ROW_LENGTH = 25; // à rendre responsive 🌝
   const groupList = getGroupList();
 
@@ -161,6 +194,9 @@ const MainGrid = ({ curriculum }) => {
             setSelectedRow={setSelectedRow}
             selectedCol={selectedCol}
             setSelectedCol={setSelectedCol}
+            courseTypes={courseTypes}
+            setCourseTypes={setCourseTypes}
+            updateCoursesForRemovedType={updateCoursesForRemovedType}
             selectedCourseType={selectedCourseType}
             setSelectedCourseType={setSelectedCourseType}
             selectedTeacher={selectedTeacher}

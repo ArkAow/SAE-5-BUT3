@@ -10,6 +10,9 @@ const ControlPanel = ({
   setSelectedRow,
   selectedCol,
   setSelectedCol,
+  courseTypes,
+  setCourseTypes,
+  updateCoursesForRemovedType,
   selectedCourseType,
   setSelectedCourseType,
   selectedTeacher,
@@ -79,6 +82,7 @@ const ControlPanel = ({
           setSelectedRow={setSelectedRow}
           selectedCol={selectedCol}
           setSelectedCol={setSelectedCol}
+          courseTypes={courseTypes}
           selectedCourseType={selectedCourseType}
           setSelectedCourseType={setSelectedCourseType}
           selectedTeacher={selectedTeacher}
@@ -86,7 +90,10 @@ const ControlPanel = ({
           selectedDuration={selectedDuration}
           setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
-        <CourseTypeButton />
+        <CourseTypeButton 
+          courseTypes={courseTypes}
+          setCourseTypes={setCourseTypes}
+          updateCoursesForRemovedType={updateCoursesForRemovedType}/>
         <GroupButton 
           groups={groups}
           isNoGroups={isNoGroups}
