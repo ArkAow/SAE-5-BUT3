@@ -6,47 +6,39 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\MappedSuperclass
- */
-abstract class Teacher
+#[ORM\Entity]
+#[ORM\InheritanceType("JOINED")]
+#[ORM\DiscriminatorColumn(name: "type", type: "string")]
+#[ORM\DiscriminatorMap([
+    "teacher" => Teacher::class,
+    "professor" => Professor::class,
+    "part_time_tutor" => PartTimeTutor::class
+])]
+class Teacher
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: "string", length: 100)]
     private string $firstName;
 
-    /**
-     * @ORM\Column(type="string", length=50)
-     */
+    #[ORM\Column(type: "string", length: 100)]
     private string $lastName;
 
-    /**
-     * @ORM\Column(type="string", unique=true)
-     */
+    #[ORM\Column(type: "string", length: 30)]
     private string $code;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Subject")
-     * @ORM\JoinTable(name="teacher_subjects")
-     */
-    private Collection $teachableSubjects;
+    #[ORM\OneToMany(mappedBy: "teacher", targetEntity: Course::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    private Collection $courses;
 
     public function __construct()
     {
-        $this->teachableSubjects = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
-    // Getters and Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -84,22 +76,27 @@ abstract class Teacher
         return $this;
     }
 
-    public function getTeachableSubjects(): Collection
+    public function getCourses(): Collection
     {
-        return $this->teachableSubjects;
+        return $this->courses;
     }
 
-    public function addTeachableSubject(Subject $subject): self
+    public function addCourse(Course $course): self
     {
-        if (!$this->teachableSubjects->contains($subject)) {
-            $this->teachableSubjects->add($subject);
+        if (!$this->courses->contains($course)) {
+            $this->courses[] = $course;
+            $course->setTeacher($this);
         }
         return $this;
     }
 
-    public function removeTeachableSubject(Subject $subject): self
+    public function removeCourse(Course $course): self
     {
-        $this->teachableSubjects->removeElement($subject);
+        if ($this->courses->removeElement($course)) {
+            if ($course->getTeacher() === $this) {
+                $course->setTeacher(null);
+            }
+        }
         return $this;
     }
 }

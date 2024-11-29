@@ -4,10 +4,20 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class PartTimeTutor extends Teacher
 {
-    // TO-DO : Ajouter les contraintes horaires par semaine pour PartTimeTutor
+    #[ORM\Column(type: "string", length: 500)]
+    private string $hourlyConstraint;
+
+    public function getHourlyConstraint(): string
+    {
+        return $this->hourlyConstraint;
+    }
+
+    public function setHourlyConstraint(string $hourlyConstraint): self
+    {
+        $this->hourlyConstraint = $hourlyConstraint;
+        return $this;
+    }
 }

@@ -6,36 +6,30 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Promo
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Group", mappedBy="promo", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToMany(mappedBy: "promo", targetEntity: Group::class, cascade: ["persist", "remove"], orphanRemoval: true)]
     private Collection $groups;
+
+    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: "promos")]
+    private Collection $curriculums;
 
     public function __construct()
     {
         $this->groups = new ArrayCollection();
+        $this->curriculums = new ArrayCollection();
     }
 
-    // Getters et Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -62,7 +56,6 @@ class Promo
             $this->groups[] = $group;
             $group->setPromo($this);
         }
-
         return $this;
     }
 
@@ -73,7 +66,25 @@ class Promo
                 $group->setPromo(null);
             }
         }
+        return $this;
+    }
 
+    public function getCurriculums(): Collection
+    {
+        return $this->curriculums;
+    }
+
+    public function addCurriculum(Curriculum $curriculum): self
+    {
+        if (!$this->curriculums->contains($curriculum)) {
+            $this->curriculums[] = $curriculum;
+        }
+        return $this;
+    }
+
+    public function removeCurriculum(Curriculum $curriculum): self
+    {
+        $this->curriculums->removeElement($curriculum);
         return $this;
     }
 }

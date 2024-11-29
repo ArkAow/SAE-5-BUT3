@@ -6,42 +6,30 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Group
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Promo", inversedBy="groups")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private ?Promo $promo = null;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\HalfGroup", mappedBy="group", cascade={"persist", "remove"})
-     */
+    #[ORM\OneToMany(mappedBy: "group", targetEntity: HalfGroup::class, cascade: ["persist", "remove"], orphanRemoval: true)]
     private Collection $halfGroups;
+
+    #[ORM\ManyToOne(targetEntity: Promo::class, inversedBy: "groups")]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Promo $promo = null;
 
     public function __construct()
     {
         $this->halfGroups = new ArrayCollection();
     }
 
-    // Getters et Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -57,17 +45,6 @@ class Group
         return $this;
     }
 
-    public function getPromo(): ?Promo
-    {
-        return $this->promo;
-    }
-
-    public function setPromo(?Promo $promo): self
-    {
-        $this->promo = $promo;
-        return $this;
-    }
-
     public function getHalfGroups(): Collection
     {
         return $this->halfGroups;
@@ -79,7 +56,6 @@ class Group
             $this->halfGroups[] = $halfGroup;
             $halfGroup->setGroup($this);
         }
-
         return $this;
     }
 
@@ -90,7 +66,17 @@ class Group
                 $halfGroup->setGroup(null);
             }
         }
+        return $this;
+    }
 
+    public function getPromo(): ?Promo
+    {
+        return $this->promo;
+    }
+
+    public function setPromo(?Promo $promo): self
+    {
+        $this->promo = $promo;
         return $this;
     }
 }
