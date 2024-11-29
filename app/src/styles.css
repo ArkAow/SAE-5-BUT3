@@ -3,37 +3,67 @@
 @import 'tailwindcss/utilities';
 
 @layer components {
-    .btn-primary {
+    .btn-default {
+      @apply bg-primary text-white rounded hover:bg-primaryshade active:bg-primarytint transition-colors duration-200;
+    }
+    .btn-login {
       @apply w-[220px] py-2 mt-6 bg-primary text-white font-bold text-lg rounded-md transform hover:scale-105;
     }
     .btn-header {
       @apply w-6 h-6 cursor-pointer hover:opacity-50 ;
     }
     .btn-control-panel {
-      @apply w-16 h-16 bg-secondary rounded-xl flex items-center justify-center transition-all duration-200 hover:bg-white
+      @apply w-16 h-16 bg-primaryshade rounded-xl flex items-center justify-center transition-all duration-200 hover:bg-white
+    }
+    .btn-control-panel:disabled {
+      @apply bg-primaryshade cursor-not-allowed;
+    }
+    .default-select {
+      @apply text-white font-bold bg-primary border hover:bg-primaryshade border-white rounded-lg shadow-sm
+    }
+    .tooltip {
+      @apply absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs border-2 border-gray-300
     }
   }
 
 /* Classe pour personnaliser la scrollbar dans l’infobulle */
-.custom-scrollbar {
+.custom-scrollbar-dark {
   scrollbar-width: thin; /* Pour Firefox */
   scrollbar-color: #4a5568 #2d3748; /* Couleurs de la scrollbar et du fond pour Firefox */
 }
 
-.custom-scrollbar::-webkit-scrollbar {
+.custom-scrollbar-dark::-webkit-scrollbar {
   width: 8px; /* Largeur de la scrollbar */
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+.custom-scrollbar-dark::-webkit-scrollbar-track {
   background: #2d3748; /* Couleur du fond de la scrollbar */
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
+.custom-scrollbar-dark::-webkit-scrollbar-thumb {
   background-color: #4a5568; /* Couleur de la scrollbar */
   border-radius: 4px; /* Arrondir la scrollbar */
   border: 2px solid transparent; /* Espace autour du scrollbar */
   background-clip: padding-box; /* Assure que la bordure est visible */
 }
   
+.custom-scrollbar-light {
+  scrollbar-width: thin; /* Pour Firefox */
+  scrollbar-color: #888 #e0e0e0; /* Couleur de la scrollbar et de son arrière-plan */
+}
 
+/* Pour Webkit (Chrome, Safari, etc.) */
+.custom-scrollbar-light::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+.custom-scrollbar-light::-webkit-scrollbar-track {
+  background-color: #e0e0e0;
+  border-radius: 10px;
+}
   
