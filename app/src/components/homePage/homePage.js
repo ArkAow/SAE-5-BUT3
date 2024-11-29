@@ -61,9 +61,8 @@ const HomePage = () => {
 
           {/* See Previ Block */}
           <div
-            className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
-            onClick={goToSeePrevi}>
-            <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
+            className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 cursor-not-allowed" disabled>
+            <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primaryshade flex justify-center items-center rounded-2xl shadow-lg">
               <div className="text-white text-6xl font-bold">
                 <svg               
                   className="size-[70px] md:size-[100px] lg:size-[200px]"
