@@ -77,7 +77,8 @@ const ControlPanel = ({
 
       <div className={`grid grid-rows-4 gap-4 min-h-fit mt-4 justify-items-start transition-all 
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
-        <CourseButton 
+        <CourseButton
+          isNoGroups={isNoGroups}
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
           selectedCol={selectedCol}
@@ -91,12 +92,13 @@ const ControlPanel = ({
           setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
         <CourseTypeButton 
+          isNoGroups={isNoGroups}
           courseTypes={courseTypes}
           setCourseTypes={setCourseTypes}
           updateCoursesForRemovedType={updateCoursesForRemovedType}/>
         <GroupButton 
-          groups={groups}
           isNoGroups={isNoGroups}
+          groups={groups}
           addGroups={handleUpdateGroups}
           deleteGroups={deleteGroups} />
 
