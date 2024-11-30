@@ -18,9 +18,9 @@ class Curriculum
     #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: Promo::class, inversedBy: 'curriculums')]
-    #[ORM\JoinTable(name: 'curriculum_promo')]
-    private Collection $promos;
+    #[ORM\ManyToMany(targetEntity: ClassEntity::class, inversedBy: 'curriculums')]
+    #[ORM\JoinTable(name: 'curriculum_class')]
+    private Collection $classes;
 
     #[ORM\ManyToMany(targetEntity: Semester::class, inversedBy: 'curriculums')]
     #[ORM\JoinTable(name: 'curriculum_semester')]
@@ -28,7 +28,7 @@ class Curriculum
 
     public function __construct()
     {
-        $this->promos = new ArrayCollection();
+        $this->classes = new ArrayCollection();
         $this->semesters = new ArrayCollection();
     }
 
@@ -48,22 +48,22 @@ class Curriculum
         return $this;
     }
 
-    public function getPromos(): Collection
+    public function getClasses(): Collection
     {
-        return $this->promos;
+        return $this->classes;
     }
 
-    public function addPromo(Promo $promo): self
+    public function addClass(ClassEntity $class): self
     {
-        if (!$this->promos->contains($promo)) {
-            $this->promos->add($promo);
+        if (!$this->classes->contains($class)) {
+            $this->classes->add($class);
         }
         return $this;
     }
 
-    public function removePromo(Promo $promo): self
+    public function removeClass(ClassEntity $class): self
     {
-        $this->promos->removeElement($promo);
+        $this->classes->removeElement($class);
         return $this;
     }
 
