@@ -87,4 +87,20 @@ class AddGroupController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors de l’ajout : ' . $e->getMessage()], 500);
         }
     }
+
+    #[Route('/groups', name: 'get_groups', methods: ['GET'])]
+    public function getGroups(): JsonResponse
+    {
+        $groupRepository = $this->entityManager->getRepository(Groups::class);
+        $groups = $groupRepository->findAll();
+
+        return new JsonResponse([
+            'groups' => array_map(fn($group) => [
+                'id' => $group->getId(),
+                'name' => $group->getName(),
+                'classes' => $group->getClasses()->map(fn($class) => ['id' => $class->getId(), 'name' => $class->getName()])->toArray(),
+                'halfGroups' => $group->getHalfGroups()->map(fn($halfgroup) => $halfgroup->getName())->toArray(),
+            ], $groups),
+        ]);
+    }
 }

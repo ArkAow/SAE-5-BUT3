@@ -19,7 +19,8 @@ const MainGrid = ({ curriculum }) => {
   const [groups, setGroups] = useState(curriculum.groups);
   const [currentCourses, setCurrentCourses] = useState(availableSubjects[0]?.courses || []);
 
-  const addGroups = (newGroups) => {
+  const addGroups = async (newGroups) => {
+    // Add new groups to the local state
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
       const filteredNewGroups = newGroups.filter(
@@ -27,6 +28,32 @@ const MainGrid = ({ curriculum }) => {
       );
       return [...prevGroups, ...filteredNewGroups];
     });
+  
+    for (const group of newGroups) {
+      try {
+        const response = await fetch("http://localhost:8600/add/group", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: group.name,
+            halfgroups: group.subGroups || [],
+          }),
+        });
+  
+        const result = await response.json();
+        if (!response.ok) {
+          console.error("Erreur pour l'ajout du groupe:", result.error);
+          alert(`Erreur lors de l'ajout du groupe : ${result.error}`);
+        } else {
+          console.log("Le groupe a belk et bienété ajouté:", result);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la connexion avec l'API:", error);
+        alert("Erreur de connexion à l'API.");
+      }
+    }
   };
 
   const deleteGroups = (index) => {

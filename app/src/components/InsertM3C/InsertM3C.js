@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import Header from "../header/header.js";
-import routes from "../../Routes/routes";
 import Toast from "../Toast/Toast.js";
 
 const InsertM3C = () => {
   const [file, setFile] = useState(null);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
-  const [filePath, setFilePath] = useState(""); // Stocke le chemin du fichier retourné
 
   const handleFileUpload = (e) => {
     const uploadedFile = e.target.files[0];
@@ -28,7 +26,7 @@ const InsertM3C = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!file) {
       return setToast({
         message: "Veuillez sélectionner un fichier valide avant de soumettre.",
@@ -36,37 +34,47 @@ const InsertM3C = () => {
         visible: true,
       });
     }
-
+  
     const formData = new FormData();
     formData.append("file", file);
-
+  
     try {
-      const response = await fetch(routes.insertM3C, {
+      const uploadResponse = await fetch("http://localhost:8600/insertM3C", {
         method: "POST",
         body: formData,
       });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setToast({
-          message: data.message || "Fichier traité avec succès !",
-          type: "success",
-          visible: true,
-        });
-        setFilePath(data.filePath);
-      } else {
-        throw new Error(data.error || "Erreur lors du traitement du fichier.");
+  
+      const uploadData = await uploadResponse.json();
+  
+      if (!uploadResponse.ok || !uploadData.success) {
+        throw new Error(uploadData.error || "Erreur lors de l'upload du fichier.");
       }
-    } catch (error) {
-      console.error("Erreur :", error);
+  
+      const fileId = uploadData.fileId;
+  
+      const insertResponse = await fetch(`http://localhost:8600/insert-data/${fileId}`, {
+        method: "POST",
+      });
+  
+      const insertData = await insertResponse.json();
+  
+      if (!insertResponse.ok || !insertData.status) {
+        throw new Error(insertData.error || "Erreur lors de l'insertion des données.");
+      }
+  
       setToast({
-        message: "Erreur lors du processus.",
+        message: insertData.message || "Données insérées avec succès !",
+        type: "success",
+        visible: true,
+      });
+    } catch (error) {
+      setToast({
+        message: error.message || "Une erreur est survenue.",
         type: "error",
         visible: true,
       });
     }
-  };
+  };  
 
   return (
     <>
@@ -86,7 +94,6 @@ const InsertM3C = () => {
           >
             Envoyer le fichier
           </button>
-
         </div>
         {toast.visible && (
           <Toast

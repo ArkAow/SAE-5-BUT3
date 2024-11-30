@@ -13,7 +13,7 @@ class ExcelReaderController extends AbstractController
     #[Route('/read-excel/{id}', name: 'read_excel', methods: ['GET'])]
     public function readExcel(string $id): JsonResponse
     {
-        $filePath = $this->getParameter('kernel.project_dir') . "/public/uploads/M3C_{$id}.xlsx";
+        $filePath = $this->getParameter('kernel.project_dir') . "/public/uploads/{$id}.xlsx";
         if (!file_exists($filePath)) {
             return new JsonResponse(['error' => "Le fichier M3C_{$id}.xlsx n'existe pas."], Response::HTTP_NOT_FOUND);
         }
