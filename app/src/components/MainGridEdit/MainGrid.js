@@ -3,6 +3,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
+import { courseTypes as initialCourseTypes } from "../../constants";
 
 const MainGrid = ({ curriculum }) => {
   const [items, setItems] = useState({});
@@ -14,6 +15,12 @@ const MainGrid = ({ curriculum }) => {
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [currentCourses, setCurrentCourses] = useState([]);
   const [groups, setGroups] = useState([]);
+
+  const [courseTypes, setCourseTypes] = useState(initialCourseTypes);
+  const [selectedCourseType, setSelectedCourseType] = useState(courseTypes[0]);
+  const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [selectedDuration, setSelectedDuration] = useState(1.0);
+  const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
   useEffect(() => {
     const fetchSemesters = async () => {
