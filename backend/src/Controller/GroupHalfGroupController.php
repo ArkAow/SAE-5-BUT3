@@ -10,73 +10,58 @@ use App\Entity\Groups;
 
 class GroupHalfGroupController extends AbstractController
 {
-    // Route pour obtenir tous les groupes avec leurs demi-groupes
-    #[Route('groups', name:"get_all_groups", methods:['GET'])]
-    public function getAllgroups(EntityManagerInterface $entityManager): JsonResponse
+    #[Route('groups/{promoID}', name: "get_all_groups_by_promo", methods: ['GET'])]
+    public function getAllGroupsByPromo(int $promoID, EntityManagerInterface $entityManager): JsonResponse
     {
-        // GroupRepository permet la recherche de tous les groupes disponibles dans la BDD  
+        // Recherche des groupes via la relation avec les classes liées à une promotion donnée
         $groupsRepository = $entityManager->getRepository(Groups::class);
-        $groups = $groupsRepository->findAll();
+        $groups = $groupsRepository->createQueryBuilder('g')
+            ->join('g.classes', 'c')
+            ->where('c.id = :promoID')
+            ->setParameter('promoID', $promoID)
+            ->getQuery()
+            ->getResult();
 
-        // Si aucun groupe n'existe ou n'est trouvé alors on retourne une erreur HTTP 404
         if (!$groups) {
-            return new JsonResponse(['error' => 'Aucun groupe trouvé.'], 404);
+            return new JsonResponse(['error' => 'Aucun groupe trouvé pour cette promotion.'], 404);
         }
 
-        // On construit les données avec les demi-groupes
-        $data = array_map(function ($group) use ($entityManager) {
+        // Construire la réponse avec les sous-groupes
+        $data = array_map(function ($group) {
             return [
                 'id' => $group->getId(),
                 'name' => $group->getName(),
-                //Tous les demi-groupes associés à chaque groupe dans la réponse
-                'subGroups' => $this->getHalfGroups_of_a_Groups($group),
+                'subGroups' => array_map(function ($subGroup) {
+                    return [
+                        'id' => $subGroup->getId(),
+                        'name' => $subGroup->getName(),
+                    ];
+                }, $group->getHalfGroups()->toArray()), // Obtenir les sous-groupes
             ];
         }, $groups);
 
-        // On retourne le tableau avec les groupes et leurs demi-groupes en format JSON
         return new JsonResponse($data, 200);
     }
 
-    // Méthode pour obtenir les demi-groupes d'un groupe spécifique
-    private function getHalfGroups_of_a_Groups(Groups $group): array
-    {
-        // On récupère les demi-groupes associés au groupe (Fonction définie dans l'entité Groups)
-        $halfGroups = $group->getHalfGroups();
-
-        // On retourne les demi-groupes sous forme de tableau
-        return array_map(function ($halfGroup) {
-            return [
-                'id' => $halfGroup->getId(),
-                'name' => $halfGroup->getName(),
-            ];
-        }, $halfGroups->toArray());
-    }
-
-    //Route pour obtenir un demi-groupe d'un groupe spécifique
-    #[Route('groups/{id}/half_group', name:"get_halfgroup_of_a_group", methods:['GET'])]
+    #[Route('groups/{id}/half_group', name: "get_halfgroup_of_a_group", methods: ['GET'])]
     public function getHalfGroup(EntityManagerInterface $entityManager, int $id): JsonResponse
     {
-        //GroupRepository permet la recherche d'un groupe spécifique dans la BDD
         $groupRepository = $entityManager->getRepository(Groups::class);
         $group = $groupRepository->find($id);
 
-        //Si le groupe n'existe pas, on retourne une erreur 404
         if (!$group) {
             return new JsonResponse(['error' => 'Groupe introuvable ou inexistant.'], 404);
         }
 
-        //On récupère les demi-groupes du groupe spécifique
         $halfGroups = $group->getHalfGroups();
 
-        //On retourne les demi-groupes sous forme de tableau
-        $data = array_map(function ($halfGroup){
+        $data = array_map(function ($halfGroup) {
             return [
                 'id' => $halfGroup->getId(),
                 'name' => $halfGroup->getName(),
             ];
         }, $halfGroups->toArray());
 
-        //On retourne le tableau avec les demi-groupes en format JSON
         return new JsonResponse($data, 200);
     }
 }

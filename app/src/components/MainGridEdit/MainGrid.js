@@ -241,8 +241,8 @@ const MainGrid = ({ curriculum }) => {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const promoID = curriculum.promos[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
-        const response = await fetch("http://localhost:8600/groups/promoID");
+        //const classID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
+        const response = await fetch(`http://localhost:8600/groups/1`);
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des groups");
         }

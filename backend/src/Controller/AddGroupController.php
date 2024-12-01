@@ -30,8 +30,8 @@ class AddGroupController extends AbstractController
         }
 
         $groupName = trim($data['name']);
-        $halfgroupNames = $data['halfgroups'] ?? [];
-        $cursusID = $data['cursusID'] ?? null;
+        $halfgroupNames = $data['halfgroups'] ?? []; // changer pour etre une map des halfgroups.name
+        $cursusID = $data['cursusID'] ?? null; // changer pour fonctionner avec le class ID
 
         try {
             $groupRepository = $this->entityManager->getRepository(Groups::class);
