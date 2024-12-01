@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\Request;
 class CourseTypeController extends AbstractController
 {
     #[Route('/coursetypes', name: 'app_course_type')]
-    public function getCourseType(EntityManagerInterface $em): JsonResponse
+    public function getCourseType(EntityManagerInterface $entityManager): JsonResponse
     {
         //CourseTypeRepository nous permet de rechercher tous les types de course dispo dans la BDD
-        $courseTypeRepository = $em->getRepository(CourseType::class);
+        $courseTypeRepository = $entityManager->getRepository(CourseType::class);
         $coursetype = $courseTypeRepository->findAll();
 
         //On retourne les coursetype sous forme de tableau
@@ -35,35 +35,48 @@ class CourseTypeController extends AbstractController
     }
 
     #[Route('/add/coursetype', name: 'add_a_course_type', methods: ['POST'])]
-    public function addCourseType(EntityManagerInterface $em, Request $request): JsonResponse
+    public function addCourseType(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
+        // Récupérer/Décoder le contenu JSON de la requête HTTP qui nous est envoyé via le front
         $data = json_decode($request->getContent(), true);
 
+        // Vérifier si le champ 'name' est présent et non vide
         if (!isset($data['name']) || empty(trim($data['name']))) {
+            //Si name n'est pas présent et/ou vide alors on retourne une réponse JSON avec une erreur et un code HTTP 400
             return new JsonResponse(['error' => 'Le nom du type de cours est obligatoire.'], 400);
         }
 
-        $courseTypeName = trim($data['name']);
-        $courseTypeColor = $data['color'] ?? null;
-        $courseTypeScope = $data['scope'] ?? null;
+        // Récupérer les données du type de cours
+        $courseTypeName = trim($data['name']);  // Le nom du type de cours
+        $courseTypeColor = $data['color'] ?? null;  // La couleur du type de cours
+        $courseTypeScope = $data['scope'] ?? null;  // La portée du type de cours
 
         try {
-            $courseTypeRepository = $em->getRepository(CourseType::class);
+            // Récupérer le Repository pour la classe CourseType (récupère toutes les données de la table CourseType)
+            $courseTypeRepository = $entityManager->getRepository(CourseType::class);
+
+            // On vérifie si un cours du même nom existe déjà
             $courseType = $courseTypeRepository->findOneBy(['name' => $courseTypeName]);
 
+            // Si le nom n'est pas déjà pris alors on crée un nouveau CourseType
             if (!$courseType) {
-                $courseType = new CourseType();
-                $courseType->setName($courseTypeName);
-                $courseType->setColor($courseTypeColor);
-                $courseType->setScope($courseTypeScope);
+                $courseType = new CourseType(); // Créer un nouvel objet CourseType pour définir les valeurs données par le Front
+                $courseType->setName($courseTypeName);  // Définir le nom
+                $courseType->setColor($courseTypeColor);  // Définir la couleur
+                $courseType->setScope($courseTypeScope);  // Définir la portée
 
-                $em->persist($courseType);
-                $em->flush();
+                // Insertion du nouveau CourseType dans la BDD
+                $entityManager->persist($courseType);
+
+                // Enfin sauvegarder les nouvelles données dans la BDD 
+                $entityManager->flush();
             }
 
-            return new JsonResponse(['success' => 'Type de cours ajouté avec succès.'], 201);
+            // Retourner une réponse JSON pour signaler la création du CourseType
+            return new JsonResponse(['success' => 'Nouveau CourseType a bel et bien été ajouté.'], 201);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Une erreur est survenue.'], 500);
+            // Si le CourseType n'a pas pu être créé alors on retourne une erreur
+            return new JsonResponse(['error' => 'Il y a eu un problème dans la création du nouveau CourseType (déjà existant, problème serveur, ...)'], 500);
         }
     }
 }
