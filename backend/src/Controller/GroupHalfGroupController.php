@@ -45,7 +45,7 @@ class GroupHalfGroupController extends AbstractController
 
         //Si le groupe n'existe pas, on retourne une erreur 404
         if (!$group) {
-            return new JsonResponse(['error' => 'Groupe introuvable.'], 404);
+            return new JsonResponse(['error' => 'Groupe introuvable ou inexistant.'], 404);
         }
 
         //On récupère les demi-groupes du groupe spécifique
