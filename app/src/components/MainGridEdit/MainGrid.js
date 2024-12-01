@@ -16,8 +16,8 @@ const MainGrid = ({ curriculum }) => {
   const [currentCourses, setCurrentCourses] = useState([]);
   const [groups, setGroups] = useState([]);
 
-  const [courseTypes, setCourseTypes] = useState(initialCourseTypes);
-  const [selectedCourseType, setSelectedCourseType] = useState(courseTypes[0]);
+  const [courseTypes, setCourseTypes] = useState([]);
+  const [selectedCourseType, setSelectedCourseType] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
@@ -109,6 +109,25 @@ const MainGrid = ({ curriculum }) => {
 
   
   {/* Gestion des COURS -------------------------------------------- */}
+  useEffect(() => {
+    const fetchCourseTypes = async () => {
+      try {
+        const response = await fetch("http://localhost:8600/coursetypes");
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement des types de cours.");
+        }
+        const data = await response.json();
+        setCourseTypes(data);
+        setSelectedCourseType(data[0] || null);
+      } catch (error) {
+        console.error(error);
+        alert("Impossible de charger les types de cours.");
+      }
+    };
+
+    fetchCourseTypes();
+  }, []);
+
   const addItem = () => {
     const positionKey = `${selectedRow}-${selectedCol}`;
     const newItem = {
