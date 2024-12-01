@@ -6,6 +6,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
   const [isFocused, setIsFocused] = useState(false);
   const [newCourseTypeName, setNewCourseTypeName] = useState("");
   const [newCourseTypeColor, setNewCourseTypeColor] = useState("#000000");
+  const [error, setError] = useState(null);
 
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
