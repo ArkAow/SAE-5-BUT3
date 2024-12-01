@@ -177,6 +177,42 @@ const MainGrid = ({ curriculum }) => {
     });
   };
 
+  const updateCoursesForRemovedType = (removedTypeName) => {
+    setAvailableSubjects((prevSubjects) =>
+      prevSubjects.map((subject) => ({
+        ...subject,
+        courses: subject.courses.map((course) =>
+          course.courseType.name === removedTypeName
+            ? {
+                ...course,
+                courseType: { name: "N/A", color: "#FFFFFF" },
+              }
+            : course
+        ),
+      }))
+    );
+  
+    setCurrentCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course.courseType.name === removedTypeName
+          ? { ...course, courseType: { name: "N/A", color: "#FFFFFF" } }
+          : course
+      )
+    );
+  
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      for (const key in updatedItems) {
+        updatedItems[key] = updatedItems[key].map((item) =>
+          item.courseType === removedTypeName
+            ? { ...item, courseType: "N/A", color: "#FFFFFF" }
+            : item
+        );
+      }
+      return updatedItems;
+    });
+  };
+
   {/* Gestion des GROUPES -------------------------------------------- */}
   const addGroups = async (newGroups) => {
     setGroups((prevGroups) => {
