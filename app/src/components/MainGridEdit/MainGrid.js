@@ -15,7 +15,6 @@ const MainGrid = ({ curriculum }) => {
   const [currentCourses, setCurrentCourses] = useState([]);
   const [groups, setGroups] = useState([]);
 
-  // Charger les semestres pour un curriculum
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
@@ -41,7 +40,6 @@ const MainGrid = ({ curriculum }) => {
     fetchSemesters();
   }, [curriculum.id]);
 
-  // Charger les matières pour un semestre
   const fetchSubjects = async (semesterId) => {
     try {
       const response = await fetch(
@@ -60,7 +58,6 @@ const MainGrid = ({ curriculum }) => {
     }
   };
 
-  // Mise à jour des semestres
   const handleSemesterChange = (e) => {
     const semesterId = parseInt(e.target.value, 10);
     const selected = availableSemesters.find((s) => s.id === semesterId);
@@ -71,7 +68,6 @@ const MainGrid = ({ curriculum }) => {
     }
   };
 
-  // Mise à jour des matières
   const handleSubjectChange = (e) => {
     const subjectId = parseInt(e.target.value, 10);
     const selected = availableSubjects.find((s) => s.id === subjectId);
@@ -79,7 +75,6 @@ const MainGrid = ({ curriculum }) => {
     setCurrentCourses(selected?.courses || []);
   };
 
-  // Mise à jour des items dans la grille
   useEffect(() => {
     const initialItems = {};
     currentCourses.forEach((course, index) => {
@@ -103,7 +98,6 @@ const MainGrid = ({ curriculum }) => {
     setItems(initialItems);
   }, [currentCourses]);
 
-  // Ajouter des groupes et sous-groupes
   const addGroups = async (newGroups) => {
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
@@ -115,7 +109,6 @@ const MainGrid = ({ curriculum }) => {
 
     for (const group of newGroups) {
       try {
-        //Appel à l'API pour ajouter un groupe
         const response = await fetch("http://localhost:8600/add/group", {
           method: "POST",
           headers: {
@@ -127,7 +120,6 @@ const MainGrid = ({ curriculum }) => {
           }),
         });
 
-        //Ajout des groupes a-t-il réussi ? --> Renvoi d'une alerte qui change en fonction de la réponse
         const result = await response.json();
         if (!response.ok) {
           console.error("Erreur pour l'ajout du groupe:", result.error);
@@ -167,20 +159,17 @@ const MainGrid = ({ curriculum }) => {
             selectedCol={selectedCol}
             setSelectedCol={setSelectedCol}
             addGroups={addGroups}
-            deleteGroups={deleteGroups}
-          />
+            deleteGroups={deleteGroups}/>
         </div>
 
         {/* Choix du semestre selon le curriculum */}
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 ml-24 px-2 before:px-4 py-2 default-select rounded-full font-normal"
           value={selectedSemester?.id || ""}
-          onChange={handleSemesterChange}
-        >
+          onChange={handleSemesterChange}>
           <option value="" disabled>
             Choisir un semestre
           </option>
-          #Afficher les valeurs des semestres disponibles selon le cursus
           {availableSemesters.map((semester) => (
             <option key={semester.id} value={semester.id}>
               {semester.name}
@@ -192,12 +181,10 @@ const MainGrid = ({ curriculum }) => {
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 px-2 before:px-4 py-2 default-select rounded-full font-normal"
           value={selectedSubject?.id || ""}
-          onChange={handleSubjectChange}
-        >
+          onChange={handleSubjectChange}>
           <option value="" disabled>
             Choisir une matière
           </option>
-          #Afficher les valeurs des matières disponibles selon le semestre
           {availableSubjects.map((subject) => (
             <option key={subject.id} value={subject.id}>
               {subject.name}
@@ -206,7 +193,6 @@ const MainGrid = ({ curriculum }) => {
         </select>
 
         {/* Bouton suivant */}
-        #Changement de matières pour aller à la suivante
         <button
           onClick={() => {
             const nextSubjectIndex =
@@ -231,22 +217,19 @@ const MainGrid = ({ curriculum }) => {
                 availableSubjects.length - 1
                 ? "bg-primaryshade cursor-not-allowed"
                 : ""
-            }`}
-        >
+            }`}>
           Passer au suivant
           <img
             src="/images/right-arrow.svg"
             alt="Right Arrow"
-            className="ml-2 w-4 h-4"
-          />
+            className="ml-2 w-4 h-4"/>
         </button>
       </div>
 
       {groups.length === 0 ? (
         <div className="flex items-center justify-center w-full">
           <div className="w-1/2 text-center text-primary mt-10 text-lg font-bold p-2 bg-white rounded-full">
-            Il n'y a pas de groupes, veuillez en ajouter pour consulter le
-            tableau.
+            Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
           </div>
         </div>
       ) : (
@@ -256,14 +239,12 @@ const MainGrid = ({ curriculum }) => {
               className="grid"
               style={{
                 gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
-              }}
-            >
+              }}>
               <div className="w-10 h-6"></div>
               {groupList.map((groupName, colIndex) => (
                 <div
                   key={`col-label-${colIndex}`}
-                  className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold"
-                >
+                  className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
                   {groupName}
                 </div>
               ))}
@@ -279,8 +260,7 @@ const MainGrid = ({ curriculum }) => {
                       <Node
                         key={positionKey}
                         positionKey={positionKey}
-                        items={cellItems}
-                      />
+                        items={cellItems}/>
                     );
                   })}
                 </React.Fragment>

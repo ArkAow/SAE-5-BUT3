@@ -60,7 +60,7 @@ const PreGridEdit = () => {
         )}
 
         {loading ? (
-          <div className="text-white text-lg">Chargement des cursus...</div>
+          <div className="text-white text-3xl font-bold">Chargement des cursus...</div>
         ) : (
           <>
             {/* Sélecteur de cursus */}
