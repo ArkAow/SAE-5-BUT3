@@ -173,6 +173,27 @@ const MainGrid = ({ curriculum }) => {
       const itemIndex = fromItems.findIndex((item) => item.id === id);
       if (itemIndex === -1) return prevItems;
       const [draggedItem] = fromItems.splice(itemIndex, 1);
+
+      setAvailableSubjects((prevSubjects) => {
+        const updatedSubjects = [...prevSubjects];
+        const currentSubject = updatedSubjects[currentSubjectIndex];  
+        currentSubject.courses = currentSubject.courses.map((course) => {
+          if (
+            course.teacher.name === draggedItem.teacher &&
+            course.courseType.name === draggedItem.courseType &&
+            course.duration === draggedItem.duration &&
+            course.pos.x === parseInt(fromKey.split("-")[1], 10) &&
+            course.pos.y === parseInt(fromKey.split("-")[0], 10)
+          ) {
+            return {
+              ...course,
+              pos: { x: parseInt(toKey.split("-")[1], 10), y: parseInt(toKey.split("-")[0], 10) },
+            };
+          }
+          return course;
+        });
+        return updatedSubjects;
+      });
       return {
         ...prevItems,
         [fromKey]: fromItems,

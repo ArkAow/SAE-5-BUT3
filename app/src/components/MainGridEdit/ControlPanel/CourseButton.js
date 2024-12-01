@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { teachers } from "../../../constants";
 
 export const CourseButton = ({
+    isNoGroups,
     selectedRow,
     setSelectedRow,
     selectedCol,
@@ -60,7 +61,8 @@ export const CourseButton = ({
         <div className="relative" ref={containerRef}>
             <button
                 onClick={() => setIsFocused((prev) => !prev)}
-                className={`btn-control-panel ${isFocused ? "bg-white shadow-lg" : ""} transition duration-300`}>
+                className={`btn-control-panel ${isFocused ? "bg-white shadow-lg" : ""} transition duration-300`}
+                disabled={isNoGroups}>
                 <img src="/images/add-block.svg" alt="book icon" className="w-10 h-10 fill-primary" draggable="false" />
             </button>
 
