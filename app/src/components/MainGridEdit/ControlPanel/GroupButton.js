@@ -47,7 +47,7 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
     setGroupName("");
     addGroups(updatedGroups);
   };
-  
+
   const handleAddSubGroup = (index) => {
     if (subGroupName.trim() === "") {
       setError("Nom de sous-groupe vide");
@@ -55,20 +55,22 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
     }
     const updatedGroups = [...groups];
     const parentGroup = updatedGroups[index];
-    const isDuplicateSubGroup = parentGroup.subGroups.includes(`${parentGroup.name}${subGroupName.trim()}`);
+    const isDuplicateSubGroup = parentGroup.subGroups.some(
+      (subGroup) => subGroup.name === subGroupName.trim()
+    );
     if (isDuplicateSubGroup) {
       setError("Nom de sous-groupe déja existant");
       return;
     }
     setError("");
-    const newSubGroupName = `${parentGroup.name}${subGroupName.trim()}`;
-    parentGroup.subGroups.push(newSubGroupName);
+    const newSubGroup = { name: subGroupName.trim() };
+    parentGroup.subGroups.push(newSubGroup);
     addGroups(updatedGroups);
     setSubGroupName("");
   };
 
   const handleDeleteGroup = (index) => {
-    deleteGroups(index)
+    deleteGroups(index);
   };
 
   const handleDeleteSubGroup = (groupIndex, subGroupIndex) => {
@@ -94,15 +96,13 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
 
-        <img src="/images/group.svg" alt="group icon" className="w-10 h-10" draggable="false"/>
+        <img src="/images/group.svg" alt="group icon" className="w-10 h-10" draggable="false" />
       </button>
 
       {/* Tooltip rendu dans le portail global */}
       {isFocused && (
         <NodePortal>
-          <div
-            className="tooltip"
-            ref={tooltipRef}>
+          <div className="tooltip" ref={tooltipRef}>
             <h3 className="mb-5 font-bold text-base">Modifier les groupes</h3>
             {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
             <input
@@ -121,15 +121,13 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
                 isNoGroups ? "hidden" : ""
               }`}>
               {groups.map((group, index) => (
-                <div
-                  key={index}
-                  className="mb-4 flex items-start justify-between">
+                <div key={index} className="mb-4 flex items-start justify-between">
                   <div className="font-semibold text-lg flex items-center">
                     {group.name}
                     <button
                       onClick={() => handleDeleteGroup(index)}
                       className="size-6 btn-default justify-items-center ml-2">
-                        <img src="images/cross.svg" alt="cross" className="size-5" />
+                      <img src="images/cross.svg" alt="cross" className="size-5" />
                     </button>
                   </div>
 
@@ -147,14 +145,10 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
                     </button>
 
                     {group.subGroups.map((subGroup, subIndex) => (
-                      <div
-                        key={subIndex}
-                        className="flex items-center mt-2 w-full">
-                        <span className="text-sm text-gray-600">{subGroup}</span>
+                      <div key={subIndex} className="flex items-center mt-2 w-full">
+                        <span className="text-sm text-gray-600">{subGroup.name}</span>
                         <button
-                          onClick={() =>
-                            handleDeleteSubGroup(index, subIndex)
-                          }
+                          onClick={() => handleDeleteSubGroup(index, subIndex)}
                           className="size-4 btn-default justify-items-center ml-2">
                           <img src="images/cross.svg" alt="cross" className="size-3" />
                         </button>
