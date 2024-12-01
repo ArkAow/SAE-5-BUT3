@@ -54,13 +54,18 @@ const PreGridEdit = () => {
 
       <div className="flex flex-col items-center justify-center flex-1 space-y-10 py-10">
         {error && (
-          <div className="text-red-500 text-lg">
+          <div className="text-red-600 text-3xl font-bold">
             Erreur : {error}
           </div>
         )}
 
         {loading ? (
-          <div className="text-white text-3xl font-bold">Chargement des cursus...</div>
+          <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
+            <div className="spinner"></div>
+            <div className="text-white text-3xl font-bold mt-4">
+              Chargement des cursus...
+            </div>
+          </div>
         ) : (
           <>
             {/* Sélecteur de cursus */}

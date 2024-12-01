@@ -118,27 +118,33 @@ const MainGrid = ({ curriculum }) => {
       duration: selectedDuration,
       id: Date.now(),
     };
-
+  
     setItems((prevItems) => ({
       ...prevItems,
       [positionKey]: [...(prevItems[positionKey] || []), newItem],
     }));
-
+  
     const newCourse = {
-      teacher: {name: selectedTeacher},
-      courseType: {name: selectedCourseType.name, color: selectedCourseType.color},
+      teacher: { name: selectedTeacher },
+      courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
       duration: selectedDuration,
-      pos: {x: selectedCol, y: selectedRow},
+      pos: { x: selectedCol, y: selectedRow },
       id: Date.now(),
     };
-
-    const updatedSubjects = [...availableSubjects];
-    const currentSubject = updatedSubjects[currentSubjectIndex];
-    const updatedCourses = [...currentSubject.courses, newCourse];
-    currentSubject.courses = updatedCourses;
-
-    setAvailableSubjects(updatedSubjects);
-    setCurrentCourses(updatedCourses);
+  
+    setAvailableSubjects((prevSubjects) => {
+      const updatedSubjects = prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = [...(subject.courses || []), newCourse];
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+  
+      return updatedSubjects;
+    });
+  
+    setCurrentCourses((prevCourses) => [...prevCourses, newCourse]);
   };
   
   const moveItem = (fromKey, toKey, id) => {
@@ -387,7 +393,9 @@ const MainGrid = ({ curriculum }) => {
                       <Node
                         key={positionKey}
                         positionKey={positionKey}
-                        items={cellItems}/>
+                        items={cellItems}
+                        moveItem={moveItem}
+                      />
                     );
                   })}
                 </React.Fragment>
