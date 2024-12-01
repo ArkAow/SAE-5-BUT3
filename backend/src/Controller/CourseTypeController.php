@@ -13,10 +13,10 @@ use App\Entity\CourseType;
 class CourseTypeController extends AbstractController
 {
     #[Route('/coursetypes', name: 'app_course_type')]
-    public function getCourseType(EntityManager $entitymanager): JsonResponse
+    public function getCourseType(EntityManagerInterface $em): JsonResponse
     {
         //CourseTypeRepository nous permet de rechercher tous les types de course dispo dans la BDD
-        $courseTypeRepository = $entitymanager->getRepository(CourseType::class);
+        $courseTypeRepository = $em->getRepository(CourseType::class);
         $coursetype = $courseTypeRepository->findAll();
 
         //On retourne les coursetype sous forme de tableau
