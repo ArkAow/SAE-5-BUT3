@@ -54,8 +54,8 @@ const PreGridEdit = () => {
 
       <div className="flex flex-col items-center justify-center flex-1 space-y-10 py-10">
         {error && (
-          <div className="text-red-600 text-3xl font-bold">
-            Erreur : {error}
+          <div className="text-primary text-3xl font-bold p-10 bg-white rounded-full">
+            Erreur lors du chargement des données
           </div>
         )}
 
@@ -67,7 +67,7 @@ const PreGridEdit = () => {
             </div>
           </div>
         ) : (
-          <>
+          <div className={`${error ? 'hidden' : ''}`}>
             {/* Sélecteur de cursus */}
             <div className="flex space-x-8">
               <div className="w-64">
@@ -109,7 +109,7 @@ const PreGridEdit = () => {
               aria-disabled={!selectedCurriculum}>
               Confirmer
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>
