@@ -23,6 +23,8 @@ class ClassEntity
 
     #[ORM\ManyToMany(targetEntity: Curriculum::class, inversedBy: "classes")]
     #[ORM\JoinTable(name: "curriculum_class")]
+    #[ORM\JoinColumn(name: "class_id", referencedColumnName: "id")]
+    #[ORM\InverseJoinColumn(name: "curriculum_id", referencedColumnName: "id")]
     private Collection $curriculums;
 
     public function __construct()

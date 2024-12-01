@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Controller\ExcelReaderController;
+use App\Entity\ClassEntity;
 
 class DatasInsertController extends AbstractController
 {
@@ -67,10 +69,33 @@ class DatasInsertController extends AbstractController
             $curriculum = new Curriculum();
             $curriculum->setName($name);
             $this->entityManager->persist($curriculum);
+
+            if (preg_match('/BUT\s+(\d+)/i', $name, $matches)) {
+                $classNumber = $matches[1];
+                $className = "A" . $classNumber;
+
+                $classEntity = $this->getOrCreateClassEntity($className);
+
+                $curriculum->addClass($classEntity);
+                $classEntity->addCurriculum($curriculum);
+            }
         }
 
         return $curriculum;
     }
+
+    private function getOrCreateClassEntity(string $className): ClassEntity
+    {
+        $classEntity = $this->entityManager->getRepository(ClassEntity::class)->findOneBy(['name' => $className]);
+    
+        if (!$classEntity) {
+            $classEntity = new ClassEntity();
+            $classEntity->setName($className);
+            $this->entityManager->persist($classEntity);
+        }
+    
+        return $classEntity;
+    }    
 
     private function getOrCreateSemester(string $name): Semester
     {

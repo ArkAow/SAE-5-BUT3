@@ -18,8 +18,7 @@ class Curriculum
     #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: ClassEntity::class, inversedBy: 'curriculums')]
-    #[ORM\JoinTable(name: 'curriculum_class')]
+    #[ORM\ManyToMany(targetEntity: ClassEntity::class, mappedBy: "curriculums")]
     private Collection $classes;
 
     #[ORM\ManyToMany(targetEntity: Semester::class, inversedBy: 'curriculums')]
