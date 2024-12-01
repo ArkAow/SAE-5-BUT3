@@ -3,24 +3,108 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
-import { courseTypes as initialCourseTypes } from "../../constants";
 
 const MainGrid = ({ curriculum }) => {
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
-  const [courseTypes, setCourseTypes] = useState(initialCourseTypes);
-  const [selectedCourseType, setSelectedCourseType] = useState(courseTypes[0]);
-  const [selectedTeacher, setSelectedTeacher] = useState("");
-  const [selectedDuration, setSelectedDuration] = useState(1.0);
-  const [selectedSemester, setSelectedSemester] = useState(curriculum.semesters[0] || {});
-  const [availableSubjects, setAvailableSubjects] = useState(curriculum.semesters[0]?.subjects || []);
-  const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
-  const [groups, setGroups] = useState(curriculum.groups);
-  const [currentCourses, setCurrentCourses] = useState(availableSubjects[0]?.courses || []);
+  const [selectedSemester, setSelectedSemester] = useState(null);
+  const [availableSemesters, setAvailableSemesters] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [currentCourses, setCurrentCourses] = useState([]);
+  const [groups, setGroups] = useState([]);
 
+  // Charger les semestres pour un curriculum
+  useEffect(() => {
+    const fetchSemesters = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8600/api/curriculum/${curriculum.id}/semesters`
+        );
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement des semestres.");
+        }
+        const semesters = await response.json();
+        setAvailableSemesters(semesters);
+        setSelectedSemester(semesters[0] || null);
+
+        if (semesters[0]) {
+          fetchSubjects(semesters[0].id);
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Impossible de charger les semestres.");
+      }
+    };
+
+    fetchSemesters();
+  }, [curriculum.id]);
+
+  // Charger les matières pour un semestre
+  const fetchSubjects = async (semesterId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8600/api/semester/${semesterId}/subjects`
+      );
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des matières.");
+      }
+      const subjects = await response.json();
+      setAvailableSubjects(subjects);
+      setSelectedSubject(subjects[0] || null);
+      setCurrentCourses(subjects[0]?.courses || []);
+    } catch (error) {
+      console.error(error);
+      alert("Impossible de charger les matières.");
+    }
+  };
+
+  // Mise à jour des semestres
+  const handleSemesterChange = (e) => {
+    const semesterId = parseInt(e.target.value, 10);
+    const selected = availableSemesters.find((s) => s.id === semesterId);
+    setSelectedSemester(selected);
+
+    if (selected) {
+      fetchSubjects(selected.id);
+    }
+  };
+
+  // Mise à jour des matières
+  const handleSubjectChange = (e) => {
+    const subjectId = parseInt(e.target.value, 10);
+    const selected = availableSubjects.find((s) => s.id === subjectId);
+    setSelectedSubject(selected);
+    setCurrentCourses(selected?.courses || []);
+  };
+
+  // Mise à jour des items dans la grille
+  useEffect(() => {
+    const initialItems = {};
+    currentCourses.forEach((course, index) => {
+      const row = course.pos.y;
+      const col = course.pos.x;
+      const positionKey = `${row}-${col}`;
+
+      if (!initialItems[positionKey]) {
+        initialItems[positionKey] = [];
+      }
+
+      initialItems[positionKey].push({
+        color: course.courseType?.color || "#ffffff",
+        courseType: course.courseType.name,
+        teacher: course.teacher.name || "N/A",
+        duration: course.duration || 1.0,
+        id: course.id || Date.now() + index,
+      });
+    });
+
+    setItems(initialItems);
+  }, [currentCourses]);
+
+  // Ajouter des groupes et sous-groupes
   const addGroups = async (newGroups) => {
-    // Add new groups to the local state
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
       const filteredNewGroups = newGroups.filter(
@@ -28,9 +112,10 @@ const MainGrid = ({ curriculum }) => {
       );
       return [...prevGroups, ...filteredNewGroups];
     });
-  
+
     for (const group of newGroups) {
       try {
+        //Appel à l'API pour ajouter un groupe
         const response = await fetch("http://localhost:8600/add/group", {
           method: "POST",
           headers: {
@@ -41,13 +126,14 @@ const MainGrid = ({ curriculum }) => {
             halfgroups: group.subGroups || [],
           }),
         });
-  
+
+        //Ajout des groupes a-t-il réussi ? --> Renvoi d'une alerte qui change en fonction de la réponse
         const result = await response.json();
         if (!response.ok) {
           console.error("Erreur pour l'ajout du groupe:", result.error);
           alert(`Erreur lors de l'ajout du groupe : ${result.error}`);
         } else {
-          console.log("Le groupe a belk et bienété ajouté:", result);
+          console.log("Le groupe a été ajouté avec succès :", result);
         }
       } catch (error) {
         console.error("Erreur lors de la connexion avec l'API:", error);
@@ -63,152 +149,11 @@ const MainGrid = ({ curriculum }) => {
 
   const getGroupList = () => {
     const mainGroups = groups.map((group) => group.name);
-    const subGroups = groups.flatMap((group) => group.subGroups);
+    const subGroups = groups.flatMap((group) => group.subGroups || []);
     return ["Tous", ...mainGroups, ...subGroups];
   };
 
-  useEffect(() => {
-    const initialItems = {};
-    currentCourses.forEach((course, index) => {
-      const row = course.pos.y;
-      const col = course.pos.x;
-      const positionKey = `${row}-${col}`;
-  
-      if (!initialItems[positionKey]) {
-        initialItems[positionKey] = [];
-      }
-      
-      initialItems[positionKey].push({
-        color: course.courseType?.color || "#ffffff",
-        courseType: course.courseType.name,
-        teacher: course.teacher.name || "N/A",
-        duration: course.duration || 1.0,
-        id: course.id || Date.now() + index,
-      });
-    });
-
-    setItems(initialItems);
-  }, [currentSubjectIndex, selectedSemester]);
-
-  const handleSemesterChange = (e) => {
-    const selectedName = e.target.value;
-    const semester = curriculum.semesters.find((s) => s.name === selectedName);
-    setSelectedSemester(semester || {});
-    
-    const subjects = semester ? semester.subjects : [];
-    setAvailableSubjects(subjects);
-    setCurrentSubjectIndex(0);
-    
-    const firstSubjectCourses = subjects[0]?.courses || [];
-    setCurrentCourses(firstSubjectCourses);
-  };
-
-  const handleSubjectChange = (e) => {
-    const selectedSubject = e.target.value;
-    const subject = selectedSemester.subjects.find((s) => s.name === selectedSubject);
-
-    const subjectIndex = availableSubjects.indexOf(subject);
-    setCurrentSubjectIndex(subjectIndex);
-    setCurrentCourses(subject?.courses || []);
-
-    setItems({});
-  };
-
-  const handleNextSubject = () => {
-    if (currentSubjectIndex < availableSubjects.length - 1) {
-      setCurrentSubjectIndex((prevIndex) => prevIndex + 1);
-
-      const nextSubject = availableSubjects[currentSubjectIndex + 1];
-      setCurrentCourses(nextSubject?.courses || []);
-
-      setItems({});
-    }
-  };
-
-  const updateCoursesForRemovedType = (removedTypeName) => {
-    setAvailableSubjects((prevSubjects) =>
-      prevSubjects.map((subject) => ({
-        ...subject,
-        courses: subject.courses.map((course) =>
-          course.courseType.name === removedTypeName
-            ? {
-                ...course,
-                courseType: { name: "N/A", color: "#FFFFFF" },
-              }
-            : course
-        ),
-      }))
-    );
-  
-    setCurrentCourses((prevCourses) =>
-      prevCourses.map((course) =>
-        course.courseType.name === removedTypeName
-          ? { ...course, courseType: { name: "N/A", color: "#FFFFFF" } }
-          : course
-      )
-    );
-  
-    setItems((prevItems) => {
-      const updatedItems = { ...prevItems };
-      for (const key in updatedItems) {
-        updatedItems[key] = updatedItems[key].map((item) =>
-          item.courseType === removedTypeName
-            ? { ...item, courseType: "N/A", color: "#FFFFFF" }
-            : item
-        );
-      }
-      return updatedItems;
-    });
-  };
-
-  const addItem = () => {
-    const positionKey = `${selectedRow}-${selectedCol}`;
-    const newItem = {
-      color: selectedCourseType.color,
-      courseType: selectedCourseType.name,
-      teacher: selectedTeacher,
-      duration: selectedDuration,
-      id: Date.now(),
-    };
-
-    setItems((prevItems) => ({
-      ...prevItems,
-      [positionKey]: [...(prevItems[positionKey] || []), newItem],
-    }));
-
-    const newCourse = {
-      teacher: {name: selectedTeacher},
-      courseType: {name: selectedCourseType.name, color: selectedCourseType.color},
-      duration: selectedDuration,
-      pos: {x: selectedCol, y: selectedRow},
-      id: Date.now(),
-    };
-
-    const updatedSubjects = [...availableSubjects];
-    const currentSubject = updatedSubjects[currentSubjectIndex];
-    const updatedCourses = [...currentSubject.courses, newCourse];
-    currentSubject.courses = updatedCourses;
-
-    setAvailableSubjects(updatedSubjects);
-    setCurrentCourses(updatedCourses);
-  };
-  
-  const moveItem = (fromKey, toKey, id) => {
-    setItems((prevItems) => {
-      const fromItems = [...(prevItems[fromKey] || [])];
-      const toItems = [...(prevItems[toKey] || [])];
-      const itemIndex = fromItems.findIndex((item) => item.id === id);
-      if (itemIndex === -1) return prevItems;
-      const [draggedItem] = fromItems.splice(itemIndex, 1);
-      return {
-        ...prevItems,
-        [fromKey]: fromItems,
-        [toKey]: [...toItems, draggedItem],
-      };
-    });
-  };
-  
-  const GRID_ROW_LENGTH = 25; // à rendre responsive 🌝
+  const GRID_ROW_LENGTH = 25;
   const groupList = getGroupList();
 
   return (
@@ -221,70 +166,87 @@ const MainGrid = ({ curriculum }) => {
             setSelectedRow={setSelectedRow}
             selectedCol={selectedCol}
             setSelectedCol={setSelectedCol}
-            courseTypes={courseTypes}
-            setCourseTypes={setCourseTypes}
-            updateCoursesForRemovedType={updateCoursesForRemovedType}
-            selectedCourseType={selectedCourseType}
-            setSelectedCourseType={setSelectedCourseType}
-            selectedTeacher={selectedTeacher}
-            setSelectedTeacher={setSelectedTeacher}
-            selectedDuration={selectedDuration}
-            setSelectedDuration={setSelectedDuration}
-            addItem={addItem}
             addGroups={addGroups}
             deleteGroups={deleteGroups}
           />
         </div>
 
-        {/* Choix semestre */}
+        {/* Choix du semestre selon le curriculum */}
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 ml-24 px-2 before:px-4 py-2 default-select rounded-full font-normal"
-          value={selectedSemester.name || ""}
-          onChange={handleSemesterChange}>
+          value={selectedSemester?.id || ""}
+          onChange={handleSemesterChange}
+        >
           <option value="" disabled>
             Choisir un semestre
           </option>
-          {curriculum.semesters.map((semester) => (
-            <option key={semester.name} value={semester.name}>
+          #Afficher les valeurs des semestres disponibles selon le cursus
+          {availableSemesters.map((semester) => (
+            <option key={semester.id} value={semester.id}>
               {semester.name}
             </option>
           ))}
         </select>
 
-        {/* Choix matière */}
+        {/* Choix des matières selon le semestre */}
         <select
           className="w-fit min-w-28 max-w-60 h-10 mt-2 px-2 before:px-4 py-2 default-select rounded-full font-normal"
-          value={availableSubjects[currentSubjectIndex]?.name || ""}
-          onChange={handleSubjectChange}>
+          value={selectedSubject?.id || ""}
+          onChange={handleSubjectChange}
+        >
           <option value="" disabled>
             Choisir une matière
           </option>
+          #Afficher les valeurs des matières disponibles selon le semestre
           {availableSubjects.map((subject) => (
-            <option key={subject.name} value={subject.name}>
+            <option key={subject.id} value={subject.id}>
               {subject.name}
             </option>
           ))}
         </select>
 
         {/* Bouton suivant */}
+        #Changement de matières pour aller à la suivante
         <button
-          onClick={handleNextSubject}
-          disabled={currentSubjectIndex >= availableSubjects.length - 1}
+          onClick={() => {
+            const nextSubjectIndex =
+              availableSubjects.findIndex((s) => s.id === selectedSubject?.id) +
+              1;
+            if (nextSubjectIndex < availableSubjects.length) {
+              const nextSubject = availableSubjects[nextSubjectIndex];
+              setSelectedSubject(nextSubject);
+              setCurrentCourses(nextSubject.courses || []);
+            }
+          }}
+          disabled={
+            !selectedSubject ||
+            availableSubjects.indexOf(selectedSubject) >=
+              availableSubjects.length - 1
+          }
           className={`flex w-48 h-10 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full
             shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none
-            ${currentSubjectIndex >= availableSubjects.length - 1 ? "bg-primaryshade cursor-not-allowed" : ""}`}>
+            ${
+              !selectedSubject ||
+              availableSubjects.indexOf(selectedSubject) >=
+                availableSubjects.length - 1
+                ? "bg-primaryshade cursor-not-allowed"
+                : ""
+            }`}
+        >
           Passer au suivant
           <img
             src="/images/right-arrow.svg"
             alt="Right Arrow"
-            className="ml-2 w-4 h-4" />
+            className="ml-2 w-4 h-4"
+          />
         </button>
       </div>
 
       {groups.length === 0 ? (
         <div className="flex items-center justify-center w-full">
           <div className="w-1/2 text-center text-primary mt-10 text-lg font-bold p-2 bg-white rounded-full">
-            Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
+            Il n'y a pas de groupes, veuillez en ajouter pour consulter le
+            tableau.
           </div>
         </div>
       ) : (
@@ -294,12 +256,14 @@ const MainGrid = ({ curriculum }) => {
               className="grid"
               style={{
                 gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
-              }}>
+              }}
+            >
               <div className="w-10 h-6"></div>
               {groupList.map((groupName, colIndex) => (
                 <div
                   key={`col-label-${colIndex}`}
-                  className={`w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold`}>
+                  className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold"
+                >
                   {groupName}
                 </div>
               ))}
@@ -316,7 +280,7 @@ const MainGrid = ({ curriculum }) => {
                         key={positionKey}
                         positionKey={positionKey}
                         items={cellItems}
-                        moveItem={moveItem} />
+                      />
                     );
                   })}
                 </React.Fragment>

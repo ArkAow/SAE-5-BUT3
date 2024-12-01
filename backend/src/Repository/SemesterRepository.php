@@ -16,6 +16,17 @@ class SemesterRepository extends ServiceEntityRepository
         parent::__construct($registry, Semester::class);
     }
 
+    public function findSemestersByCurriculum(int $curriculumId): array
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->innerJoin('s.curriculums', 'c')
+            ->andWhere('c.id = :curriculumId')
+            ->setParameter('curriculumId', $curriculumId)
+            ->getQuery();
+
+        return $qb->getResult();
+    }
+    
     //    /**
     //     * @return Semester[] Returns an array of Semester objects
     //     */
