@@ -2,40 +2,50 @@ import React, { useState, useEffect } from "react";
 import Header from "../header/header";
 import { useNavigate } from "react-router-dom";
 
-const PreGridEdit = () => {
+// Hook pour récupérer les cursus
+const useFetchCurriculums = (url) => {
   const [curriculums, setCurriculums] = useState([]);
-  const [selectedCurriculum, setSelectedCurriculum] = useState(null);
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCurriculums = async () => {
       try {
-        const response = await fetch("http://localhost:8600/curriculums");
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des curriculums");
         }
         const data = await response.json();
-        if (data && data.length > 0) {
-          setCurriculums(data);
-          setSelectedCurriculum(data[0]);
-        } else {
-          setCurriculums([]);
-        }
+        setCurriculums(data);
       } catch (error) {
-        console.error("Erreur lors de la récupération des cursus :", error);
-        alert("Impossible de charger les cursus.");
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCurriculums();
-  }, []);
+  }, [url]);
+
+  return { curriculums, error, loading };
+};
+
+const PreGridEdit = () => {
+  const { curriculums, error, loading } = useFetchCurriculums("http://localhost:8600/curriculums");
+  const [selectedCurriculum, setSelectedCurriculum] = useState(null);
+  const navigate = useNavigate();
+
+  const handleCurriculumChange = (e) => {
+    const selected = curriculums.find(
+      (curriculum) => curriculum.id === parseInt(e.target.value, 10)
+    );
+    setSelectedCurriculum(selected);
+  };
 
   const goToPreviEdit = () => {
-    if (!selectedCurriculum) {
-      alert("Veuillez sélectionner un cursus valide.");
-      return;
+    if (selectedCurriculum) {
+      navigate("/PreviEdit", { state: { selectedCurriculum } });
     }
-    navigate("/PreviEdit", { state: { selectedCurriculum } });
   };
 
   return (
@@ -43,49 +53,62 @@ const PreGridEdit = () => {
       <Header />
 
       <div className="flex flex-col items-center justify-center flex-1 space-y-10 py-10">
-        {/* Sélecteur de cursus */}
-        <div className="flex space-x-8">
-          <div className="w-64">
-            <label className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white">
-              Cursus :
-            </label>
-            <select
-              value={selectedCurriculum?.id || ""}
-              onChange={(e) => {
-                const selected = curriculums.find(
-                  (curriculum) => curriculum.id === parseInt(e.target.value)
-                );
-                setSelectedCurriculum(selected);
-              }}
-              className="w-full min-w-48 h-28 p-3 text-2xl default-select focus:outline-none"
-            >
-              <option value="" disabled>
-                {curriculums.length > 0
-                  ? "Choisir un Cursus"
-                  : "Aucun cursus disponible"}
-              </option>
-              {curriculums.map((curriculum) => (
-                <option key={curriculum.id} value={curriculum.id}>
-                  {curriculum.name}
-                </option>
-              ))}
-            </select>
+        {error && (
+          <div className="text-red-500 text-lg">
+            Erreur : {error}
           </div>
-        </div>
+        )}
 
-        {/* Bouton pour confirmer le choix */}
-        <button
-          type="button"
-          className={`w-1/5 min-w-40 px-6 py-3 text-white text-xl 
-            bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint 
-            focus:outline-none border border-white ${
-              !selectedCurriculum ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          onClick={goToPreviEdit}
-          disabled={!selectedCurriculum}
-        >
-          Confirmer
-        </button>
+        {loading ? (
+          <div className="text-white text-lg">Chargement des cursus...</div>
+        ) : (
+          <>
+            {/* Sélecteur de cursus */}
+            <div className="flex space-x-8">
+              <div className="w-64">
+                <label
+                  htmlFor="curriculum-select"
+                  className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white"
+                >
+                  Cursus :
+                </label>
+                <select
+                  id="curriculum-select"
+                  value={selectedCurriculum?.id || ""}
+                  onChange={handleCurriculumChange}
+                  className="w-full min-w-48 h-28 p-3 text-2xl default-select focus:outline-none"
+                  aria-label="Sélectionner un cursus"
+                >
+                  <option value="" disabled>
+                    {curriculums.length > 0
+                      ? "Choisir un Cursus"
+                      : "Aucun Cursus"}
+                  </option>
+                  {curriculums.map((curriculum) => (
+                    <option key={curriculum.id} value={curriculum.id}>
+                      {curriculum.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Bouton pour confirmer le choix */}
+            <button
+              type="button"
+              className={`w-1/5 min-w-40 px-6 py-3 text-white text-xl 
+                bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint 
+                focus:outline-none border border-white ${
+                  !selectedCurriculum ? "bg-primaryshade cursor-not-allowed" : ""
+                }`}
+              onClick={goToPreviEdit}
+              disabled={!selectedCurriculum}
+              aria-disabled={!selectedCurriculum}
+            >
+              Confirmer
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
