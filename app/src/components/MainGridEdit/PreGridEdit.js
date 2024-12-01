@@ -68,8 +68,7 @@ const PreGridEdit = () => {
               <div className="w-64">
                 <label
                   htmlFor="curriculum-select"
-                  className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white"
-                >
+                  className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white">
                   Cursus :
                 </label>
                 <select
@@ -77,8 +76,7 @@ const PreGridEdit = () => {
                   value={selectedCurriculum?.id || ""}
                   onChange={handleCurriculumChange}
                   className="w-full min-w-48 h-28 p-3 text-2xl default-select focus:outline-none"
-                  aria-label="Sélectionner un cursus"
-                >
+                  aria-label="Sélectionner un cursus">
                   <option value="" disabled>
                     {curriculums.length > 0
                       ? "Choisir un Cursus"
@@ -103,8 +101,7 @@ const PreGridEdit = () => {
                 }`}
               onClick={goToPreviEdit}
               disabled={!selectedCurriculum}
-              aria-disabled={!selectedCurriculum}
-            >
+              aria-disabled={!selectedCurriculum}>
               Confirmer
             </button>
           </>
