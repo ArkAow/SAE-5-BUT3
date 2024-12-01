@@ -22,6 +22,8 @@ const MainGrid = ({ curriculum }) => {
   const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
+
+  {/* Gestion des SEMESTRES et MATIERES -------------------------------------------- */}
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
@@ -105,6 +107,8 @@ const MainGrid = ({ curriculum }) => {
     setItems(initialItems);
   }, [currentCourses]);
 
+
+  {/* Gestion des GROUPES -------------------------------------------- */}
   const addGroups = async (newGroups) => {
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
