@@ -107,6 +107,75 @@ const MainGrid = ({ curriculum }) => {
     setItems(initialItems);
   }, [currentCourses]);
 
+  
+  {/* Gestion des COURS -------------------------------------------- */}
+  const addItem = () => {
+    const positionKey = `${selectedRow}-${selectedCol}`;
+    const newItem = {
+      color: selectedCourseType.color,
+      courseType: selectedCourseType.name,
+      teacher: selectedTeacher,
+      duration: selectedDuration,
+      id: Date.now(),
+    };
+
+    setItems((prevItems) => ({
+      ...prevItems,
+      [positionKey]: [...(prevItems[positionKey] || []), newItem],
+    }));
+
+    const newCourse = {
+      teacher: {name: selectedTeacher},
+      courseType: {name: selectedCourseType.name, color: selectedCourseType.color},
+      duration: selectedDuration,
+      pos: {x: selectedCol, y: selectedRow},
+      id: Date.now(),
+    };
+
+    const updatedSubjects = [...availableSubjects];
+    const currentSubject = updatedSubjects[currentSubjectIndex];
+    const updatedCourses = [...currentSubject.courses, newCourse];
+    currentSubject.courses = updatedCourses;
+
+    setAvailableSubjects(updatedSubjects);
+    setCurrentCourses(updatedCourses);
+  };
+  
+  const moveItem = (fromKey, toKey, id) => {
+    setItems((prevItems) => {
+      const fromItems = [...(prevItems[fromKey] || [])];
+      const toItems = [...(prevItems[toKey] || [])];
+      const itemIndex = fromItems.findIndex((item) => item.id === id);
+      if (itemIndex === -1) return prevItems;
+      const [draggedItem] = fromItems.splice(itemIndex, 1);
+
+      setAvailableSubjects((prevSubjects) => {
+        const updatedSubjects = [...prevSubjects];
+        const currentSubject = updatedSubjects[currentSubjectIndex];  
+        currentSubject.courses = currentSubject.courses.map((course) => {
+          if (
+            course.teacher.name === draggedItem.teacher &&
+            course.courseType.name === draggedItem.courseType &&
+            course.duration === draggedItem.duration &&
+            course.pos.x === parseInt(fromKey.split("-")[1], 10) &&
+            course.pos.y === parseInt(fromKey.split("-")[0], 10)
+          ) {
+            return {
+              ...course,
+              pos: { x: parseInt(toKey.split("-")[1], 10), y: parseInt(toKey.split("-")[0], 10) },
+            };
+          }
+          return course;
+        });
+        return updatedSubjects;
+      });
+      return {
+        ...prevItems,
+        [fromKey]: fromItems,
+        [toKey]: [...toItems, draggedItem],
+      };
+    });
+  };
 
   {/* Gestion des GROUPES -------------------------------------------- */}
   const addGroups = async (newGroups) => {
