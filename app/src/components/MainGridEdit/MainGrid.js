@@ -232,14 +232,25 @@ const MainGrid = ({ curriculum }) => {
     <div className="min-h-screen py-10">
       <div className="flex items-center justify-start gap-5 h-20 px-10">
         <div className="absolute top-6">
-          <ControlPanel
+        <ControlPanel
             groups={groups}
             selectedRow={selectedRow}
             setSelectedRow={setSelectedRow}
             selectedCol={selectedCol}
             setSelectedCol={setSelectedCol}
+            courseTypes={courseTypes}
+            setCourseTypes={setCourseTypes}
+            updateCoursesForRemovedType={updateCoursesForRemovedType}
+            selectedCourseType={selectedCourseType}
+            setSelectedCourseType={setSelectedCourseType}
+            selectedTeacher={selectedTeacher}
+            setSelectedTeacher={setSelectedTeacher}
+            selectedDuration={selectedDuration}
+            setSelectedDuration={setSelectedDuration}
+            addItem={addItem}
             addGroups={addGroups}
-            deleteGroups={deleteGroups}/>
+            deleteGroups={deleteGroups}
+          />
         </div>
 
         {/* Choix du semestre selon le curriculum */}
