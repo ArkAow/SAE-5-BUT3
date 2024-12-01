@@ -3,7 +3,6 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
-import { courseTypes as initialCourseTypes } from "../../constants";
 
 const MainGrid = ({ curriculum }) => {
   const [items, setItems] = useState({});
@@ -239,6 +238,25 @@ const MainGrid = ({ curriculum }) => {
   };
 
   {/* Gestion des GROUPES -------------------------------------------- */}
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const promoID = curriculum.promos[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
+        const response = await fetch("http://localhost:8600/groups/promoID");
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement des groups");
+        }
+        const data = await response.json();
+        setGroups(data);
+      } catch (error) {
+        console.error(error);
+        alert("Impossible de charger les groupes.");
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
   const addGroups = async (newGroups) => {
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
@@ -282,7 +300,9 @@ const MainGrid = ({ curriculum }) => {
 
   const getGroupList = () => {
     const mainGroups = groups.map((group) => group.name);
-    const subGroups = groups.flatMap((group) => group.subGroups || []);
+    const subGroups = groups.flatMap((group) => 
+      (group.subGroups || []).map((subGroup) => subGroup.name)
+    );
     return ["Tous", ...mainGroups, ...subGroups];
   };
 
