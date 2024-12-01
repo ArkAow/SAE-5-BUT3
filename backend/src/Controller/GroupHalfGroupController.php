@@ -10,29 +10,46 @@ use App\Entity\Groups;
 
 class GroupHalfGroupController extends AbstractController
 {
-    //Route pour obtenir tous les groupes
+    // Route pour obtenir tous les groupes avec leurs demi-groupes
     #[Route('groups', name:"get_all_groups", methods:['GET'])]
     public function getAllgroups(EntityManagerInterface $entityManager): JsonResponse
     {
-        //GroupRepository permet la recherche de tous les groupes disponibles dans la BDD  
+        // GroupRepository permet la recherche de tous les groupes disponibles dans la BDD  
         $groupsRepository = $entityManager->getRepository(Groups::class);
         $groups = $groupsRepository->findAll();
 
-        //On retourne les groupes sous forme de tableau
-        $data = array_map(function ($group){
-            return [
-                'id' => $group->getId(),
-                'name' => $group->getName(),
-            ];
-        }, $groups);
-        
-        //Si aucun groupe n'existe ou n'est trouvé alors on retourne une erreuir HTTP 404
+        // Si aucun groupe n'existe ou n'est trouvé alors on retourne une erreur HTTP 404
         if (!$groups) {
             return new JsonResponse(['error' => 'Aucun groupe trouvé.'], 404);
         }
 
-        //On retourne le tableau avec les groupes en format JSON
+        // On construit les données avec les demi-groupes
+        $data = array_map(function ($group) use ($entityManager) {
+            return [
+                'id' => $group->getId(),
+                'name' => $group->getName(),
+                //Tous les demi-groupes associés à chaque groupe dans la réponse
+                'subGroups' => $this->getHalfGroups_of_a_Groups($group),
+            ];
+        }, $groups);
+
+        // On retourne le tableau avec les groupes et leurs demi-groupes en format JSON
         return new JsonResponse($data, 200);
+    }
+
+    // Méthode pour obtenir les demi-groupes d'un groupe spécifique
+    private function getHalfGroups_of_a_Groups(Groups $group): array
+    {
+        // On récupère les demi-groupes associés au groupe (Fonction définie dans l'entité Groups)
+        $halfGroups = $group->getHalfGroups();
+
+        // On retourne les demi-groupes sous forme de tableau
+        return array_map(function ($halfGroup) {
+            return [
+                'id' => $halfGroup->getId(),
+                'name' => $halfGroup->getName(),
+            ];
+        }, $halfGroups->toArray());
     }
 
     //Route pour obtenir un demi-groupe d'un groupe spécifique
