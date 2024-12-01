@@ -67,9 +67,9 @@ const PreGridEdit = () => {
             </div>
           </div>
         ) : (
-          <div className={`${error ? 'hidden' : ''}`}>
+          <>
             {/* Sélecteur de cursus */}
-            <div className="flex space-x-8">
+            <div className={`${error ? 'hidden' : 'flex space-x-8'}`}>
               <div className="w-64">
                 <label
                   htmlFor="curriculum-select"
@@ -102,14 +102,14 @@ const PreGridEdit = () => {
               className={`w-1/5 min-w-40 px-6 py-3 text-white text-xl 
                 bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint 
                 focus:outline-none border border-white ${
-                  !selectedCurriculum ? "bg-primaryshade cursor-not-allowed" : ""
-                }`}
+                  !selectedCurriculum ? "bg-primaryshade cursor-not-allowed" : ""}
+                ${error ? 'hidden' : ''}`}
               onClick={goToPreviEdit}
               disabled={!selectedCurriculum}
               aria-disabled={!selectedCurriculum}>
               Confirmer
             </button>
-          </div>
+          </>
         )}
       </div>
     </div>
