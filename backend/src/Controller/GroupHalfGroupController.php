@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Groups;
+use App\Entity\HalfGroup;
 
 class GroupHalfGroupController extends AbstractController
 {
@@ -63,5 +64,36 @@ class GroupHalfGroupController extends AbstractController
         }, $halfGroups->toArray());
 
         return new JsonResponse($data, 200);
+    }
+
+    #[Route('/delete/group/{id}', name: 'delete_group', methods: ['DELETE'])]
+    public function deleteGroups(EntityManagerInterface $em, string $id) : JsonResponse
+    {
+        $groupRepository = $em->getRepository(Groups::class);
+        $group = $groupRepository->findOneBy(['id' => $id]);
+
+        if (!$group){
+            return new JsonResponse(['error' => 'Groupe introuvable', 404]);
+        }else {
+            $em->remove($group);
+            $em->flush();
+        }
+
+        return new JsonResponse(['status' => 'Groupe supprimé avec succès'], 200);
+    }
+
+    #[Route('/delete/halfgroup/{id}', name: 'delete_halfgroup', methods: ['DELETE'])]
+    public function deletehalfGroup(EntityManagerInterface $entityManager, string $id) : JsonResponse
+    {
+        $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);
+        $halfgroup = $halfgroupRepository->findOneBy(['id' => $id]);
+        
+        if (!$halfgroup) {
+            return new JsonResponse(['error' => 'Erreur HalfGroup introuvable'], 404);
+        }else {
+            $entityManager->remove($halfgroup);
+            $entityManager->flush();
+        }
+        return new JsonResponse(['status' => 'HalfGroup supprimé avec succès'], 200);
     }
 }
