@@ -32,3 +32,6 @@
 /backend/var/
 /backend/vendor/
 ###< symfony/framework-bundle ###
+
+### fichiers excels
+/backend/public/uploads
