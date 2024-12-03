@@ -81,23 +81,23 @@ class CourseTypeController extends AbstractController
     }
 
     //Route permettant de supprimer un CourseType spéciffique par son ID
-    #[Route('/delete/coursetype/{id}', name: 'get_a_course_type', methods: ['DELETE'])]
+    #[Route('/delete/coursetype/{id}', name: 'delete_course_type', methods: ['DELETE'])]
     public function deleteCourseType(EntityManagerInterface $entityManager, int $id): JsonResponse
     {
-        //CourseTypeRepository permettra la recherche d'un CourseType spécifique dans la BDD
+        // Recherche d'un CourseType par son nom
         $courseTypeRepository = $entityManager->getRepository(CourseType::class);
         $courseType = $courseTypeRepository->find($id);
-
-        //Si le type de cours n'existe pas, on retourne une erreur à l'utilisateur
+    
+        // Si le type de cours n'existe pas, on retourne une erreur
         if (!$courseType) {
-            return new JsonResponse(['error' => 'Type de cours introuvable ou inexistant.'], 404);
+            return new JsonResponse(['error' => 'Type de cours introuvable ou inexistant.'], 404, [], true);
         }
-
-        //Suppression du CourseType et sauvegarde de la suppression en BDD (flush)
+    
+        // Suppression du CourseType
         $entityManager->remove($courseType);
         $entityManager->flush();
-
-        //On retourne un message de succès pour signaler la suppression du CourseType
+    
+        // Retourne une réponse de succès
         return new JsonResponse(['success' => 'Type de cours supprimé avec succès.'], 200);
     }
 }

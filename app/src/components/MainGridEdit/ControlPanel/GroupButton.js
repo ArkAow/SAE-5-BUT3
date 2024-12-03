@@ -63,7 +63,7 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
       return;
     }
     setError("");
-    const newSubGroup = { name: subGroupName.trim() };
+    const newSubGroup = { name: parentGroup.name + subGroupName.trim() };
     parentGroup.subGroups.push(newSubGroup);
     addGroups(updatedGroups);
     setSubGroupName("");
