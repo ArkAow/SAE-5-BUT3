@@ -38,9 +38,8 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
       setError("Le nom du type de cours est obligatoire.");
       return;
     }
-
     try {
-      const response = await fetch("/add/coursetype", {
+      const response = await fetch("http://localhost:8600/add/coursetype", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,6 +47,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
         body: JSON.stringify({
           name: newCourseTypeName.trim(),
           color: newCourseTypeColor,
+          scope: "",
         }),
       });
 
@@ -74,7 +74,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
     if (!courseType) return;
 
     try {
-      const response = await fetch(`/delete/coursetype/${courseType.id}`, {
+      const response = await fetch(`http://localhost:8600/delete/coursetype/${courseType.id}`, {
         method: "DELETE",
       });
 
@@ -113,7 +113,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
             <h3 className="mb-3 font-bold text-base">
               Modifier les types de cours
             </h3>
-            {error && <p className="text-red-600 text-sm">{error}</p>}
+            {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
             <ul className="mb-3">
               {courseTypes.map((type) => (
                 <li
