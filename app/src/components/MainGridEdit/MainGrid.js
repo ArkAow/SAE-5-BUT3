@@ -285,6 +285,8 @@ const MainGrid = ({ curriculum }) => {
   }, []);
 
   const addGroups = async (newGroups) => {
+    const actualClassID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
+
     setGroups((prevGroups) => {
       const existingGroupNames = prevGroups.map((g) => g.name);
       const filteredNewGroups = newGroups.filter(
@@ -303,6 +305,7 @@ const MainGrid = ({ curriculum }) => {
           body: JSON.stringify({
             name: group.name,
             halfgroups: group.subGroups || [],
+            classID: actualClassID,
           }),
         });
 
