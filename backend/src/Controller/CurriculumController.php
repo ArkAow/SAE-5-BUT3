@@ -52,7 +52,7 @@ class CurriculumController extends AbstractController
             return [
                 'id' => $curriculum->getId(),
                 'name' => $curriculum->getName(),
-                // ajouter 'classes' qui est la liste de classes/promo du cursus
+                'classes' => $curriculum->getClasses(),
             ];
         }, $curriculums);
 
