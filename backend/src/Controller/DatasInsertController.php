@@ -41,8 +41,8 @@ class DatasInsertController extends AbstractController
             return new JsonResponse(['error' => "Le fichier avec l'ID {$id} n'existe pas ou est invalide."], Response::HTTP_NOT_FOUND);
         }
 
-        foreach ($jsonData['sheets'] as $sheetName => $curricula) {
-            foreach ($curricula as $curriculumName => $semesters) {
+        foreach ($jsonData['sheets'] as $sheetName => $curricul) {
+            foreach ($curricul as $curriculumName => $semesters) {
                 $curriculum = $this->getOrCreateCurriculum($curriculumName);
 
                 foreach ($semesters as $semesterName => $subjects) {
@@ -58,7 +58,8 @@ class DatasInsertController extends AbstractController
 
         $this->entityManager->flush();
 
-        return new JsonResponse(['status' => 'Les données ont été insérées avec succès']);
+        return new JsonResponse(['status' => 'Les données ont été insérées avec succès',
+            'sheets' => $jsonData['sheets']], Response::HTTP_OK);
     }
 
     private function getOrCreateCurriculum(string $name): Curriculum

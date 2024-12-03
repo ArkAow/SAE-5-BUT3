@@ -63,7 +63,7 @@ class AddGroupController extends AbstractController
             }
 
             foreach ($halfgroupsData as $halfgroupData) {
-                // Si halfGroup n'a pas de nom alors on renvoi une erreur ou si celuki-ci n'est pas bon
+                // Si half_group n'a pas de nom alors on renvoi une erreur ou si celuki-ci n'est pas bon
                 if (!isset($halfgroupData['name']) || empty(trim($halfgroupData['name']))) {
                     return new JsonResponse(['error' => 'Chaque halfgroup doit avoir un nom valide.'], 400);
                 }
