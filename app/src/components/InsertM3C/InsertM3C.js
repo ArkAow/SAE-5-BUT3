@@ -5,7 +5,7 @@ import Toast from "../Toast/Toast.js";
 const InsertM3C = () => {
   const [file, setFile] = useState(null);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const handleFileUpload = (e) => {
     const uploadedFile = e.target.files[0];
@@ -71,7 +71,7 @@ const InsertM3C = () => {
       });
     } catch (error) {
       setToast({
-        message: error.message || "Une erreur est survenue.",
+        message: "Une erreur est survenue.",
         type: "error",
         visible: true,
       });
@@ -80,7 +80,7 @@ const InsertM3C = () => {
     }
   };  
 
-return (
+  return (
     <div className="flex flex-col min-h-screen bg-cover bg-center bg-landscape">
       <Header />
       {toast.visible && (
@@ -91,31 +91,33 @@ return (
         />
       )}
       <div className="flex flex-row items-center justify-center flex-1 space-y-10 py-10">
-        <div className="flex flex-col w-[50vw] min-w-80 items-start bg-black bg-opacity-75 p-10 rounded-lg">
-          <h1 className="text-white text-3xl font-bold mt-4">Insérez votre fichier M3C</h1>
-          <input
-            type="file"
-            accept=".csv, .xls, .xlsx"
-            onChange={handleFileUpload}
-            className="my-4 text-gray-300"/>
-          <button
-            onClick={handleSubmit}
-            className="btn-default p-2">
-            Envoyer le fichier
-          </button>
-
-          {loading && (
-            <div className="flex flex-col items-center justify-center mt-6 bg-black bg-opacity-75 p-6 rounded-lg">
-              <div className="spinner"></div>
-              <div className="text-white text-3xl font-bold mt-4">
-                Envoie des données...
-              </div>
+        <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
+          <div className="flex flex-col items-start">
+            <h1 className="text-white text-3xl font-bold mt-4">Insérez votre fichier M3C</h1>
+            <input
+              type="file"
+              accept=".csv, .xls, .xlsx"
+              onChange={handleFileUpload}
+              className="my-4 text-gray-300"/>
+            <button
+              onClick={handleSubmit}
+              className="btn-default p-2">
+              Envoyer le fichier
+            </button>
+          </div>
+  
+          <div className={`flex flex-col items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg 
+            transition-opacity duration-300 ${loading ? "opacity-100" : "opacity-0"}`}>
+            <div className="spinner"></div>
+            <div className="text-white text-3xl font-bold mt-4">
+              Envoie des données...
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
   );
+  
 };
 
 export default InsertM3C;

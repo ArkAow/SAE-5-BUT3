@@ -54,7 +54,7 @@ const PreGridEdit = () => {
 
       <div className="flex flex-col items-center justify-center flex-1 space-y-10 py-10">
         {error && (
-          <div className="text-primary text-3xl font-bold p-10 bg-white rounded-full">
+          <div className="text-primary text-3xl font-bold px-10 py-3 bg-white rounded-full">
             Erreur lors du chargement des données
           </div>
         )}

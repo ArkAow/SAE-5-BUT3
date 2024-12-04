@@ -5,8 +5,8 @@ const Toast = ({ message, type, onClose }) => {
 
   return (
     <div
-      className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 text-white rounded shadow ${toastStyle}`}
-    >
+      className={`fixed bottom-16 left-1/2 transform -translate-x-1/2 px-4 py-2 
+        text-white rounded shadow ${toastStyle}`}>
       {message}
       <button onClick={onClose} className="ml-4 text-gray-200">
         ✕
