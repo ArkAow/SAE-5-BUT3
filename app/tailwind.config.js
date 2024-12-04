@@ -19,6 +19,15 @@ module.exports = {
       backgroundImage: {
         'landscape': "url('../public/images/paysage.png')",
         'pfp': "url('../public/images/profile_picture_anonym.png')",
+      },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        }
+      },
+      animation: {
+        wiggle: 'wiggle .3s ease-in-out 2',
       }
     },
   },
