@@ -1,7 +1,7 @@
 import React from "react";
 
 const Toast = ({ message, type, onClose }) => {
-  const toastStyle = type === "success" ? "bg-green-500" : "bg-red-500";
+  const toastStyle = type === "success" ? "bg-accept" : "bg-primaryshade";
 
   return (
     <div
