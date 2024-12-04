@@ -323,9 +323,39 @@ const MainGrid = ({ curriculum }) => {
     }
   };
 
-  const deleteGroups = (index) => {
-    const updatedGroups = groups.filter((_, i) => i !== index);
-    setGroups(updatedGroups);
+  const deleteGroups = async (index) => {
+    const group = groups[index];
+    try {
+      const response = await fetch(`http://localhost:8600/delete/group/${group.id}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        const updatedGroups = groups.filter((_, i) => i !== index);
+        setGroups(updatedGroups);
+        console.log("Le groupe a été supprimé avec succès :", response);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du groupe:', error);
+    }
+  };
+
+  const deleteHalfGroups = async (groupIndex, index) => {
+    const group = groups[groupIndex];
+    const halfGroup = group.halfgroups[index];
+    try {
+      const response = await fetch(`http://localhost:8600/delete/halfgroup/${halfGroup.id}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        const updatedGroups = groups.filter((_, i) => i !== index);
+        setGroups(updatedGroups);
+        console.log("Le sous-groupe a été supprimé avec succès :", response);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du sous-groupe:', error);
+    }
   };
 
   const getGroupList = () => {
@@ -372,6 +402,7 @@ const MainGrid = ({ curriculum }) => {
                 addItem={addItem}
                 addGroups={addGroups}
                 deleteGroups={deleteGroups}
+                deleteHalfGroups={deleteHalfGroups}
               />
             </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => {
+export const GroupButton = ({ addGroups, deleteGroups, deleteHalfGroups, isNoGroups, groups }) => {
   const [groupName, setGroupName] = useState("");
   const [subGroupName, setSubGroupName] = useState("");
   const [error, setError] = useState("");
@@ -74,11 +74,7 @@ export const GroupButton = ({ addGroups, deleteGroups, isNoGroups, groups }) => 
   };
 
   const handleDeleteSubGroup = (groupIndex, subGroupIndex) => {
-    const updatedGroups = [...groups];
-    updatedGroups[groupIndex].subGroups = updatedGroups[groupIndex].subGroups.filter(
-      (_, i) => i !== subGroupIndex
-    );
-    addGroups(updatedGroups);
+    deleteHalfGroups(groupIndex, subGroupIndex);
   };
 
   return (
