@@ -67,19 +67,30 @@ class GroupHalfGroupController extends AbstractController
     }
 
     #[Route('/delete/group/{id}', name: 'delete_group', methods: ['DELETE'])]
-    public function deleteGroups(EntityManagerInterface $em, string $id) : JsonResponse
+    public function deleteGroups(EntityManagerInterface $em, string $id): JsonResponse
     {
         $groupRepository = $em->getRepository(Groups::class);
         $group = $groupRepository->findOneBy(['id' => $id]);
 
-        if (!$group){
-            return new JsonResponse(['error' => 'Groupe introuvable', 404]);
-        }else {
-            $em->remove($group);
-            $em->flush();
+        if (!$group) {
+            return new JsonResponse(['error' => 'Groupe introuvable'], 404);
         }
 
-        return new JsonResponse(['status' => 'Groupe supprimé avec succès'], 200);
+        $halfgroupRepository = $em->getRepository(HalfGroup::class);
+        $halfGroups = $halfgroupRepository->createQueryBuilder('h')
+            ->where(':group MEMBER OF h.groups')
+            ->setParameter('group', $group)
+            ->getQuery()
+            ->getResult();
+
+        foreach ($halfGroups as $halfGroup) {
+            $em->remove($halfGroup);
+        }
+
+        $em->remove($group);
+        $em->flush();
+
+        return new JsonResponse(['status' => 'Groupe et ses HalfGroup supprimés avec succès'], 200);
     }
 
     #[Route('/delete/halfgroup/{id}', name: 'delete_halfgroup', methods: ['DELETE'])]
@@ -87,7 +98,7 @@ class GroupHalfGroupController extends AbstractController
     {
         $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);
         $halfgroup = $halfgroupRepository->findOneBy(['id' => $id]);
-        
+
         if (!$halfgroup) {
             return new JsonResponse(['error' => 'Erreur HalfGroup introuvable'], 404);
         }else {
