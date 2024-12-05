@@ -4,7 +4,7 @@ const Toast = ({ message, type, onClose }) => {
   const toastStyle = type === "success" ? "bg-accept" : "bg-primaryshade";
 
   return (
-    <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2">
+    <div className="fixed bottom-2 left-1/2 transform -translate-x-1/2">
       <div
         className={`animate-wiggle px-4 py-2 text-white rounded shadow ${toastStyle}`}>
         {message}

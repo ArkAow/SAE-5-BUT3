@@ -71,6 +71,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
 
   const handleRemoveCourseType = async (name) => {
     const courseType = courseTypes.find((type) => type.name === name);
+    console.log(courseType);
     if (!courseType) return;
 
     try {
@@ -88,7 +89,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
       }
     } catch (error) {
       console.error("Erreur lors de la suppression du type de cours :", error);
-      setError("Erreur lors de la suppression du type de cours.");
+      setError("Erreur lors de la suppression.");
     }
   };
 
