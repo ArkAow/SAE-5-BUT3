@@ -24,78 +24,85 @@ class AddGroupController extends AbstractController
     #[Route('/add/group', name: 'add_group', methods: ['POST'])]
     public function addGroup(Request $request): JsonResponse
     {
-        // On récupère le JSON donner à partir du Frontend
+        // On récupère le JSON donné à partir du Frontend
         $data = json_decode($request->getContent(), true);
 
-        // Si aucun nom  de groupe n'est donné alors on renvoi une erreur
+        // Si le nom du groupe est vide, on renvoie une erreur.
+        // Si le groupe n'a pas de promotion, on renvoie une erreur.
+        // Sinon on récupère les informations
+
         if (!isset($data['name']) || empty(trim($data['name']))) {
             return new JsonResponse(['error' => 'Le nom du groupe est obligatoire.'], 400);
+        } else if (!isset($data['classID']) || empty(trim($data['classID']))) {
+            return new JsonResponse(['error' => 'Le groupe doit être lié à une promotion.'], 400);
+        } else {
+            $groupName = trim($data['name']);       //Nom du groupe à ajouter
+            $halfgroupsData = $data['halfgroups'] ?? [];    // Tous les half_groups lié au groupe (id et name)
+            $classID = $data['classID'] ?? null;            //ID de la classe parente du nouveau groupe. Null à enlever si l'ID ne peut pas être = à 0
+        }
+        
+
+        // On créé le nouveau groupe.  
+
+        $group = new Groups();
+        $group->setName($groupName);
+        $this->entityManager->persist($group);
+
+        // Récupération de l'id de la promotion
+        
+        $classRepository = $this->entityManager->getRepository(ClassEntity::class);
+        $class = $classRepository->find($classID);
+
+        //  Associer le groupe à la promotion si elle existe
+        //  Sinon on retourne une erreur
+
+        
+        if ($class) {                           
+            $group->addClass($class);   
+        } else {
+
+            return new JsonResponse(['error' => 'Classe introuvable pour l\'ID fourni.'], 400);
+        }
+            
+        // Gestion des halfgroups
+        
+        foreach ($halfgroupsData as $halfgroupData) {
+            
+            // Si un half_group n'a pas de nom, on renvoie une erreur.
+
+            if (!isset($halfgroupData['name']) || empty(trim($halfgroupData['name']))) {
+                return new JsonResponse(['error' => 'Chaque halfgroup doit avoir un nom valide.'], 400);
+            }
+
+            $halfgroupName = trim($halfgroupData['name']);
+            $halfgroupRepository = $this->entityManager->getRepository(HalfGroup::class);
+            $existingHalfgroup = $halfgroupRepository->findOneBy(['name' => $halfgroupName]);
+
+            if (!$existingHalfgroup) { // Si le halfgroup n'existe pas alors on le créé
+                $halfgroup = new HalfGroup();
+                $halfgroup->setName($halfgroupName);
+                $this->entityManager->persist($halfgroup);
+            } else {
+                $halfgroup = $existingHalfgroup; // Si le halfgroup existe déjà alors on l'utilise
+            }
+
+            // Si un halfgroup n'est pas associé au groupe, alors on l'ajoute
+            
+            if (!$group->getHalfGroups()->contains($halfgroup)) {
+                $group->addHalfGroup($halfgroup);
+            }
         }
 
-        $groupName = trim($data['name']); //Nom du groupe à ajouter
-        $halfgroupsData = $data['halfgroups'] ?? []; // Tous les half_groups en lien avec le groupe ajouté
-        $classID = $data['classID'] ?? null; //ID de la classe qui est en lien avec le groupe ajouté
+        // Ajouter le nouveau groupe dans la BDD
 
-        try {
-            // Récupération du groupe existant par son nom ou création d'un nouveau groupe
-            $groupRepository = $this->entityManager->getRepository(Groups::class);
-            $group = $groupRepository->findOneBy(['name' => $groupName]);
+        $this->entityManager->flush();
 
-            //Si le groupe n'existe pas alors on peut le créer
-            if (!$group) { 
-                $group = new Groups();
-                $group->setName($groupName);
-
-                $this->entityManager->persist($group);
-            }
-
-            // Si un ID de classe est fourni, on tente de l'associer au groupe
-            if ($classID) {
-                $classRepository = $this->entityManager->getRepository(ClassEntity::class);
-                $class = $classRepository->find($classID);
-
-                if ($class) { // Si la classe existe
-                    $group->addClass($class); // Ajout de la classe au groupe
-                } else {
-                    // Retourne une erreur si la classe est introuvable
-                    return new JsonResponse(['error' => 'Classe introuvable pour l\'ID fourni.'], 400);
-                }
-            }
-
-            foreach ($halfgroupsData as $halfgroupData) {
-                // Si half_group n'a pas de nom alors on renvoi une erreur ou si celuki-ci n'est pas bon
-                if (!isset($halfgroupData['name']) || empty(trim($halfgroupData['name']))) {
-                    return new JsonResponse(['error' => 'Chaque halfgroup doit avoir un nom valide.'], 400);
-                }
-
-                $halfgroupName = trim($halfgroupData['name']);
-                $halfgroupRepository = $this->entityManager->getRepository(HalfGroup::class);
-                $existingHalfgroup = $halfgroupRepository->findOneBy(['name' => $halfgroupName]);
-
-                if (!$existingHalfgroup) { // Si le halfgroup n'existe pas alors on le crée
-                    $halfgroup = new HalfGroup();
-                    $halfgroup->setName($halfgroupName);
-                    $this->entityManager->persist($halfgroup);
-                } else {
-                    $halfgroup = $existingHalfgroup; // Si le halfgroup existe déjà alors on l'utilise
-                }
-
-                // Si le halfgroup donné n'est pas déjà associé au groupe, alors on l'ajoute
-                if (!$group->getHalfGroups()->contains($halfgroup)) {
-                    $group->addHalfGroup($halfgroup);
-                }
-            }
-
-            // "Push" le nouveau group dans la BDD
-            $this->entityManager->flush();
-
-            // On retourne un réponse JSON pour dire que l'ajout du groupe (halfgroups, class, ...) a fonctionné
-            return new JsonResponse([
-                'message' => 'Groupe ajouté avec succès.',
-            ], 201);
-        } catch (\Exception $e) {
-            // Capture des erreurs et retour d'un message d'erreur avec le statut HTTP 500
-            return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
-        }
+        //Réponse JSON pour dire que l'ajout du groupe (class) et de ses halfgroups a fonctionné
+        return new JsonResponse([
+            'message' => 'Groupe ajouté avec succès.',
+        ], 201);
+        
+        // Capture des erreurs et retour d'un message d'erreur avec le statut HTTP 500
+        //return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
     }
 }
