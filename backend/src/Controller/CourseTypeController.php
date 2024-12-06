@@ -84,7 +84,7 @@ class CourseTypeController extends AbstractController
     #[Route('/delete/coursetype/{id}', name: 'delete_course_type', methods: ['DELETE'])]
     public function deleteCourseType(EntityManagerInterface $entityManager, string $id): JsonResponse
     {
-        // Recherche d'un CourseType par son nom
+        // Recherche d'un CourseType par son id
         $courseTypeRepository = $entityManager->getRepository(CourseType::class);
         $courseType = $courseTypeRepository->findOneBy(['id' => $id]);
     

@@ -3,8 +3,11 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
+import Toast from "../Toast/Toast.js";
 
 const MainGrid = ({ curriculum }) => {
+  const [toast, setToast] = useState({ message: "", type: "", visible: false });
+
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
@@ -264,7 +267,6 @@ const MainGrid = ({ curriculum }) => {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        console.log(curriculum);
         const classID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
         const response = await fetch(`http://localhost:8600/groups/${classID}`);
         if (!response.ok) {
@@ -310,22 +312,87 @@ const MainGrid = ({ curriculum }) => {
         });
 
         const result = await response.json();
-        if (!response.ok) {
-          console.error("Erreur pour l'ajout du groupe:", result.error);
-          alert(`Erreur lors de l'ajout du groupe : ${result.error}`);
-        } else {
+        if (response.ok) {
           console.log("Le groupe a été ajouté avec succès :", result);
+          setToast({
+            message: "Le groupe a été ajouté avec succès !",
+            type: "success",
+            visible: true,
+          });
+        } else {
+          setToast({
+            message: "Erreur lors de l'ajout du groupe",
+            type: "error",
+            visible: true,
+          });
         }
       } catch (error) {
         console.error("Erreur lors de la connexion avec l'API:", error);
-        alert("Erreur de connexion à l'API.");
       }
     }
   };
 
-  const deleteGroups = (index) => {
-    const updatedGroups = groups.filter((_, i) => i !== index);
-    setGroups(updatedGroups);
+  const deleteGroups = async (index) => {
+    const group = groups[index];
+    try {
+      const response = await fetch(`http://localhost:8600/delete/group/${group.id}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        const updatedGroups = groups.filter((_, i) => i !== index);
+        setGroups(updatedGroups);
+        console.log("Le groupe a été supprimé avec succès :", response);
+        setToast({
+          message: "Le groupe a été supprimé avec succès !",
+          type: "success",
+          visible: true,
+        });
+      }
+      else {
+        setToast({
+          message: "Erreur lors de la suppression du groupe.",
+          type: "error",
+          visible: true,
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du groupe:', error);
+    }
+  };
+
+  const deleteHalfGroups = async (groupIndex, index) => {
+    const group = groups[groupIndex];
+    const halfGroup = group.subGroups[index];
+
+    try {
+      const response = await fetch(`http://localhost:8600/delete/halfgroup/${halfGroup.id}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        const updatedGroups = groups.map((g, i) =>
+          i === groupIndex
+            ? { ...g, subGroups: g.subGroups.filter((_, subIndex) => subIndex !== index) }
+            : g
+        );
+
+        setGroups(updatedGroups);
+        setToast({
+          message: "Le sous-groupe a été supprimé avec succès !",
+          type: "success",
+          visible: true,
+        });
+      } else {
+        setToast({
+          message: "Erreur lors de la suppression du sous-groupe.",
+          type: "error",
+          visible: true,
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du sous-groupe:', error);
+    }
   };
 
   const getGroupList = () => {
@@ -352,6 +419,13 @@ const MainGrid = ({ curriculum }) => {
       </div>
       ) : (
         <>
+          {toast.visible && (
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast({ ...toast, visible: false })}
+            />
+          )}
           <div className="flex items-center justify-start gap-5 h-20 px-10">
             <div className="absolute top-6">
             <ControlPanel
@@ -372,6 +446,7 @@ const MainGrid = ({ curriculum }) => {
                 addItem={addItem}
                 addGroups={addGroups}
                 deleteGroups={deleteGroups}
+                deleteHalfGroups={deleteHalfGroups}
               />
             </div>
 
