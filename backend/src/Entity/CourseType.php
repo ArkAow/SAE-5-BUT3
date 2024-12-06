@@ -24,10 +24,10 @@ class CourseType
     #[ORM\Column(type: 'string', length: 500)]
     private string $scope;
 
-    #[ORM\OneToMany(mappedBy: 'courseType', targetEntity: Course::class, cascade: ['persist', 'remove'])]
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'courseTypes')]
     private Collection $courses;
 
-    #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, mappedBy: "courseTypes")]
+    #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, mappedBy: "courseTypes", cascade: ['persist', 'remove'])]
     private Collection $expectedDurations;
 
     public function __construct()
@@ -83,17 +83,16 @@ class CourseType
     {
         if (!$this->courses->contains($course)) {
             $this->courses->add($course);
-            $course->setCourseType($this);
+            $course->addCourseType($this);
         }
+
         return $this;
     }
 
     public function removeCourse(Course $course): self
     {
         if ($this->courses->removeElement($course)) {
-            if ($course->getCourseType() === $this) {
-                $course->setCourseType(null);
-            }
+            $course->removeCourseType($this);
         }
         return $this;
     }
