@@ -34,7 +34,7 @@ class CourseTypeController extends AbstractController
         return new JsonResponse($data, 200);
     }
 
-    #[Route('/add/coursetype', name: 'add_a_course_type', methods: ['POST'])]
+    #[Route('/coursetypes/add', name: 'add_a_course_type', methods: ['POST'])]
     public function addCourseType(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         // Récupérer/Décoder le contenu JSON de la requête HTTP qui nous est envoyé via le front
@@ -81,7 +81,7 @@ class CourseTypeController extends AbstractController
     }
 
     //Route permettant de supprimer un CourseType spéciffique par son ID
-    #[Route('/delete/coursetype/{id}', name: 'delete_course_type', methods: ['DELETE'])]
+    #[Route('/coursetypes/delete/{id}', name: 'delete_course_type', methods: ['DELETE'])]
     public function deleteCourseType(EntityManagerInterface $entityManager, string $id): JsonResponse
     {
         // Recherche d'un CourseType par son id

@@ -4,6 +4,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
+import routes from "../../Routes/routes.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -134,7 +135,7 @@ const MainGrid = ({ curriculum }) => {
   useEffect(() => {
     const fetchCourseTypes = async () => {
       try {
-        const response = await fetch("http://localhost:8600/coursetypes");
+        const response = await fetch(routes.dev.courseTypes.get());
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des types de cours.");
         }
@@ -229,10 +230,10 @@ const MainGrid = ({ curriculum }) => {
 
   const updateCoursesForRemovedType = (removedTypeName) => {
     setAvailableSubjects((prevSubjects) =>
-      prevSubjects.map((subject) => ({
+      (prevSubjects || []).map((subject) => ({
         ...subject,
-        courses: subject.courses.map((course) =>
-          course.courseType.name === removedTypeName
+        courses: (subject.courses || []).map((course) =>
+          course.courseType?.name === removedTypeName
             ? {
                 ...course,
                 courseType: { name: "N/A", color: "#FFFFFF" },
@@ -243,8 +244,8 @@ const MainGrid = ({ curriculum }) => {
     );
   
     setCurrentCourses((prevCourses) =>
-      prevCourses.map((course) =>
-        course.courseType.name === removedTypeName
+      (prevCourses || []).map((course) =>
+        course.courseType?.name === removedTypeName
           ? { ...course, courseType: { name: "N/A", color: "#FFFFFF" } }
           : course
       )
@@ -253,22 +254,22 @@ const MainGrid = ({ curriculum }) => {
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       for (const key in updatedItems) {
-        updatedItems[key] = updatedItems[key].map((item) =>
+        updatedItems[key] = (updatedItems[key] || []).map((item) =>
           item.courseType === removedTypeName
-            ? { ...item, courseType: "N/A", color: "#FFFFFF" }
+            ? { ...item, courseType: { name: "N/A", color: "#FFFFFF" } }
             : item
         );
       }
       return updatedItems;
     });
-  };
+  };  
 
   {/* Gestion des GROUPES -------------------------------------------- */}
   useEffect(() => {
     const fetchGroups = async () => {
       try {
         const classID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
-        const response = await fetch(`http://localhost:8600/groups/${classID}`);
+        const response = await fetch(routes.dev.groups.getGroups(classID));
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des groups");
         }
@@ -299,7 +300,7 @@ const MainGrid = ({ curriculum }) => {
 
     for (const group of newGroups) {
       try {
-        const response = await fetch("http://localhost:8600/groups/add", {
+        const response = await fetch(routes.dev.groups.add(), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -335,7 +336,7 @@ const MainGrid = ({ curriculum }) => {
   const deleteGroups = async (index) => {
     const group = groups[index];
     try {
-      const response = await fetch(`http://localhost:8600/delete/group/${group.id}`, {
+      const response = await fetch(routes.dev.groups.deleteGroup(group.id), {
         method: 'DELETE',
       });
   
@@ -366,7 +367,7 @@ const MainGrid = ({ curriculum }) => {
     const halfGroup = group.subGroups[index];
 
     try {
-      const response = await fetch(`http://localhost:8600/delete/halfgroup/${halfGroup.id}`, {
+      const response = await fetch(routes.dev.groups.deleteHalfGroup(halfGroup.id), {
         method: 'DELETE',
       });
   

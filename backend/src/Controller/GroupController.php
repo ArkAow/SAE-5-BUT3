@@ -144,7 +144,7 @@ class GroupController extends AbstractController
         //return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
     }
 
-    #[Route('/delete/group/{id}', name: 'delete_group', methods: ['DELETE'])]
+    #[Route('/groups/delete/{id}', name: 'delete_group', methods: ['DELETE'])]
     public function deleteGroups(EntityManagerInterface $em, string $id): JsonResponse
     {
         $groupRepository = $em->getRepository(Groups::class);
@@ -171,7 +171,7 @@ class GroupController extends AbstractController
         return new JsonResponse(['status' => 'Groupe et ses HalfGroup supprimés avec succès'], 200);
     }
 
-    #[Route('/delete/halfgroup/{id}', name: 'delete_halfgroup', methods: ['DELETE'])]
+    #[Route('/groups/delete/halfgroup/{id}', name: 'delete_halfgroup', methods: ['DELETE'])]
     public function deletehalfGroup(EntityManagerInterface $entityManager, string $id) : JsonResponse
     {
         $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);

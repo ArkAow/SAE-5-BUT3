@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { courseTypes as initialCourseTypes } from "../../../constants";
+import routes from "../../../Routes/routes";
 
 export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesForRemovedType }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -39,7 +40,7 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
       return;
     }
     try {
-      const response = await fetch("http://localhost:8600/add/coursetype", {
+      const response = await fetch(routes.dev.courseTypes.add(), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,11 +72,10 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
 
   const handleRemoveCourseType = async (name) => {
     const courseType = courseTypes.find((type) => type.name === name);
-    console.log(courseType);
     if (!courseType) return;
 
     try {
-      const response = await fetch(`http://localhost:8600/delete/coursetype/${courseType.id}`, {
+      const response = await fetch(routes.dev.courseTypes.delete(courseType.id), {
         method: "DELETE",
       });
 
