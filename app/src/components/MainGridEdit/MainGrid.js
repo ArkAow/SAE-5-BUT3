@@ -57,7 +57,6 @@ const MainGrid = ({ curriculum }) => {
         }
       } catch (error) {
         console.error(error);
-        alert("Impossible de charger les semestres.");
       }
       finally {
         setIsSemesterLoading(false);
@@ -79,7 +78,6 @@ const MainGrid = ({ curriculum }) => {
       setCurrentCourses(subjects[0]?.courses || []);
     } catch (error) {
       console.error(error);
-      alert("Impossible de charger les matières.");
     }
     finally {
       setIsSubjectLoading(false);
@@ -140,7 +138,6 @@ const MainGrid = ({ curriculum }) => {
         setSelectedCourseType(data[0] || null);
       } catch (error) {
         console.error(error);
-        alert("Impossible de charger les types de cours.");
       }
       finally {
         setIsCourseTypeLoading(false);
@@ -273,7 +270,6 @@ const MainGrid = ({ curriculum }) => {
         setGroups(data);
       } catch (error) {
         console.error(error);
-        alert("Impossible de charger les groupes.");
       }
       finally {
         setIsGroupLoading(false);
