@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\ClassEntity;
 use App\Entity\Groups;
 use App\Entity\HalfGroup;
+use PHPUnit\TextUI\XmlConfiguration\Group;
 
 class GroupController extends AbstractController
 {
@@ -73,6 +74,7 @@ class GroupController extends AbstractController
     {
         // On récupère le JSON donné à partir du Frontend
         $data = json_decode($request->getContent(), true);
+        $groupRepository = $entityManager->getRepository(Group::class);
 
         // Si le nom du groupe est vide, on renvoie une erreur.
         // Si le groupe n'a pas de promotion, on renvoie une erreur.
@@ -87,7 +89,11 @@ class GroupController extends AbstractController
             $halfgroupsData = $data['halfgroups'] ?? [];    // Tous les half_groups lié au groupe (id et name)
             $classID = $data['classID'] ?? null;            //ID de la classe parente du nouveau groupe. Null à enlever si l'ID ne peut pas être = à 0
         }
-        
+
+        $group = $groupRepository->findOneBy(['name' => $groupName]);
+        if ($group){
+            return new JsonResponse(['error' => 'Groupe déjà existant'], 404);
+        }
 
         // On créé le nouveau groupe.  
         $group = new Groups();
@@ -151,7 +157,7 @@ class GroupController extends AbstractController
         $group = $groupRepository->findOneBy(['id' => $id]);
 
         if (!$group) {
-            return new JsonResponse(['error' => 'Groupe introuvable'], 404);
+            return new JsonResponse(['error' => 'Groupe introuvable'], 409);
         }
 
         $halfgroupRepository = $em->getRepository(HalfGroup::class);
