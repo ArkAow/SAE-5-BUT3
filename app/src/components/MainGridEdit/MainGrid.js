@@ -299,7 +299,7 @@ const MainGrid = ({ curriculum }) => {
 
     for (const group of newGroups) {
       try {
-        const response = await fetch("http://localhost:8600/add/group", {
+        const response = await fetch("http://localhost:8600/groups/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
