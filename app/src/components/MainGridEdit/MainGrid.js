@@ -44,9 +44,7 @@ const MainGrid = ({ curriculum }) => {
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8600/api/curriculum/${curriculum.id}/semesters`
-        );
+        const response = await fetch(routes.dev.semesters.get(curriculum.id));
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des semestres.");
         }
@@ -71,9 +69,7 @@ const MainGrid = ({ curriculum }) => {
 
   const fetchSubjects = async (semesterId) => {
     try {
-      const response = await fetch(
-        `http://localhost:8600/api/semester/${semesterId}/subjects`
-      );
+      const response = await fetch(routes.dev.subjects.get(semesterId));
       if (!response.ok) {
         throw new Error("Erreur lors du chargement des matières.");
       }
