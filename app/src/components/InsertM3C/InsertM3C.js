@@ -90,10 +90,10 @@ const InsertM3C = () => {
           onClose={() => setToast({ ...toast, visible: false })}
         />
       )}
-      <div className="flex flex-row items-center justify-center flex-1 space-y-10 py-10">
+      <div className="flex flex-col items-center justify-center flex-1 space-y-5 py-10">
         <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
           <div className="flex flex-col items-start">
-            <h1 className="text-white text-3xl font-bold mt-4">Insérez votre fichier M3C</h1>
+            <h1 className="text-white text-3xl font-bold mt-1">Insérez votre fichier M3C</h1>
             <input
               type="file"
               accept=".csv, .xls, .xlsx"
@@ -112,6 +112,12 @@ const InsertM3C = () => {
             <div className="text-white text-3xl font-bold mt-4">
               Envoie des données...
             </div>
+          </div>
+        </div>
+
+        <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
+          <div className="flex flex-col items-start">
+            <h1 className="text-white text-3xl font-bold mt-1">Modifier les enseignants</h1>
           </div>
         </div>
       </div>
