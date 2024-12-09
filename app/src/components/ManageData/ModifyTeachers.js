@@ -6,7 +6,6 @@ import Toast from "../Toast/Toast.js";
 const ModifyTeachers = () => {
   const [file, setFile] = useState(null);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
-  const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate();
 
@@ -34,62 +33,7 @@ const ModifyTeachers = () => {
         visible: true,
       });
     }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    if (!file) {
-      return setToast({
-        message: "Veuillez sélectionner un fichier valide avant de soumettre.",
-        type: "error",
-        visible: true,
-      });
-    }
-  
-    const formData = new FormData();
-    formData.append("file", file);
-    setLoading(true);
-
-    try {
-      const uploadResponse = await fetch("http://localhost:8600/insertM3C", {
-        method: "POST",
-        body: formData,
-      });
-  
-      const uploadData = await uploadResponse.json();
-  
-      if (!uploadResponse.ok || !uploadData.success) {
-        throw new Error(uploadData.error || "Erreur lors de l'upload du fichier.");
-      }
-  
-      const fileId = uploadData.fileId;
-  
-      const insertResponse = await fetch(`http://localhost:8600/insert-data/${fileId}`, {
-        method: "POST",
-      });
-  
-      const insertData = await insertResponse.json();
-  
-      if (!insertResponse.ok || !insertData.status) {
-        throw new Error(insertData.error || "Erreur lors de l'insertion des données.");
-      }
-  
-      setToast({
-        message: insertData.message || "Données insérées avec succès !",
-        type: "success",
-        visible: true,
-      });
-    } catch (error) {
-      setToast({
-        message: "Une erreur est survenue.",
-        type: "error",
-        visible: true,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };  
+  }; 
 
   return (
     <div className="flex flex-col min-h-screen bg-cover bg-center bg-landscape">
@@ -129,7 +73,6 @@ const ModifyTeachers = () => {
               onChange={handleFileUpload}
               className="my-4 text-gray-300"/>
             <button
-              onClick={handleSubmit}
               className="btn-default p-2">
               Envoyer le fichier
               </button>
