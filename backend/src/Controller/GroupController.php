@@ -74,7 +74,7 @@ class GroupController extends AbstractController
     {
         // On récupère le JSON donné à partir du Frontend
         $data = json_decode($request->getContent(), true);
-        $groupRepository = $entityManager->getRepository(Group::class);
+        $groupRepository = $entityManager->getRepository(Groups::class);
 
         // Si le nom du groupe est vide, on renvoie une erreur.
         // Si le groupe n'a pas de promotion, on renvoie une erreur.
@@ -110,7 +110,6 @@ class GroupController extends AbstractController
         if ($class) {                           
             $group->addClass($class);   
         } else {
-
             return new JsonResponse(['error' => 'Classe introuvable pour l\'ID fourni.'], 400);
         }
             
@@ -147,7 +146,7 @@ class GroupController extends AbstractController
             'message' => 'Groupe ajouté avec succès.',
         ], 201);
         // Capture des erreurs et retour d'un message d'erreur avec le statut HTTP 500
-        //return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
+        //$return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
     }
 
     #[Route('/groups/delete/{id}', name: 'delete_group', methods: ['DELETE'])]
