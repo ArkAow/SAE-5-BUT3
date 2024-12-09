@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../header/header.js";
 import Toast from "../Toast/Toast.js";
 
-const InsertM3C = () => {
+const ModifyTeachers = () => {
   const [file, setFile] = useState(null);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [loading, setLoading] = useState(false)
@@ -93,7 +93,7 @@ const InsertM3C = () => {
       <div className="flex flex-col items-center justify-center flex-1 space-y-5 py-10">
         <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
           <div className="flex flex-col items-start">
-            <h1 className="text-white text-3xl font-bold mt-1">Insérez votre fichier M3C</h1>
+            <h1 className="text-white text-3xl font-bold mt-1">Modifier les enseignants</h1>
             <input
               type="file"
               accept=".csv, .xls, .xlsx"
@@ -103,14 +103,12 @@ const InsertM3C = () => {
               onClick={handleSubmit}
               className="btn-default p-2">
               Envoyer le fichier
-            </button>
+              </button>
           </div>
-  
-          <div className={`flex flex-col items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg 
-            transition-opacity duration-300 ${loading ? "opacity-100" : "opacity-0"}`}>
-            <div className="spinner"></div>
-            <div className="text-white text-3xl font-bold mt-4">
-              Envoie des données...
+          <div className="flex flex-col items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg 
+            transition-opacity duration-300">
+            <div className="text-white text-l font-bold m-1">
+              Voici ce qu'on attend comme fichier...
             </div>
           </div>
         </div>
@@ -119,4 +117,4 @@ const InsertM3C = () => {
   );
 };
 
-export default InsertM3C;
+export default ModifyTeachers;

@@ -12,6 +12,7 @@ import PreviEdit from "../components/MainGridEdit/PreviEdit";
 import SeePrevi from "../components/SeePrevi/SeePrevi";
 import InsertM3C from "../components/InsertData/InsertM3C";
 import InsertData from "../components/InsertData/InsertData";
+import ModifyTeachers from "../components/InsertData/ModifyTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
 
 const AppRoutes = () => {
@@ -64,10 +65,10 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/InsertTeacher"
+          path="/ModifyTeachers"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <InsertM3C />
+              <ModifyTeachers />
             </ProtectedRoute>
           }
         />
