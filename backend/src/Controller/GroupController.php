@@ -110,12 +110,7 @@ class GroupController extends AbstractController
         if ($class) {                           
             $group->addClass($class);   
         } else {
-<<<<<<< HEAD
-            return new JsonResponse(['error' => 'Classe introuvable pour l\'ID fourni.'], 400);
-=======
-
-            return new JsonResponse(['error' => 'Classe introuvable pour l\'ID fourni.'], 404);
->>>>>>> 75f2f9dca248be1b94610e2c179a165adb911dbb
+            return new JsonResponse(['error' => 'Promotion introuvable'], 404);
         }
             
         // Gestion des halfgroups
@@ -153,6 +148,7 @@ class GroupController extends AbstractController
         // Capture des erreurs et retour d'un message d'erreur avec le statut HTTP 500
         //$return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
     }
+
 
     #[Route('/groups/delete/{id}', name: 'delete_group', methods: ['DELETE'])]
     public function deleteGroups(EntityManagerInterface $em, string $id): JsonResponse
