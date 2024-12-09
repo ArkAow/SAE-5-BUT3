@@ -99,8 +99,13 @@ const InsertM3C = () => {
             Page d'accueil /
         </span>
         <img src="/images/options.svg" alt="Options Icon" className="w-8 h-8"/>
+        <span
+          onClick={goToManageData} 
+          className="cursor-pointer hover:underline">
+            Gestion des données /
+        </span>
         <span>
-            Gestion des données
+          Insérer le M3C
         </span>
       </div>
       <div className="flex flex-col items-center justify-center flex-1 space-y-5 py-10">
