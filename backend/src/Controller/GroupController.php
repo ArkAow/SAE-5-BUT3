@@ -149,7 +149,6 @@ class GroupController extends AbstractController
         //$return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
     }
 
-
     #[Route('/groups/delete/{id}', name: 'delete_group', methods: ['DELETE'])]
     public function deleteGroups(EntityManagerInterface $em, string $id): JsonResponse
     {

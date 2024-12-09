@@ -30,7 +30,12 @@ class Teacher
     #[ORM\Column(type: "string", length: 30)]
     private string $code;
 
-    #[ORM\OneToMany(mappedBy: "teacher", targetEntity: Course::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'teachers')]
+    #[ORM\JoinTable(
+        name: 'course_teacher',
+        joinColumns: [new ORM\JoinColumn(name: 'teacher_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
     private Collection $courses;
 
     public function __construct()
@@ -85,7 +90,7 @@ class Teacher
     {
         if (!$this->courses->contains($course)) {
             $this->courses[] = $course;
-            $course->setTeacher($this);
+            $course->addTeacher($this);
         }
         return $this;
     }
@@ -93,8 +98,8 @@ class Teacher
     public function removeCourse(Course $course): self
     {
         if ($this->courses->removeElement($course)) {
-            if ($course->getTeacher() === $this) {
-                $course->setTeacher(null);
+            if ($course->getTeachers() === $this) {
+                $course->removeTeacher($this);
             }
         }
         return $this;

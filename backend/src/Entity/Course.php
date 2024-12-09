@@ -32,6 +32,9 @@ class Course
     )]
     private Collection $courseTypes;
 
+    #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'courses')]
+    private Collection $teachers;
+
     public function __construct()
     {
         $this->courseTypes = new ArrayCollection();
@@ -94,6 +97,30 @@ class Course
     {
         if ($this->courseTypes->removeElement($courseType)) {
             $courseType->removeCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function getTeachers(): Collection
+    {
+        return $this->teachers;
+    }
+
+    public function addTeacher(Teacher $teacher): self
+    {
+        if (!$this->teachers->contains($teacher)) {
+            $this->teachers->add($teacher);
+            $teacher->addCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeacher(Teacher $teacher): self
+    {
+        if ($this->teachers->removeElement($teacher)) {
+            $teacher->removeCourse($this);
         }
 
         return $this;
