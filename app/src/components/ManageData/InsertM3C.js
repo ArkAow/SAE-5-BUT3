@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
 import Toast from "../Toast/Toast.js";
 
@@ -6,6 +7,16 @@ const InsertM3C = () => {
   const [file, setFile] = useState(null);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [loading, setLoading] = useState(false)
+
+  const navigate = useNavigate();
+
+  const goToHomePage = () => {
+    navigate("/homePage");
+  }; 
+
+  const goToManageData = () => {
+    navigate("/ManageData");
+  }; 
 
   const handleFileUpload = (e) => {
     const uploadedFile = e.target.files[0];
@@ -27,7 +38,6 @@ const InsertM3C = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
     if (!file) {
       return setToast({
         message: "Veuillez sélectionner un fichier valide avant de soumettre.",
@@ -35,35 +45,26 @@ const InsertM3C = () => {
         visible: true,
       });
     }
-  
     const formData = new FormData();
     formData.append("file", file);
     setLoading(true);
-
     try {
       const uploadResponse = await fetch("http://localhost:8600/insertM3C", {
         method: "POST",
         body: formData,
       });
-  
       const uploadData = await uploadResponse.json();
-  
       if (!uploadResponse.ok || !uploadData.success) {
         throw new Error(uploadData.error || "Erreur lors de l'upload du fichier.");
       }
-  
       const fileId = uploadData.fileId;
-  
       const insertResponse = await fetch(`http://localhost:8600/insert-data/${fileId}`, {
         method: "POST",
       });
-  
       const insertData = await insertResponse.json();
-  
       if (!insertResponse.ok || !insertData.status) {
         throw new Error(insertData.error || "Erreur lors de l'insertion des données.");
       }
-  
       setToast({
         message: insertData.message || "Données insérées avec succès !",
         type: "success",
@@ -90,6 +91,18 @@ const InsertM3C = () => {
           onClose={() => setToast({ ...toast, visible: false })}
         />
       )}
+      <div className="flex flex-row items-center mt-16 ml-10 py-1 px-8 
+        text-white bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg">
+        <span 
+            onClick={goToHomePage} 
+            className="cursor-pointer hover:underline">
+            Page d'accueil /
+        </span>
+        <img src="/images/options.svg" alt="Options Icon" className="w-8 h-8"/>
+        <span>
+            Gestion des données
+        </span>
+      </div>
       <div className="flex flex-col items-center justify-center flex-1 space-y-5 py-10">
         <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
           <div className="flex flex-col items-start">
