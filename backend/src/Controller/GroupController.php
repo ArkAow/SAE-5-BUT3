@@ -92,7 +92,7 @@ class GroupController extends AbstractController
 
         $group = $groupRepository->findOneBy(['name' => $groupName]);
         if ($group){
-            return new JsonResponse(['error' => 'Groupe déjà existant'], 404);
+            return new JsonResponse(['error' => 'Groupe déjà existant'], 409);
         }
 
         // On créé le nouveau groupe.  
@@ -110,7 +110,12 @@ class GroupController extends AbstractController
         if ($class) {                           
             $group->addClass($class);   
         } else {
+<<<<<<< HEAD
             return new JsonResponse(['error' => 'Classe introuvable pour l\'ID fourni.'], 400);
+=======
+
+            return new JsonResponse(['error' => 'Classe introuvable pour l\'ID fourni.'], 404);
+>>>>>>> 75f2f9dca248be1b94610e2c179a165adb911dbb
         }
             
         // Gestion des halfgroups
