@@ -13,8 +13,8 @@ const HomePage = () => {
     navigate("/SeePrevi");
   };
 
-  const goToInsertM3C = () => {
-    navigate("/InsertM3C");
+  const goToInsertData = () => {
+    navigate("/InsertData");
   };
 
   return (
@@ -47,15 +47,15 @@ const HomePage = () => {
             </p>
           </div>
 
-          {/* Insert M3C Block */}
+          {/* Insert Data Block */}
           <div
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
-            onClick={goToInsertM3C}>
+            onClick={goToInsertData}>
             <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
-              <div className="text-white text-6xl lg:text-8xl font-bold">M3C</div>
+              <img src="/images/options.svg" className="size-[70px] md:size-[100px] lg:size-[200px]"/>
             </div>
             <p className="text-white text-xl text-center pb-6">
-              Insérer un M3C
+              Insérer des données
             </p>
           </div>
 

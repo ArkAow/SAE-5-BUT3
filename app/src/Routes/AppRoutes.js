@@ -10,7 +10,8 @@ import HomePage from "../components/homePage/homePage";
 import PreGridEdit from "../components/MainGridEdit/PreGridEdit";
 import PreviEdit from "../components/MainGridEdit/PreviEdit";
 import SeePrevi from "../components/SeePrevi/SeePrevi";
-import InsertM3C from "../components/InsertM3C/InsertM3C";
+import InsertM3C from "../components/InsertData/InsertM3C";
+import InsertData from "../components/InsertData/InsertData";
 import ProtectedRoute from "./ProtectedRoutes";
 
 const AppRoutes = () => {
@@ -51,6 +52,22 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <SeePrevi />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/InsertData"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <InsertData />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/InsertTeacher"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <InsertM3C />
             </ProtectedRoute>
           }
         />

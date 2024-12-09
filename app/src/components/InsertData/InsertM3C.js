@@ -118,12 +118,27 @@ const InsertM3C = () => {
         <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
           <div className="flex flex-col items-start">
             <h1 className="text-white text-3xl font-bold mt-1">Modifier les enseignants</h1>
+            <input
+              type="file"
+              accept=".csv, .xls, .xlsx"
+              onChange={handleFileUpload}
+              className="my-4 text-gray-300"/>
+            <button
+              onClick={handleSubmit}
+              className="btn-default p-2">
+              Envoyer le fichier
+              </button>
+          </div>
+          <div className="flex flex-col items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg 
+            transition-opacity duration-300">
+            <div className="text-white text-l font-bold m-1">
+              Voici ce qu'on attend comme fichier...
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-  
 };
 
 export default InsertM3C;
