@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TeacherController extends AbstractController
 {
-    #[Route('/teacher/add', name: 'add_teacher', methods: ['POST'])]
+    #[Route('/teachers/add', name: 'add_teacher', methods: ['POST'])]
     public function addTeacher(EntityManagerInterface $entityManager, Request $request):JsonResponse
     {
         // On récupère le JSON donné à partir du Frontend
