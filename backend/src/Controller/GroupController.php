@@ -190,4 +190,51 @@ class GroupController extends AbstractController
         }
         return new JsonResponse(['status' => 'HalfGroup supprimé avec succès'], 200);
     }
+
+    #[Route('/groups/add/halfgroup', name: 'add_halfgroup', methods: ['POST'])]
+    public function addHalfGroup(EntityManagerInterface $entityManager, Request $request): JsonResponse
+    {
+        // Décodage des données JSON envoyées dans la requête
+        $data = json_decode($request->getContent(), true);
+
+        // Vérification de la présence et de la validité des champs requis
+        if (!isset($data['name']) || empty(trim($data['name']))) {
+            return new JsonResponse(['error' => 'Le nom du halfgroup est obligatoire.'], 400);
+        }
+
+        if (!isset($data['group_id']) || empty($data['group_id'])) {
+            return new JsonResponse(['error' => 'L\'ID du groupe est obligatoire.'], 400);
+        }
+
+        $halfgroupName = trim($data['name']);
+        $groupId = $data['group_id'];
+
+        // Récupération des repositories
+        $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);
+        $groupRepository = $entityManager->getRepository(Groups::class);
+
+        // Vérification si le HalfGroup existe déjà
+        $existingHalfgroup = $halfgroupRepository->findOneBy(['name' => $halfgroupName]);
+        if ($existingHalfgroup) {
+            return new JsonResponse(['error' => 'HalfGroup déjà existant'], 409);
+        }
+
+        // Récupération du Group correspondant à l'ID fourni
+        $group = $groupRepository->find($groupId);
+        if (!$group) {
+            return new JsonResponse(['error' => 'Groupe introuvable.'], 404);
+        }
+
+        // Création du HalfGroup
+        $halfgroup = new HalfGroup();
+        $halfgroup->setName($halfgroupName);
+        $halfgroup->addGroup($group); // Association au groupe
+
+        // Persistance du HalfGroup
+        $entityManager->persist($halfgroup);
+        $entityManager->flush();
+
+        // Réponse JSON en cas de succès
+        return new JsonResponse(['message' => 'HalfGroup ajouté avec succès.'], 201);
+    }
 }

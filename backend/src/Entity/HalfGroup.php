@@ -46,4 +46,23 @@ class HalfGroup
     {
         return $this->groups;
     }
+
+    public function addGroup(Groups $group): self
+    {
+        if (!$this->groups->contains($group)) {
+            $this->groups[] = $group;
+            $group->addHalfGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroup(Groups $group): self
+    {
+        if ($this->groups->removeElement($group)) {
+            $group->removeHalfGroup($this);
+        }
+
+        return $this;
+    }
 }
