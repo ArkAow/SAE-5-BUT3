@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import routes from "../../../Routes/routes";
 
-export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroups  }) => {
+export const GroupButton = ({ curriculum, groups, setGroups, setToast, fetchGroups, isNoGroups  }) => {
   const [groupName, setGroupName] = useState("");
   const [subGroupName, setSubGroupName] = useState("");
   const [error, setError] = useState("");
@@ -75,6 +75,8 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
           type: "error",
           visible: true,
         });
+      } finally {
+        fetchGroups();
       }
     }
   };
@@ -106,6 +108,8 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
         type: "error",
         visible: true,
       });
+    } finally {
+      fetchGroups();
     }
   };
   
@@ -144,6 +148,8 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
         type: "error",
         visible: true,
       });
+    } finally {
+      fetchGroups();
     }
   };
   
@@ -191,6 +197,8 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
         type: "error",
         visible: true,
       });
+    } finally {
+      fetchGroups();
     }
   };
   

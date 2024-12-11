@@ -5,10 +5,11 @@ import { PrintButton } from "./PrintButton";
 import { CourseTypeButton } from "./CourseTypeButton"
 
 const ControlPanel = ({
+  curriculum,
   setToast,
   groups,
   setGroups,
-  curriculum,
+  fetchGroups,
   selectedRow,
   setSelectedRow,
   selectedCol,
@@ -92,10 +93,11 @@ const ControlPanel = ({
           updateCoursesForRemovedType={updateCoursesForRemovedType}/>
 
         <GroupButton 
+          curriculum={curriculum}
           setToast={setToast}
           groups={groups}
           setGroups={setGroups}
-          curriculum={curriculum}
+          fetchGroups={fetchGroups}
           isNoGroups={isNoGroups}/>
 
         <PrintButton />

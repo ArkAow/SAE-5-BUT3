@@ -258,24 +258,24 @@ const MainGrid = ({ curriculum }) => {
   };  
 
   {/* Gestion des GROUPES -------------------------------------------- */}
+  const fetchGroups = async () => {
+    try {
+      const classID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
+      const response = await fetch(routes.dev.groups.getGroups(classID));
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des groups");
+      }
+      const data = await response.json();
+      setGroups(data);
+    } catch (error) {
+      console.error(error);
+    }
+    finally {
+      setIsGroupLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const classID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
-        const response = await fetch(routes.dev.groups.getGroups(classID));
-        if (!response.ok) {
-          throw new Error("Erreur lors du chargement des groups");
-        }
-        const data = await response.json();
-        setGroups(data);
-      } catch (error) {
-        console.error(error);
-      }
-      finally {
-        setIsGroupLoading(false);
-      }
-    };
-
     fetchGroups();
   }, []);
 
@@ -313,10 +313,11 @@ const MainGrid = ({ curriculum }) => {
           <div className="flex items-center justify-start gap-5 h-20 px-10">
             <div className="absolute top-6">
               <ControlPanel
+                curriculum={curriculum}
                 setToast={setToast}
                 groups={groups}
                 setGroups={setGroups}
-                curriculum={curriculum}
+                fetchGroups={fetchGroups}
                 selectedRow={selectedRow}
                 setSelectedRow={setSelectedRow}
                 selectedCol={selectedCol}
