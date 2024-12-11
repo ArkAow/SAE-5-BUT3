@@ -33,19 +33,15 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
   };
 
   const addGroups = async (newGroups) => {
-    const actualClassID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
-
-    setGroups((prevGroups) => {
-      const existingGroupNames = prevGroups.map((g) => g.name);
-      const filteredNewGroups = newGroups.filter(
-        (newGroup) => !existingGroupNames.includes(newGroup.name)
-      );
-      return [...prevGroups, ...filteredNewGroups];
-    });
-
-    for (const group of newGroups) {
+    const actualClassID = curriculum.classes[0].id;
+    const filteredNewGroups = newGroups.filter(
+      (newGroup) => !groups.some((g) => g.name === newGroup.name)
+    );
+    if (filteredNewGroups.length === 0) return;
+    setGroups((prevGroups) => [...prevGroups, ...filteredNewGroups]);
+    for (const group of filteredNewGroups) {
       try {
-        const response = await fetch(routes.dev.groups.add(), {
+        const response = await fetch(routes.dev.groups.addGroups(), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -56,46 +52,47 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
             classID: actualClassID,
           }),
         });
-
-        const result = await response.json();
-        if (response.ok) {
-          console.log("Le groupe a été ajouté avec succès :", result);
+        if (!response.ok) {
+          const error = await response.json();
           setToast({
-            message: "Le groupe a été ajouté avec succès !",
-            type: "success",
-            visible: true,
-          });
-        } else {
-          setToast({
-            message: "Erreur lors de l'ajout du groupe",
+            message: error.message || "Erreur lors de l'ajout du groupe",
             type: "error",
             visible: true,
           });
+          continue;
         }
+        const result = await response.json();
+        console.log("Le groupe a été ajouté avec succès :", result);
+        setToast({
+          message: "Le groupe a été ajouté avec succès !",
+          type: "success",
+          visible: true,
+        });
       } catch (error) {
         console.error("Erreur lors de la connexion avec l'API:", error);
+        setToast({
+          message: "Erreur de connexion au serveur.",
+          type: "error",
+          visible: true,
+        });
       }
     }
   };
-
+  
   const deleteGroups = async (index) => {
     const group = groups[index];
     try {
       const response = await fetch(routes.dev.groups.deleteGroup(group.id), {
-        method: 'DELETE',
+        method: "DELETE",
       });
-  
       if (response.ok) {
-        const updatedGroups = groups.filter((_, i) => i !== index);
-        setGroups(updatedGroups);
-        console.log("Le groupe a été supprimé avec succès :", response);
+        setGroups(groups.filter((_, i) => i !== index));
         setToast({
           message: "Le groupe a été supprimé avec succès !",
           type: "success",
           visible: true,
         });
-      }
-      else {
+      } else {
         setToast({
           message: "Erreur lors de la suppression du groupe.",
           type: "error",
@@ -103,27 +100,31 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
         });
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression du groupe:', error);
+      console.error("Erreur lors de la suppression du groupe:", error);
+      setToast({
+        message: "Erreur de connexion au serveur.",
+        type: "error",
+        visible: true,
+      });
     }
   };
-
+  
   const deleteHalfGroups = async (groupIndex, index) => {
     const group = groups[groupIndex];
     const halfGroup = group.subGroups[index];
-
     try {
-      const response = await fetch(routes.dev.groups.deleteHalfGroup(halfGroup.id), {
-        method: 'DELETE',
+      const response = await fetch(routes.dev.groups.deleteSubGroup(halfGroup.id), {
+        method: "DELETE",
       });
   
       if (response.ok) {
-        const updatedGroups = groups.map((g, i) =>
-          i === groupIndex
-            ? { ...g, subGroups: g.subGroups.filter((_, subIndex) => subIndex !== index) }
-            : g
+        setGroups((prevGroups) =>
+          prevGroups.map((g, i) =>
+            i === groupIndex
+              ? { ...g, subGroups: g.subGroups.filter((_, subIndex) => subIndex !== index) }
+              : g
+          )
         );
-
-        setGroups(updatedGroups);
         setToast({
           message: "Le sous-groupe a été supprimé avec succès !",
           type: "success",
@@ -137,55 +138,95 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
         });
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression du sous-groupe:', error);
+      console.error("Erreur lors de la suppression du sous-groupe:", error);
+      setToast({
+        message: "Erreur de connexion au serveur.",
+        type: "error",
+        visible: true,
+      });
     }
   };
+  
+  const addSubGroups = async (groupId, newSubGroup, index) => {
+    try {
+      const response = await fetch(routes.dev.groups.addSubGroups(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newSubGroup.name,
+          group_id: groupId,
+        }),
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        setToast({
+          message: error.message || "Erreur lors de l'ajout du sous-groupe.",
+          type: "error",
+          visible: true,
+        });
+        return;
+      }
+      const result = await response.json();
+      console.log("Le sous-groupe a été ajouté avec succès :", result);
+      setGroups((prevGroups) => {
+        const updatedGroups = [...prevGroups];
+        const updatedGroup = { ...updatedGroups[index] };
+        updatedGroup.subGroups = [...updatedGroup.subGroups, newSubGroup];
+        updatedGroups[index] = updatedGroup;
+        return updatedGroups;
+      });
 
+      setToast({
+        message: "Le sous-groupe a été ajouté avec succès !",
+        type: "success",
+        visible: true,
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du sous-groupe:", error);
+      setToast({
+        message: "Erreur de connexion au serveur.",
+        type: "error",
+        visible: true,
+      });
+    }
+  };
+  
   const handleAddGroup = () => {
     if (groupName.trim() === "") {
       setError("Nom de groupe vide");
       return;
     }
-    const isDuplicateGroup = groups.some((group) => group.name === groupName.trim());
-    if (isDuplicateGroup) {
-      setError("Nom de groupe déja existant");
+    if (groups.some((group) => group.name === groupName.trim())) {
+      setError("Nom de groupe déjà existant");
       return;
     }
     setError("");
-    const newGroup = { name: groupName.trim(), subGroups: [] };
-    const updatedGroups = [...groups, newGroup];
+    addGroups([{ name: groupName.trim(), subGroups: [] }]);
     setGroupName("");
-    addGroups(updatedGroups);
   };
-
+  
   const handleAddSubGroup = (index) => {
     if (subGroupName.trim() === "") {
       setError("Nom de sous-groupe vide");
       return;
     }
-    const updatedGroups = [...groups];
-    const parentGroup = updatedGroups[index];
-    const isDuplicateSubGroup = parentGroup.subGroups.some(
-      (subGroup) => subGroup.name === subGroupName.trim()
-    );
-    if (isDuplicateSubGroup) {
-      setError("Nom de sous-groupe déja existant");
+    const parentGroup = groups[index];
+    const fullSubGroupName = parentGroup.name + subGroupName.trim();
+    if (parentGroup.subGroups.some((subGroup) => subGroup.name === fullSubGroupName)) {
+      setError("Nom de sous-groupe déjà existant");
       return;
     }
     setError("");
-    const newSubGroup = { name: parentGroup.name + subGroupName.trim() };
-    parentGroup.subGroups.push(newSubGroup);
-    addGroups(updatedGroups);
+    addSubGroups(parentGroup.id, { name: fullSubGroupName }, index);
     setSubGroupName("");
   };
-
-  const handleDeleteGroup = (index) => {
-    deleteGroups(index);
-  };
-
-  const handleDeleteSubGroup = (groupIndex, subGroupIndex) => {
-    deleteHalfGroups(groupIndex, subGroupIndex);
-  };
+  
+  const handleDeleteGroup = deleteGroups;
+  const handleDeleteSubGroup = deleteHalfGroups;
+  
 
   return (
     <div className="relative" ref={containerRef}>
@@ -246,7 +287,7 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroup
                       className="w-full p-2 mb-2 border rounded"/>
                     <button
                       onClick={() => handleAddSubGroup(index)}
-                      className="w-full p-2 btn-default">
+                      className="w-full p-2 btn-default text-[0.6rem]">
                       Ajouter Sous-Groupe
                     </button>
 

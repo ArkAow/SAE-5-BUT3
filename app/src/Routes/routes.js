@@ -5,10 +5,11 @@ const routes = {
     default: "http://localhost:8600/",
     groups: {
       getGroups: (classID) => `${routes.dev.default}groups/${classID}`,
-      getHalfGroups: (groupId) => `${routes.dev.default}groups/${groupId}/half_group`,
-      add: () => `${routes.dev.default}groups/add`,
+      getSubGroups: (groupId) => `${routes.dev.default}groups/${groupId}/half_group`,
+      addGroups: () => `${routes.dev.default}groups/add`,
+      addSubGroups: () => `${routes.dev.default}groups/add/halfgroup`,
       deleteGroup: (id) => `${routes.dev.default}groups/delete/${id}`,
-      deleteHalfGroup: (id) => `${routes.dev.default}groups/delete/halfgroup/${id}`,
+      deleteSubGroup: (id) => `${routes.dev.default}groups/delete/halfgroup/${id}`,
     },
     courseTypes: {
       get: () => `${routes.dev.default}coursetypes`,
