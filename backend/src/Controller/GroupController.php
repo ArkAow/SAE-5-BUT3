@@ -77,22 +77,30 @@ class GroupController extends AbstractController
         $groupRepository = $entityManager->getRepository(Groups::class);
 
         // Si le nom du groupe est vide, on renvoie une erreur.
-        // Si le groupe n'a pas de promotion, on renvoie une erreur.
-        // Sinon on récupère les informations
-
         if (!isset($data['name']) || empty(trim($data['name']))) {
             return new JsonResponse(['error' => 'Le nom du groupe est obligatoire.'], 400);
-        } else if (!isset($data['classID']) || empty(trim($data['classID']))) {
+        }
+        if (!isset($data['classID']) || empty(trim($data['classID']))) {
             return new JsonResponse(['error' => 'Le groupe doit être lié à une promotion.'], 400);
-        } else {
-            $groupName = trim($data['name']);       //Nom du groupe à ajouter
-            $halfgroupsData = $data['halfgroups'] ?? [];    // Tous les half_groups lié au groupe (id et name)
-            $classID = $data['classID'] ?? null;            //ID de la classe parente du nouveau groupe. Null à enlever si l'ID ne peut pas être = à 0
         }
 
-        $group = $groupRepository->findOneBy(['name' => $groupName]);
-        if ($group){
-            return new JsonResponse(['error' => 'Groupe déjà existant'], 409);
+        $groupName = trim($data['name']);       // Nom du groupe à ajouter
+        $halfgroupsData = $data['halfgroups'] ?? [];    // Tous les half_groups liés au groupe (id et name)
+        $classID = $data['classID'];           // ID de la classe parente du nouveau groupe
+
+        // Récupération de la promotion
+        $classRepository = $entityManager->getRepository(ClassEntity::class);
+        $class = $classRepository->find($classID);
+
+        if (!$class) {
+            return new JsonResponse(['error' => 'Promotion introuvable'], 404);
+        }
+
+        // Vérification si un groupe avec le même nom existe dans cette classe
+        foreach ($class->getGroups() as $existingGroup) {
+            if ($existingGroup->getName() === $groupName) {
+                return new JsonResponse(['error' => 'Un groupe avec ce nom existe déjà dans cette promotion.'], 409);
+            }
         }
 
         // On créé le nouveau groupe.  
@@ -213,16 +221,23 @@ class GroupController extends AbstractController
         $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);
         $groupRepository = $entityManager->getRepository(Groups::class);
 
-        // Vérification si le HalfGroup existe déjà
-        $existingHalfgroup = $halfgroupRepository->findOneBy(['name' => $halfgroupName]);
-        if ($existingHalfgroup) {
-            return new JsonResponse(['error' => 'HalfGroup déjà existant'], 409);
+        // Récupération du Group correspondant à l'ID fourni
+        $group = $groupRepository->find($groupId);
+        if (!$group) {
+            return new JsonResponse(['error' => 'Groupe introuvable.'], 404);
         }
 
         // Récupération du Group correspondant à l'ID fourni
         $group = $groupRepository->find($groupId);
         if (!$group) {
             return new JsonResponse(['error' => 'Groupe introuvable.'], 404);
+        }
+
+        // Vérification si le nom du HalfGroup existe déjà parmi les sous-groupes du même groupe
+        foreach ($group->getHalfGroups() as $existingSubGroup) {
+            if ($existingSubGroup->getName() === $halfgroupName) {
+                return new JsonResponse(['error' => 'Un sous-groupe avec ce nom existe déjà dans ce groupe.'], 409);
+            }
         }
 
         // Création du HalfGroup
