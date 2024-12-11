@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import routes from "../../../Routes/routes";
 
-export const GroupButton = ({ addGroups, deleteGroups, deleteHalfGroups, isNoGroups, groups }) => {
+export const GroupButton = ({ curriculum, groups, setGroups, setToast, isNoGroups  }) => {
   const [groupName, setGroupName] = useState("");
   const [subGroupName, setSubGroupName] = useState("");
   const [error, setError] = useState("");
@@ -29,6 +30,115 @@ export const GroupButton = ({ addGroups, deleteGroups, deleteHalfGroups, isNoGro
 
   const NodePortal = ({ children }) => {
     return createPortal(children, document.getElementById("portal-root"));
+  };
+
+  const addGroups = async (newGroups) => {
+    const actualClassID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
+
+    setGroups((prevGroups) => {
+      const existingGroupNames = prevGroups.map((g) => g.name);
+      const filteredNewGroups = newGroups.filter(
+        (newGroup) => !existingGroupNames.includes(newGroup.name)
+      );
+      return [...prevGroups, ...filteredNewGroups];
+    });
+
+    for (const group of newGroups) {
+      try {
+        const response = await fetch(routes.dev.groups.add(), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: group.name,
+            halfgroups: group.subGroups || [],
+            classID: actualClassID,
+          }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          console.log("Le groupe a été ajouté avec succès :", result);
+          setToast({
+            message: "Le groupe a été ajouté avec succès !",
+            type: "success",
+            visible: true,
+          });
+        } else {
+          setToast({
+            message: "Erreur lors de l'ajout du groupe",
+            type: "error",
+            visible: true,
+          });
+        }
+      } catch (error) {
+        console.error("Erreur lors de la connexion avec l'API:", error);
+      }
+    }
+  };
+
+  const deleteGroups = async (index) => {
+    const group = groups[index];
+    try {
+      const response = await fetch(routes.dev.groups.deleteGroup(group.id), {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        const updatedGroups = groups.filter((_, i) => i !== index);
+        setGroups(updatedGroups);
+        console.log("Le groupe a été supprimé avec succès :", response);
+        setToast({
+          message: "Le groupe a été supprimé avec succès !",
+          type: "success",
+          visible: true,
+        });
+      }
+      else {
+        setToast({
+          message: "Erreur lors de la suppression du groupe.",
+          type: "error",
+          visible: true,
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du groupe:', error);
+    }
+  };
+
+  const deleteHalfGroups = async (groupIndex, index) => {
+    const group = groups[groupIndex];
+    const halfGroup = group.subGroups[index];
+
+    try {
+      const response = await fetch(routes.dev.groups.deleteHalfGroup(halfGroup.id), {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        const updatedGroups = groups.map((g, i) =>
+          i === groupIndex
+            ? { ...g, subGroups: g.subGroups.filter((_, subIndex) => subIndex !== index) }
+            : g
+        );
+
+        setGroups(updatedGroups);
+        setToast({
+          message: "Le sous-groupe a été supprimé avec succès !",
+          type: "success",
+          visible: true,
+        });
+      } else {
+        setToast({
+          message: "Erreur lors de la suppression du sous-groupe.",
+          type: "error",
+          visible: true,
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du sous-groupe:', error);
+    }
   };
 
   const handleAddGroup = () => {
