@@ -9,50 +9,63 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Teacher;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Professor;
 
 class TeacherController extends AbstractController
 {
     #[Route('/teachers/add', name: 'add_teacher', methods: ['POST'])]
-    public function addTeacher(EntityManagerInterface $entityManager, Request $request):JsonResponse
+    public function addTeacher(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
-        // On récupère le JSON donné à partir du Frontend
         $data = json_decode($request->getContent(), true);
-
-        // On récupère le Repository pour la classe Teacher (récupère toutes les données de la table Teacher)
-        $teacherRepository = $entityManager->getRepository(Teacher::class);
     
-        // On vérifie si le prénom et le nom du professeur ne sont pas déja présent ou si ils sont vide
-        if (!isset($data['firstname']) || empty(trim($data['firstname']))) {
+        if (!isset($data['firstName']) || empty(trim($data['firstName']))) {
             return new JsonResponse(['error' => 'Le prénom du professeur est obligatoire.'], 400);
-        } else if (!isset($data['lastname']) || empty(trim($data['lastname']))) {
+        }
+        if (!isset($data['lastName']) || empty(trim($data['lastName']))) {
             return new JsonResponse(['error' => 'Le nom du professeur est obligatoire.'], 400);
-        } else {
-            $teacherFirstname = trim($data['firstname']);
-            $teacherLastname = trim($data['lastname']);
         }
-
-        //Création d'un nouveau Teacher
-        $teacher = new Teacher();
-
-        //Création du code Teacher à partir du prénom et du nom et vérification si le code existe déjà ou non
-        $teacherCode = $teacherFirstname[0] . $teacherLastname[0];
-        if ($teacherRepository->findOneBy(['code' => $teacherCode]) && $teacherRepository->findOneBy(['firstname' => $teacherFirstname]) && $teacherRepository->findOneBy(['lastname' => $teacherLastname])) {
-            return new JsonResponse(['error' => 'Professeur déjà existant (nom,prénom et code déja existant)'], 409);
-        } else if ($teacherRepository->findOneBy(['code' => $teacherCode]) && !$teacherRepository->findOneBy(['firstname' => $teacherFirstname]) && !$teacherRepository->findOneBy(['lastname' => $teacherLastname])) {
-            return new JsonResponse(['error' => 'Code de Professeur déjà utlisée'], 409);
-            $teacherCode = $teacherFirstname[0] . $teacherFirstName[1] . $teacherLastname[0];
-        } else {
-            $teacher->setCode($teacherCode);
+    
+        $teacherFirstname = trim($data['firstName']);
+        $teacherLastname = trim($data['lastName']);
+    
+        // Vérification si un professeur existe déjà par le nom ET le prénom
+        $teacherRepository = $entityManager->getRepository(Professor::class);
+        $existingTeacher = $teacherRepository->findOneBy([
+            'firstName' => $teacherFirstname,
+            'lastName' => $teacherLastname,
+        ]);
+    
+        if ($existingTeacher !== null) {
+            return new JsonResponse(['error' => 'Professeur déjà existant (même nom, prénom et code).'], 409);
         }
-
-        //Définition du nom et du prénom du Teacher
-        $teacher->setFirstname($teacherFirstname);
-        $teacher->setLastname($teacherLastname);
-
-        // Ajouter le nouveau Teacher dans la BDD
+    
+        // Création d'un nouveau professeur
+        $professor = new Professor();
+    
+        //Génération d'un code unique pour le professeur
+        $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0]);
+        $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
+    
+        $index = 1; // Compteur pour différencier les codes
+        while ($existingCodeTeacher !== null) {
+            // Si le code existe, on ajoute des lettres supplémentaires pour rendre le code unique el CO et COD
+            $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0] . substr($teacherLastname, $index, 1));
+            $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
+            $index++;
+            
+            // Si on dépasse la longueur du nom, on passe aux lettres du prénom pour différencier les codes mais arrive très peu de fois
+            $teacherCode = strtoupper($teacherFirstname[0] . substr($teacherFirstname, 1, $index - strlen($teacherLastname)) . $teacherLastname[0]);
+            $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
+        }
+    
+        $professor->setCode($teacherCode);
+        $professor->setFirstname($teacherFirstname);
+        $professor->setLastname($teacherLastname);
+        $professor->setSubjectsTaught($data['subjectsTaught'] ?? '');
+    
+        $entityManager->persist($professor);
         $entityManager->flush();
-
-        //Réponse JSON pour dire que l'ajout du Teacher s'est bien passé
-        return new JsonResponse(['message' => 'Teacher ajouté avec succès.',], 201);
-    }
+    
+        return new JsonResponse(['message' => 'Professeur ajouté avec succès.', 'code' => $teacherCode], 201);
+    }    
 }

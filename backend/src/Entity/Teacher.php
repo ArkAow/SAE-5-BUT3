@@ -30,6 +30,9 @@ class Teacher
     #[ORM\Column(type: "string", length: 30)]
     private string $code;
 
+    #[ORM\Column(type: "string", length: 1000)]
+    private string $subjectsTaught;
+
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'teachers')]
     #[ORM\JoinTable(
         name: 'course_teacher',
@@ -102,6 +105,17 @@ class Teacher
                 $course->removeTeacher($this);
             }
         }
+        return $this;
+    }
+
+    public function getSubjectsTaught(): string
+    {
+        return $this->subjectsTaught;
+    }
+
+    public function setSubjectsTaught(string $subjectsTaught): self
+    {
+        $this->subjectsTaught = $subjectsTaught;
         return $this;
     }
 }

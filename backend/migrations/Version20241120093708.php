@@ -178,6 +178,7 @@ final class Version20241120093708 extends AbstractMigration
         $teacher->addColumn('last_name', 'string', ['length' => 100]);
         $teacher->addColumn('code', 'string', ['length' => 30]);
         $teacher->addColumn('subjects_taught', 'string', ['length' => 1000]);
+        $teacher->addColumn('type', 'string', ['length' => 100]);
         $teacher->setPrimaryKey(['id']);
 
         // Table Course - Teacher
