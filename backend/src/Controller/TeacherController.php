@@ -13,7 +13,7 @@ use App\Entity\Professor;
 
 class TeacherController extends AbstractController
 {
-    #[Route('/teachers/add', name: 'add_teacher', methods: ['POST'])]
+    #[Route('/professor/add', name: 'add_teacher', methods: ['POST'])]
     public function addTeacher(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -67,5 +67,42 @@ class TeacherController extends AbstractController
         $entityManager->flush();
     
         return new JsonResponse(['message' => 'Professeur ajouté avec succès.', 'code' => $teacherCode], 201);
-    }    
+    }
+
+    #[Route('/professors', name: 'get_teachers', methods: ['GET'])]
+    public function getTeachers(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $teacherRepository = $entityManager->getRepository(Professor::class);
+        $teachers = $teacherRepository->findAll();
+    
+        $data = array_map(function($teacher){
+            return [
+                'id' => $teacher->getId(),
+                'firstName' => $teacher->getFirstName(),
+                'lastName' => $teacher->getLastName(),
+                'code' => $teacher->getCode(),
+                'subjectsTaught' => $teacher->getSubjectsTaught(),
+            ];
+        }, $teachers);
+    
+        return new JsonResponse($data, 200);
+    }
+
+    #[Route('/professor/delete', name: 'delete_teacher', methods: ['DELETE'])]
+    public function deleteTeacher(EntityManagerInterface $entityManager, Request $request) : JsonResponse
+    {
+        $teacherId = json_decode($request->getContent(), true)['id'];
+    
+        $teacherRepository = $entityManager->getRepository(Professor::class);
+        $teacher = $teacherRepository->findOneBy(['id' => $teacherId]);
+    
+        if ($teacher === null) {
+            return new JsonResponse(['error' => 'Professeur non trouvé.'], 404);
+        }
+    
+        $entityManager->remove($teacher);
+        $entityManager->flush();
+    
+        return new JsonResponse(['message' => 'Professeur supprimé avec succès.'], 200);
+    }
 }
