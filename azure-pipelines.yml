@@ -7,11 +7,11 @@ trigger:
       - main # Déclenche la pipeline sur les changements dans la branche principale
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 variables:
-  NODE_VERSION: '23.2.0' # Version de Node.js
-  PHP_VERSION: '8.2.24'   # Version de PHP
+  NODE_VERSION: "23.2.0" # Version de Node.js
+  PHP_VERSION: "8.2.24" # Version de PHP
 
 stages:
   # 1. Étape d'installation et de validation des dépendances
@@ -118,4 +118,3 @@ stages:
               echo "Collecte des logs d'erreurs et d'exécution..."
               # Exemple d'exportation de logs
               cat /var/log/syslog
-
