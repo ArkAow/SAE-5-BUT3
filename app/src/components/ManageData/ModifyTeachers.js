@@ -25,10 +25,26 @@ const ModifyTeachers = () => {
     }
   };
 
-  const handleDeleteTeacher = () => {
-    console.log("suppression de teacher");
-    return;
-  }
+  const handleDeleteTeacher = async (teacher) => {
+    if (!window.confirm(`Voulez-vous vraiment supprimer ${teacher.firstName} ${teacher.lastName} ?`)) return;
+
+    try {
+      const response = await fetch(routes.dev.teachers.delete(), {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: teacher.id }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erreur lors de la suppression.");
+      }
+      setToast({ message: "Professeur supprimé avec succès.", type: "success", visible: true });
+      setTeachers((prev) => prev.filter((t) => t.id !== teacher.id));
+    } catch (error) {
+      console.error(error);
+      setToast({ message: "Erreur lors de la suppression de l'enseignant", type: "error", visible: true });
+    }
+  };
 
   const handleAddTeacher = async (e) => {
     e.preventDefault();
