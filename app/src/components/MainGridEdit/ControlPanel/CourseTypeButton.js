@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { courseTypes as initialCourseTypes } from "../../../constants";
+import routes from "../../../Routes/routes";
 
 export const CourseTypeButton = ({ 
   isNoGroups,
@@ -11,6 +12,7 @@ export const CourseTypeButton = ({
   const [isFocused, setIsFocused] = useState(false);
   const [newCourseTypeName, setNewCourseTypeName] = useState("");
   const [newCourseTypeColor, setNewCourseTypeColor] = useState("#000000");
+  const [error, setError] = useState(null);
 
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
@@ -37,24 +39,62 @@ export const CourseTypeButton = ({
     };
   }, []);
 
-  const handleAddCourseType = () => {
-    if (
-      newCourseTypeName.trim() &&
-      !courseTypes.some((type) => type.name === newCourseTypeName)
-    ) {
-      setCourseTypes((prev) => [
-        ...prev,
-        { name: newCourseTypeName.trim(), color: newCourseTypeColor },
-      ]);
-      setNewCourseTypeName("");
-      setNewCourseTypeColor("#000000");
+  const handleAddCourseType = async () => {
+    if (!newCourseTypeName.trim()) {
+      setError("Le nom du type de cours est obligatoire.");
+      return;
+    }
+    try {
+      const response = await fetch(routes.dev.courseTypes.add(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newCourseTypeName.trim(),
+          color: newCourseTypeColor,
+          scope: "",
+        }),
+      });
+
+      if (response.status === 201) {
+        setCourseTypes((prev) => [
+          ...prev,
+          { name: newCourseTypeName.trim(), color: newCourseTypeColor },
+        ]);
+        setNewCourseTypeName("");
+        setNewCourseTypeColor("#000000");
+        setError(null);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Erreur lors de l'ajout du type de cours.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du type de cours :", error);
+      setError("Erreur lors de l'ajout du type de cours.");
     }
   };
 
-  const handleRemoveCourseType = (name) => {
-    if (!initialCourseTypes.some((type) => type.name === name)) {
-      setCourseTypes((prev) => prev.filter((type) => type.name !== name));
-      updateCoursesForRemovedType(name);
+  const handleRemoveCourseType = async (name) => {
+    const courseType = courseTypes.find((type) => type.name === name);
+    if (!courseType) return;
+
+    try {
+      const response = await fetch(routes.dev.courseTypes.delete(courseType.id), {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setCourseTypes((prev) => prev.filter((type) => type.name !== name));
+        updateCoursesForRemovedType(name);
+        setError(null);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Erreur lors de la suppression du type de cours.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression du type de cours :", error);
+      setError("Erreur lors de la suppression.");
     }
   };
 
@@ -78,6 +118,7 @@ export const CourseTypeButton = ({
             <h3 className="mb-3 font-bold text-base">
               Modifier les types de cours
             </h3>
+            {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
             <ul className="mb-3">
               {courseTypes.map((type) => (
                 <li

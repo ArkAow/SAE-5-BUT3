@@ -16,6 +16,17 @@ class SubjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Subject::class);
     }
 
+    public function findSubjectsBySemester(int $semesterId): array
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->innerJoin('s.semesters', 'sem')
+            ->andWhere('sem.id = :semesterId')
+            ->setParameter('semesterId', $semesterId)
+            ->getQuery();
+
+        return $qb->getResult();
+    }
+
     //    /**
     //     * @return Subject[] Returns an array of Subject objects
     //     */

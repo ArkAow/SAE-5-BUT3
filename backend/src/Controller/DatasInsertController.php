@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Controller\ExcelReaderController;
+use App\Entity\ClassEntity;
 
 class DatasInsertController extends AbstractController
 {
@@ -39,8 +41,8 @@ class DatasInsertController extends AbstractController
             return new JsonResponse(['error' => "Le fichier avec l'ID {$id} n'existe pas ou est invalide."], Response::HTTP_NOT_FOUND);
         }
 
-        foreach ($jsonData['sheets'] as $sheetName => $curricula) {
-            foreach ($curricula as $curriculumName => $semesters) {
+        foreach ($jsonData['sheets'] as $sheetName => $curricul) {
+            foreach ($curricul as $curriculumName => $semesters) {
                 $curriculum = $this->getOrCreateCurriculum($curriculumName);
 
                 foreach ($semesters as $semesterName => $subjects) {
@@ -56,7 +58,8 @@ class DatasInsertController extends AbstractController
 
         $this->entityManager->flush();
 
-        return new JsonResponse(['status' => 'Les données ont été insérées avec succès']);
+        return new JsonResponse(['status' => 'Les données ont été insérées avec succès',
+            'sheets' => $jsonData['sheets']], Response::HTTP_OK);
     }
 
     private function getOrCreateCurriculum(string $name): Curriculum
@@ -67,10 +70,33 @@ class DatasInsertController extends AbstractController
             $curriculum = new Curriculum();
             $curriculum->setName($name);
             $this->entityManager->persist($curriculum);
+
+            if (preg_match('/BUT\s+(\d+)/i', $name, $matches)) {
+                $classNumber = $matches[1];
+                $className = "A" . $classNumber;
+
+                $classEntity = $this->getOrCreateClassEntity($className);
+
+                $curriculum->addClass($classEntity);
+                $classEntity->addCurriculum($curriculum);
+            }
         }
 
         return $curriculum;
     }
+
+    private function getOrCreateClassEntity(string $className): ClassEntity
+    {
+        $classEntity = $this->entityManager->getRepository(ClassEntity::class)->findOneBy(['name' => $className]);
+    
+        if (!$classEntity) {
+            $classEntity = new ClassEntity();
+            $classEntity->setName($className);
+            $this->entityManager->persist($classEntity);
+        }
+    
+        return $classEntity;
+    }    
 
     private function getOrCreateSemester(string $name): Semester
     {

@@ -7,7 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-class Promo
+#[ORM\Table(name: "class")]
+class ClassEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,10 +18,13 @@ class Promo
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\OneToMany(mappedBy: "promo", targetEntity: Group::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    #[ORM\ManyToMany(targetEntity: Groups::class, mappedBy: "classes")]
     private Collection $groups;
 
-    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: "promos")]
+    #[ORM\ManyToMany(targetEntity: Curriculum::class, inversedBy: "classes")]
+    #[ORM\JoinTable(name: "curriculum_class")]
+    #[ORM\JoinColumn(name: "class_id", referencedColumnName: "id")]
+    #[ORM\InverseJoinColumn(name: "curriculum_id", referencedColumnName: "id")]
     private Collection $curriculums;
 
     public function __construct()
@@ -48,25 +52,6 @@ class Promo
     public function getGroups(): Collection
     {
         return $this->groups;
-    }
-
-    public function addGroup(Group $group): self
-    {
-        if (!$this->groups->contains($group)) {
-            $this->groups[] = $group;
-            $group->setPromo($this);
-        }
-        return $this;
-    }
-
-    public function removeGroup(Group $group): self
-    {
-        if ($this->groups->removeElement($group)) {
-            if ($group->getPromo() === $this) {
-                $group->setPromo(null);
-            }
-        }
-        return $this;
     }
 
     public function getCurriculums(): Collection

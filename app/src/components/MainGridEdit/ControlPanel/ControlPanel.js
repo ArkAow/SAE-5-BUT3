@@ -5,7 +5,11 @@ import { PrintButton } from "./PrintButton";
 import { CourseTypeButton } from "./CourseTypeButton"
 
 const ControlPanel = ({
+  curriculum,
+  setToast,
   groups,
+  setGroups,
+  fetchGroups,
   selectedRow,
   setSelectedRow,
   selectedCol,
@@ -19,9 +23,7 @@ const ControlPanel = ({
   setSelectedTeacher,
   selectedDuration,
   setSelectedDuration,
-  addItem,
-  addGroups,
-  deleteGroups }) => {
+  addItem }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -44,12 +46,6 @@ const ControlPanel = ({
       return newExpandedState;
     });
     setTimeout(() => setIsButtonDisabled(false), 300);
-  };
-
-  const handleUpdateGroups = (newGroups) => {
-    if (addGroups) {
-      addGroups(newGroups);
-    }
   };
 
   return (
@@ -91,16 +87,20 @@ const ControlPanel = ({
           selectedDuration={selectedDuration}
           setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
+
         <CourseTypeButton 
           isNoGroups={isNoGroups}
           courseTypes={courseTypes}
           setCourseTypes={setCourseTypes}
           updateCoursesForRemovedType={updateCoursesForRemovedType}/>
+
         <GroupButton 
-          isNoGroups={isNoGroups}
+          curriculum={curriculum}
+          setToast={setToast}
           groups={groups}
-          addGroups={handleUpdateGroups}
-          deleteGroups={deleteGroups} />
+          setGroups={setGroups}
+          fetchGroups={fetchGroups}
+          isNoGroups={isNoGroups}/>
 
         <PrintButton />
       </div>

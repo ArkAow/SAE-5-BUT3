@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'course')]
@@ -22,9 +24,21 @@ class Course
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $positionY = null;
 
-    #[ORM\ManyToOne(targetEntity: CourseType::class, inversedBy: 'courses')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?CourseType $courseType = null;
+    #[ORM\ManyToMany(targetEntity: CourseType::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_type_course',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'course_type_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private Collection $courseTypes;
+
+    #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'courses')]
+    private Collection $teachers;
+
+    public function __construct()
+    {
+        $this->courseTypes = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -64,14 +78,51 @@ class Course
         return $this;
     }
 
-    public function getCourseType(): ?CourseType
+    public function getCourseTypes(): Collection
     {
-        return $this->courseType;
+        return $this->courseTypes;
     }
 
-    public function setCourseType(?CourseType $courseType): self
+    public function addCourseType(CourseType $courseType): self
     {
-        $this->courseType = $courseType;
+        if (!$this->courseTypes->contains($courseType)) {
+            $this->courseTypes->add($courseType);
+            $courseType->addCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourseType(CourseType $courseType): self
+    {
+        if ($this->courseTypes->removeElement($courseType)) {
+            $courseType->removeCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function getTeachers(): Collection
+    {
+        return $this->teachers;
+    }
+
+    public function addTeacher(Teacher $teacher): self
+    {
+        if (!$this->teachers->contains($teacher)) {
+            $this->teachers->add($teacher);
+            $teacher->addCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeacher(Teacher $teacher): self
+    {
+        if ($this->teachers->removeElement($teacher)) {
+            $teacher->removeCourse($this);
+        }
+
         return $this;
     }
 }
