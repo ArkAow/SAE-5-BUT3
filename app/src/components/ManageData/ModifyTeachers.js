@@ -25,6 +25,11 @@ const ModifyTeachers = () => {
     }
   };
 
+  const handleDeleteTeacher = () => {
+    console.log("suppression de teacher");
+    return;
+  }
+
   const handleAddTeacher = async (e) => {
     e.preventDefault();
 
@@ -32,7 +37,6 @@ const ModifyTeachers = () => {
       setToast({ message: "Veuillez fournir un nom et un prénom.", type: "error", visible: true });
       return;
     }
-
     try {
       const response = await fetch(routes.dev.teachers.add(), {
         method: "POST",
@@ -42,12 +46,10 @@ const ModifyTeachers = () => {
           lastName: lastName.trim(),
         }),
       });
-
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Erreur lors de l'ajout.");
       }
-
       const result = await response.json();
       setToast({ message: "Professeur ajouté avec succès.", type: "success", visible: true });
       setTeachers((prev) => [...prev, { ...result, firstName, lastName}]);
@@ -106,8 +108,12 @@ const ModifyTeachers = () => {
                   {teachers.map((teacher) => (
                     <li key={teacher.id} className="flex justify-between items-center bg-gray-800 rounded-lg p-4">
                       <div>
-                        <p><span className="font-semibold">Nom :</span> {teacher.lastName} {teacher.firstName}</p>
-                        <p><span className="font-semibold">Code :</span> {teacher.code}</p>
+                        <span className="text-sm">{teacher.code}</span>
+                        <button
+                          onClick={() => handleDeleteTeacher(teacher)}
+                          className="size-4 btn-default justify-items-center ml-2">
+                          <img src="images/cross.svg" alt="cross" className="size-3" />
+                        </button>
                       </div>
                     </li>
                   ))}
