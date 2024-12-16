@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { teachers } from "../../../constants";
 
 export const CourseButton = ({
     isNoGroups,
@@ -19,6 +18,7 @@ export const CourseButton = ({
 }) => {  
     const [isFocused, setIsFocused] = useState(false);
     const [error, setError] = useState("");
+    const [teachers, setTeachers] = useState([]);
     const containerRef = useRef(null);
     const tooltipRef = useRef(null);
 
@@ -40,6 +40,17 @@ export const CourseButton = ({
         };
     }, []);
 
+    const fetchTeachers = async () => {
+        try {
+          const response = await fetch(routes.dev.teachers.get());
+          if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
+          const data = await response.json();
+          setTeachers(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
     const NodePortal = ({ children }) => {
         return createPortal(
             children,
@@ -56,6 +67,10 @@ export const CourseButton = ({
         setError("");
         addItem();
     };
+
+    useEffect(() => {
+        fetchTeachers();
+      }, []);
 
     return (
         <div className="relative" ref={containerRef}>
