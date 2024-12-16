@@ -54,7 +54,7 @@ class TeacherController extends AbstractController
             $index++;
             
             // Si on dépasse la longueur du nom, on passe aux lettres du prénom pour différencier les codes mais arrive très peu de fois
-            $teacherCode = strtoupper($teacherFirstname[0] . substr($teacherFirstname, 1, $index - strlen($teacherLastname)) . $teacherLastname[0]);
+            $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0] . substr($teacherLastname, 1, $index - strlen($teacherLastname)));
             $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
         }
     
