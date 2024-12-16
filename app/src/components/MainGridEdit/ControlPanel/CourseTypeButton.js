@@ -3,7 +3,12 @@ import { createPortal } from "react-dom";
 import { courseTypes as initialCourseTypes } from "../../../constants";
 import routes from "../../../Routes/routes";
 
-export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesForRemovedType }) => {
+export const CourseTypeButton = ({ 
+  isNoGroups,
+  courseTypes,
+  setCourseTypes,
+  updateCoursesForRemovedType
+}) => {
   const [isFocused, setIsFocused] = useState(false);
   const [newCourseTypeName, setNewCourseTypeName] = useState("");
   const [newCourseTypeColor, setNewCourseTypeColor] = useState("#000000");
@@ -97,9 +102,8 @@ export const CourseTypeButton = ({ courseTypes, setCourseTypes, updateCoursesFor
     <div ref={containerRef}>
       <button
         onClick={() => setIsFocused(true)}
-        className={`btn-control-panel ${
-          isFocused ? "bg-white shadow-lg" : ""
-        } transition duration-300`}>
+        className={`btn-control-panel ${isFocused ? "bg-white shadow-lg" : ""} transition duration-300`}
+        disabled={isNoGroups}>
         <img
           src="/images/book.svg"
           alt="course type icon"
