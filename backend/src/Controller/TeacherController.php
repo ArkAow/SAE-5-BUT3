@@ -69,10 +69,10 @@ class TeacherController extends AbstractController
         return new JsonResponse(['message' => 'Professeur ajouté avec succès.', 'code' => $teacherCode], 201);
     }
 
-    #[Route('/professors', name: 'get_teachers', methods: ['GET'])]
+    #[Route('/teacher', name: 'get_teachers', methods: ['GET'])]
     public function getTeachers(EntityManagerInterface $entityManager): JsonResponse
     {
-        $teacherRepository = $entityManager->getRepository(Professor::class);
+        $teacherRepository = $entityManager->getRepository(Teacher::class);
         $teachers = $teacherRepository->findAll();
     
         $data = array_map(function($teacher){
@@ -88,7 +88,7 @@ class TeacherController extends AbstractController
         return new JsonResponse($data, 200);
     }
 
-    #[Route('/professor/delete', name: 'delete_teacher', methods: ['DELETE'])]
+    #[Route('/teacher/delete', name: 'delete_teacher', methods: ['DELETE'])]
     public function deleteTeacher(EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
         $teacherId = json_decode($request->getContent(), true)['id'];
