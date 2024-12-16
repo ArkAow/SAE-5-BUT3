@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Table(name: "class")]
-class ClassEntity
+#[ORM\Table(name: "formation_level")]
+class FormationLevel
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

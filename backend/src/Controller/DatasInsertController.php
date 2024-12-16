@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\ExcelReaderController;
-use App\Entity\ClassEntity;
+use App\Entity\FormationLevel;
 
 class DatasInsertController extends AbstractController
 {
@@ -75,27 +75,27 @@ class DatasInsertController extends AbstractController
                 $classNumber = $matches[1];
                 $className = "A" . $classNumber;
 
-                $classEntity = $this->getOrCreateClassEntity($className);
+                $FormationLevel = $this->getOrCreateClassEntity($className);
 
-                $curriculum->addClass($classEntity);
-                $classEntity->addCurriculum($curriculum);
+                $curriculum->addClass($FormationLevel);
+                $FormationLevel->addCurriculum($curriculum);
             }
         }
 
         return $curriculum;
     }
 
-    private function getOrCreateClassEntity(string $className): ClassEntity
+    private function getOrCreateClassEntity(string $className): FormationLevel
     {
-        $classEntity = $this->entityManager->getRepository(ClassEntity::class)->findOneBy(['name' => $className]);
+        $FormationLevel = $this->entityManager->getRepository(FormationLevel::class)->findOneBy(['name' => $className]);
     
-        if (!$classEntity) {
-            $classEntity = new ClassEntity();
-            $classEntity->setName($className);
-            $this->entityManager->persist($classEntity);
+        if (!$FormationLevel) {
+            $FormationLevel = new FormationLevel();
+            $FormationLevel->setName($className);
+            $this->entityManager->persist($FormationLevel);
         }
     
-        return $classEntity;
+        return $FormationLevel;
     }    
 
     private function getOrCreateSemester(string $name): Semester
