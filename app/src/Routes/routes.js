@@ -23,7 +23,7 @@ const routes = {
       get: (curriculumId) => `${routes.dev.default}api/curriculum/${curriculumId}/semesters`
     },
     teachers: {
-      add: () => `${routes.dev.default}teachers/add`
+      add: () => `${routes.dev.default}teacher/add`
     }
   },
   insertM3C: "http://localhost:8600/insertM3C",

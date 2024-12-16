@@ -13,7 +13,7 @@ use App\Entity\Professor;
 
 class TeacherController extends AbstractController
 {
-    #[Route('/professor/add', name: 'add_teacher', methods: ['POST'])]
+    #[Route('/teacher/add', name: 'add_teacher', methods: ['POST'])]
     public function addTeacher(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -29,7 +29,7 @@ class TeacherController extends AbstractController
         $teacherLastname = trim($data['lastName']);
     
         // Vérification si un professeur existe déjà par le nom ET le prénom
-        $teacherRepository = $entityManager->getRepository(Professor::class);
+        $teacherRepository = $entityManager->getRepository(Teacher::class);
         $existingTeacher = $teacherRepository->findOneBy([
             'firstName' => $teacherFirstname,
             'lastName' => $teacherLastname,
@@ -40,7 +40,7 @@ class TeacherController extends AbstractController
         }
     
         // Création d'un nouveau professeur
-        $professor = new Professor();
+        $teacher = new Teacher();
     
         //Génération d'un code unique pour le professeur
         $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0]);
@@ -58,12 +58,12 @@ class TeacherController extends AbstractController
             $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
         }
     
-        $professor->setCode($teacherCode);
-        $professor->setFirstname($teacherFirstname);
-        $professor->setLastname($teacherLastname);
-        $professor->setSubjectsTaught($data['subjectsTaught'] ?? '');
+        $teacher->setCode($teacherCode);
+        $teacher->setFirstname($teacherFirstname);
+        $teacher->setLastname($teacherLastname);
+        $teacher->setSubjectsTaught($data['subjectsTaught'] ?? '');
     
-        $entityManager->persist($professor);
+        $entityManager->persist($teacher);
         $entityManager->flush();
     
         return new JsonResponse(['message' => 'Professeur ajouté avec succès.', 'code' => $teacherCode], 201);
