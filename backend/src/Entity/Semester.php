@@ -6,37 +6,31 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'semester')]
 class Semester
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Subject")
-     * @ORM\JoinTable(name="semester_subject")
-     */
+    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: 'semesters')]
+    private Collection $curriculums;
+
+    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'semesters')]
     private Collection $subjects;
 
     public function __construct()
     {
+        $this->curriculums = new ArrayCollection();
         $this->subjects = new ArrayCollection();
     }
 
-    // Getters et Setters
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -52,6 +46,25 @@ class Semester
         return $this;
     }
 
+    public function getCurriculums(): Collection
+    {
+        return $this->curriculums;
+    }
+
+    public function addCurriculum(Curriculum $curriculum): self
+    {
+        if (!$this->curriculums->contains($curriculum)) {
+            $this->curriculums->add($curriculum);
+        }
+        return $this;
+    }
+
+    public function removeCurriculum(Curriculum $curriculum): self
+    {
+        $this->curriculums->removeElement($curriculum);
+        return $this;
+    }
+
     public function getSubjects(): Collection
     {
         return $this->subjects;
@@ -60,15 +73,17 @@ class Semester
     public function addSubject(Subject $subject): self
     {
         if (!$this->subjects->contains($subject)) {
-            $this->subjects[] = $subject;
+            $this->subjects->add($subject);
+            $subject->addSemester($this);
         }
-
         return $this;
     }
 
     public function removeSubject(Subject $subject): self
     {
-        $this->subjects->removeElement($subject);
+        if ($this->subjects->removeElement($subject)) {
+            $subject->removeSemester($this);
+        }
         return $this;
     }
 }

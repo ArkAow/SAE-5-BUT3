@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LoginHeader from "../header/header"; // Composant de l'en-tête
-import '../../styles.css'
+import LoginHeader from "../header/header";
 
 const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
@@ -33,14 +32,13 @@ const Login = ({ setIsAuthenticated }) => {
   return (
     <>
       <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col items-center">
-        <div className="w-full">
-          <LoginHeader />
-        </div>
-        <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-8 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="flex flex-col items-center w-full">
-            <div
-              className="bg-primary rounded-full w-32 h-32 mb-12 bg-center bg-cover bg-pfp"
-            />
+        <LoginHeader />
+        <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col items-center w-full"
+          >
+            <div className="bg-primary rounded-full w-32 h-32 mb-12 bg-center bg-cover bg-pfp" />
             <div className="flex flex-col items-center mb-6">
               <label htmlFor="email" className="text-white mb-2">
                 Identifiant :
@@ -69,12 +67,15 @@ const Login = ({ setIsAuthenticated }) => {
             </div>
             <button
               type="submit"
-              className="btn-primary transition duration-300"
+              className="btn-login transition duration-300"
             >
               Se connecter
             </button>
             <p
-              className={`text-red-500 text-right text-sm mt-4 h-6 ${error ? "visible" : "invisible"}`}>
+              className={`text-red-500 text-right text-sm mt-4 h-6 ${
+                error ? "visible" : "invisible"
+              }`}
+            >
               {error}
             </p>
           </form>

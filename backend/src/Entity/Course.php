@@ -3,90 +3,126 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'course')]
 class Course
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private int $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Teacher")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private Teacher $teacher;
+    #[ORM\Column(type: 'float', nullable: false)]
+    private float $duration;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\CourseType")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private CourseType $courseType;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $positionX = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Subject")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private Subject $subject;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $positionY = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private int $duration;
+    #[ORM\ManyToMany(targetEntity: CourseType::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_type_course',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'course_type_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private Collection $courseTypes;
 
-    // Getters and Setters
+    #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'courses')]
+    private Collection $teachers;
 
-    public function getId(): ?int
+    public function __construct()
+    {
+        $this->courseTypes = new ArrayCollection();
+    }
+
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getTeacher(): Teacher
-    {
-        return $this->teacher;
-    }
-
-    public function setTeacher(Teacher $teacher): self
-    {
-        $this->teacher = $teacher;
-        return $this;
-    }
-
-    public function getCourseType(): CourseType
-    {
-        return $this->courseType;
-    }
-
-    public function setCourseType(CourseType $courseType): self
-    {
-        $this->courseType = $courseType;
-        return $this;
-    }
-
-    public function getSubject(): Subject
-    {
-        return $this->subject;
-    }
-
-    public function setSubject(Subject $subject): self
-    {
-        $this->subject = $subject;
-        return $this;
-    }
-
-    public function getDuration(): int
+    public function getDuration(): float
     {
         return $this->duration;
     }
 
-    public function setDuration(int $duration): self
+    public function setDuration(float $duration): self
     {
         $this->duration = $duration;
+        return $this;
+    }
+
+    public function getPositionX(): ?int
+    {
+        return $this->positionX;
+    }
+
+    public function setPositionX(?int $positionX): self
+    {
+        $this->positionX = $positionX;
+        return $this;
+    }
+
+    public function getPositionY(): ?int
+    {
+        return $this->positionY;
+    }
+
+    public function setPositionY(?int $positionY): self
+    {
+        $this->positionY = $positionY;
+        return $this;
+    }
+
+    public function getCourseTypes(): Collection
+    {
+        return $this->courseTypes;
+    }
+
+    public function addCourseType(CourseType $courseType): self
+    {
+        if (!$this->courseTypes->contains($courseType)) {
+            $this->courseTypes->add($courseType);
+            $courseType->addCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourseType(CourseType $courseType): self
+    {
+        if ($this->courseTypes->removeElement($courseType)) {
+            $courseType->removeCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function getTeachers(): Collection
+    {
+        return $this->teachers;
+    }
+
+    public function addTeacher(Teacher $teacher): self
+    {
+        if (!$this->teachers->contains($teacher)) {
+            $this->teachers->add($teacher);
+            $teacher->addCourse($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeacher(Teacher $teacher): self
+    {
+        if ($this->teachers->removeElement($teacher)) {
+            $teacher->removeCourse($this);
+        }
+
         return $this;
     }
 }

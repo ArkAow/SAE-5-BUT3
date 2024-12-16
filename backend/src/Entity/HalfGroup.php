@@ -3,33 +3,30 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
+#[ORM\Table(name: "half_group")]
 class HalfGroup
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
+    #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Group", inversedBy="halfGroups")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private ?Group $group = null;
+    #[ORM\ManyToMany(targetEntity: Groups::class, mappedBy: "halfGroups")]
+    private Collection $groups;
 
-    // Getters et Setters
+    public function __construct()
+    {
+        $this->groups = new ArrayCollection();
+    }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -45,14 +42,27 @@ class HalfGroup
         return $this;
     }
 
-    public function getGroup(): ?Group
+    public function getGroups(): Collection
     {
-        return $this->group;
+        return $this->groups;
     }
 
-    public function setGroup(?Group $group): self
+    public function addGroup(Groups $group): self
     {
-        $this->group = $group;
+        if (!$this->groups->contains($group)) {
+            $this->groups[] = $group;
+            $group->addHalfGroup($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroup(Groups $group): self
+    {
+        if ($this->groups->removeElement($group)) {
+            $group->removeHalfGroup($this);
+        }
+
         return $this;
     }
 }
