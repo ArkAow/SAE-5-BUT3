@@ -43,14 +43,14 @@ final class Version20241120093708 extends AbstractMigration
 
         // Table FormationLevel
 
-        $formationLevel = $schema->createTable('FormationLevel');
+        $formationLevel = $schema->createTable('formation_Level');
         $formationLevel->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $formationLevel->addColumn('name', 'string', ['length' => 100]); 
         $formationLevel->setPrimaryKey(['id']);
         
         // Table FormationLevel - Group
 
-        $formationLevel_group = $schema->createTable('formationLevel_group');
+        $formationLevel_group = $schema->createTable('formation_Level_group');
         $formationLevel_group->addColumn('formationLevel_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $formationLevel_group->addColumn('group_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $formationLevel_group->setPrimaryKey(['formationLevel_id', 'group_id']);
@@ -66,7 +66,7 @@ final class Version20241120093708 extends AbstractMigration
 
         // Table Curriculum - FormationLevel
 
-        $curriculum_formationLevel = $schema->createTable('curriculum_formationLevel');
+        $curriculum_formationLevel = $schema->createTable('curriculum_formation_Level');
         $curriculum_formationLevel->addColumn('curriculum_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $curriculum_formationLevel->addColumn('formationLevel_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $curriculum_formationLevel->setPrimaryKey(['curriculum_id', 'formationLevel_id']);
@@ -213,7 +213,7 @@ final class Version20241120093708 extends AbstractMigration
         $department->setPrimaryKey(['id']);
         
         // Table Department - FormationLevel
-        $department_formationLevel = $schema->createTable('department_formationLevel');
+        $department_formationLevel = $schema->createTable('department_formation_Level');
         $department_formationLevel->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
         $department_formationLevel->addColumn('formationLevel_id','integer', ['unsigned' => true, 'notnull' => true]);
         $department_formationLevel->setPrimaryKey(['department_id', 'formationLevel_id']);
@@ -266,10 +266,10 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('half_group');
         $schema->dropTable('group');
         $schema->dropTable('group_half_group');
-        $schema->dropTable('formationLevel');
-        $schema->dropTable('formationLevel_group');
+        $schema->dropTable('formation_Level');
+        $schema->dropTable('formation_Level_group');
         $schema->dropTable('curriculum');
-        $schema->dropTable('curriculum_formationLevel');
+        $schema->dropTable('curriculum_formation_Level');
         $schema->dropTable('semester');
         $schema->dropTable('curriculum_semester');
         $schema->dropTable('subject');
@@ -286,7 +286,7 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('subject_teacher');
         $schema->dropTable('user');
         $schema->dropTable('department');
-        $schema->dropTable('department_formationLevel');
+        $schema->dropTable('department_formation_Level');
         $schema->dropTable('department_teacher');
         $schema->dropTable('department_curriculum');
         $schema->dropTable('user_department');

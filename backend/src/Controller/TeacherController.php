@@ -93,7 +93,7 @@ class TeacherController extends AbstractController
     {
         $teacherId = json_decode($request->getContent(), true)['id'];
     
-        $teacherRepository = $entityManager->getRepository(Professor::class);
+        $teacherRepository = $entityManager->getRepository(Teacher::class);
         $teacher = $teacherRepository->findOneBy(['id' => $teacherId]);
     
         if ($teacher === null) {

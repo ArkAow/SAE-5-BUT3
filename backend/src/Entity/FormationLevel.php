@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Table(name: "formation_level")]
+#[ORM\Table(name: "formationL_evel")]
 class FormationLevel
 {
     #[ORM\Id]
@@ -22,7 +22,7 @@ class FormationLevel
     private Collection $groups;
 
     #[ORM\ManyToMany(targetEntity: Curriculum::class, inversedBy: "classes")]
-    #[ORM\JoinTable(name: "curriculum_class")]
+    #[ORM\JoinTable(name: "curriculum_formation_Level")]
     #[ORM\JoinColumn(name: "class_id", referencedColumnName: "id")]
     #[ORM\InverseJoinColumn(name: "curriculum_id", referencedColumnName: "id")]
     private Collection $curriculums;
