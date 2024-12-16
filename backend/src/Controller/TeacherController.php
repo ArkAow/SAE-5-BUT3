@@ -27,6 +27,8 @@ class TeacherController extends AbstractController
     
         $teacherFirstname = trim($data['firstName']);
         $teacherLastname = trim($data['lastName']);
+        $teacher_timeConstraints = $data['constraints'];
+        $teacher_is_partimetutor = $data['is_partimetutor'];
     
         // Vérification si un professeur existe déjà par le nom ET le prénom
         $teacherRepository = $entityManager->getRepository(Teacher::class);
@@ -61,7 +63,8 @@ class TeacherController extends AbstractController
         $teacher->setCode($teacherCode);
         $teacher->setFirstname($teacherFirstname);
         $teacher->setLastname($teacherLastname);
-        $teacher->setSubjectsTaught($data['subjectsTaught'] ?? '');
+        $teacher->setTimeConstraints($teacher_timeConstraints ?? 0);
+        $teacher->setIsPartimeTutor($teacher_is_partimetutor ?? false);
     
         $entityManager->persist($teacher);
         $entityManager->flush();
@@ -74,14 +77,18 @@ class TeacherController extends AbstractController
     {
         $teacherRepository = $entityManager->getRepository(Teacher::class);
         $teachers = $teacherRepository->findAll();
-    
+        
+        // Affichage de TOUS les professeurs en liste avec TOUTES leurs données
         $data = array_map(function($teacher){
             return [
                 'id' => $teacher->getId(),
                 'firstName' => $teacher->getFirstName(),
                 'lastName' => $teacher->getLastName(),
                 'code' => $teacher->getCode(),
-                'subjectsTaught' => $teacher->getSubjectsTaught(),
+                'subjects' => $teacher->getSubjects(),
+                'courses' => $teacher->getCourses(),
+                'timeConstraints' => $teacher->getTimeConstraints(),
+                'isPartimeTutor' => $teacher->getIsPartimeTutor(),
             ];
         }, $teachers);
     

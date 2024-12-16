@@ -23,6 +23,12 @@ class Teacher
 
     #[ORM\Column(type: "string", length: 30)]
     private string $code;
+    
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $time_constraints = 0;
+
+    #[ORM\Column(name: "partTimeTutor", type: "boolean", nullable: true)]
+    private ?bool $is_partimetutor = null;
 
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'teachers')]
     #[ORM\JoinTable(
@@ -32,11 +38,12 @@ class Teacher
     )]
     private Collection $courses;
 
-    #[ORM\ManyToMany(targetEntity:Subject::class, mappedBy: 'teachers')]
+    #[ORM\ManyToMany(targetEntity:Subject::class, inversedBy: 'teachers')]
     private Collection $subjects;
 
-    #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'departments')]
+    #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'teachers')]
     private Collection $departments;
+
 
     public function __construct()
     {
@@ -146,6 +153,28 @@ class Teacher
         if ($this->departments->removeElement($department)) {
             $department->removeTeacher($this);
         }
+        return $this;
+    }
+    
+    public function getTimeConstraints(): ?int
+    {
+        return $this->time_constraints;
+    }
+    
+    public function setTimeConstraints(?int $time_constraints): self
+    {
+        $this->time_constraints = $time_constraints;
+        return $this;
+    }
+    
+    public function getIsPartimeTutor(): ?bool
+    {
+        return $this->is_partimetutor;
+    }
+    
+    public function setIsPartimeTutor(?bool $is_partimetutor): self
+    {
+        $this->is_partimetutor = $is_partimetutor;
         return $this;
     }
 }

@@ -23,8 +23,8 @@ class Department
     #[ORM\JoinTable(name: "department_formationLevel")]
     private Collection $formationLevels;
 
-    #[ORM\ManyToMany(targetEntity: Teacher::class)]
-    #[ORM\JoinTable(name: "department_teacher")]
+    #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'departments')]
+    #[ORM\JoinTable(name: 'department_teacher')]
     private Collection $teachers;
 
     #[ORM\ManyTomany(targetEntity: Curriculum::class)]
