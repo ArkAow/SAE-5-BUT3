@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { CourseButton } from "./CourseButton";
 import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
-import { CourseTypeButton } from "./CourseTypeButton"
+import { CourseTypeButton } from "./CourseTypeButton";
+import { SaveButton } from "./SaveButton";
 
 const ControlPanel = ({
   curriculum,
@@ -103,6 +104,8 @@ const ControlPanel = ({
           isNoGroups={isNoGroups}/>
 
         <PrintButton />
+
+        <SaveButton />
       </div>
     </div>
   );
