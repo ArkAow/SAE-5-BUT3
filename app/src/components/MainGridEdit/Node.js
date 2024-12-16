@@ -5,11 +5,13 @@ import { getShade } from "../../services/colorService";
 
 const ITEM_TYPE = "rectangle";
 
-const Node = ({ positionKey, items, moveItem }) => {
+const Node = ({ positionKey, items, moveItem,removeNode }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipDirection, setTooltipDirection] = useState("right");
-
+const handleDeleteNode = (id) => {
+  removeNode(positionKey, id);
+};
   const [, drop] = useDrop({
     accept: ITEM_TYPE,
     drop: (draggedItem) => {
