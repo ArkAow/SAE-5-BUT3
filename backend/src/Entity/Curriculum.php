@@ -47,12 +47,12 @@ class Curriculum
         return $this;
     }
 
-    public function getClasses(): Collection
+    public function getFormationLevels(): Collection
     {
         return $this->formationLevels;
     }
 
-    public function addClass(FormationLevel $formationLevel): self
+    public function addFormationLevel(FormationLevel $formationLevel): self
     {
         if (!$this->formationLevels->contains($formationLevel)) {
             $this->formationLevels->add($formationLevel);
@@ -60,7 +60,7 @@ class Curriculum
         return $this;
     }
 
-    public function removeClass(FormationLevel $formationLevel): self
+    public function removeFormationLevel(FormationLevel $formationLevel): self
     {
         $this->formationLevels->removeElement($formationLevel);
         return $this;
