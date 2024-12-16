@@ -1,0 +1,121 @@
+# Fichier azure-pipelines.yml
+# Pipeline pour projet Symfony (backend) + React/Electron (frontend)
+
+trigger:
+  branches:
+    include:
+      - main # Déclenche la pipeline sur les changements dans la branche principale
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  NODE_VERSION: '23.2.0' # Version de Node.js
+  PHP_VERSION: '8.2.24'   # Version de PHP
+
+stages:
+  # 1. Étape d'installation et de validation des dépendances
+  - stage: InstallAndValidate
+    displayName: "Installation et validation"
+    jobs:
+      - job: InstallDependencies
+        displayName: "Installation des dépendances (frontend et backend)"
+        steps:
+          - task: UseNode@1
+            inputs:
+              version: $(NODE_VERSION)
+
+          - script: |
+              echo "Installation des dépendances frontend..."
+              npm install
+            workingDirectory: ./frontend
+
+          - script: |
+              echo "Installation des dépendances backend..."
+              composer install
+            workingDirectory: ./backend
+
+          - script: |
+              echo "Validation des fichiers de configuration Symfony..."
+              php bin/console lint:yaml config
+            workingDirectory: ./backend
+
+  # 2. Étape de tests unitaires et de linting
+  - stage: TestAndLint
+    displayName: "Tests et Linting"
+    jobs:
+      - job: FrontendTests
+        displayName: "Tests et linting frontend"
+        steps:
+          - script: |
+              echo "Linting du code React/Electron..."
+              npm run lint
+            workingDirectory: ./frontend
+
+          - script: |
+              echo "Exécution des tests frontend..."
+              npm test
+            workingDirectory: ./frontend
+
+      - job: BackendTests
+        displayName: "Tests backend"
+        steps:
+          - script: |
+              echo "Exécution des tests unitaires backend avec PHPUnit..."
+              php bin/phpunit
+            workingDirectory: ./backend
+
+          - script: |
+              echo "Vérification des migrations de base de données Symfony..."
+              php bin/console doctrine:migrations:status
+            workingDirectory: ./backend
+
+  # 3. Étape de build
+  - stage: Build
+    displayName: "Build"
+    jobs:
+      - job: BuildFrontend
+        displayName: "Build frontend React/Electron"
+        steps:
+          - script: |
+              echo "Build de l'application React/Electron..."
+              npm run build
+            workingDirectory: ./frontend
+
+      - job: BuildBackend
+        displayName: "Préparation du backend Symfony"
+        steps:
+          - script: |
+              echo "Vérification du cache Symfony..."
+              php bin/console cache:clear --env=prod
+            workingDirectory: ./backend
+
+  # 4. Étape de déploiement
+  - stage: Deploy
+    displayName: "Déploiement"
+    dependsOn:
+      - Build
+    condition: succeeded()
+    jobs:
+      - job: DeployApp
+        displayName: "Déploiement sur Azure"
+        steps:
+          - script: |
+              echo "Déploiement en cours..."
+              # Ajouter ici les commandes ou tâches spécifiques au déploiement sur Azure
+              echo "Déploiement terminé avec succès !"
+
+  # Logs et monitoring
+  - stage: Monitoring
+    displayName: "Monitoring et logs"
+    dependsOn:
+      - Deploy
+    jobs:
+      - job: LogCollection
+        displayName: "Collection des logs"
+        steps:
+          - script: |
+              echo "Collecte des logs d'erreurs et d'exécution..."
+              # Exemple d'exportation de logs
+              cat /var/log/syslog
+

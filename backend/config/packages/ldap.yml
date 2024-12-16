@@ -1,0 +1,12 @@
+# config/packages/ldap.yaml
+framework:
+  ldap:
+    connections:
+      default:
+        host: 'ldap.unilim.fr'
+        port: 389
+        options:
+          protocol_version: 3
+          referrals: false
+          bind_dn: 'uid=bind_user,ou=users,dc=unilim,dc=fr'  # Remplace par le bon utilisateur LDAP
+          password: 'bind_user_password'                    # Remplace par le bon mot de passe
