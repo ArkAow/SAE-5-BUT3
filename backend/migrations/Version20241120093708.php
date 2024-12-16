@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace DoctrineMigrations;
@@ -42,21 +41,21 @@ final class Version20241120093708 extends AbstractMigration
         $group_half_group->addForeignKeyConstraint($group,['group_id'],['id'],['onDelete' => 'CASCADE']);
         $group_half_group->addForeignKeyConstraint($half_group,['half_group_id'],['id'],['onDelete' => 'CASCADE']);
 
-        // Table Class
+        // Table FormationLevel
 
-        $class = $schema->createTable('class');
-        $class->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
-        $class->addColumn('name', 'string', ['length' => 100]); 
-        $class->setPrimaryKey(['id']);
+        $formationLevel = $schema->createTable('FormationLevel');
+        $formationLevel->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
+        $formationLevel->addColumn('name', 'string', ['length' => 100]); 
+        $formationLevel->setPrimaryKey(['id']);
         
-        // Table Class - Group
+        // Table FormationLevel - Group
 
-        $class_group = $schema->createTable('class_group');
-        $class_group->addColumn('class_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $class_group->addColumn('group_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $class_group->setPrimaryKey(['class_id', 'group_id']);
-        $class_group->addForeignKeyConstraint($class, ['class_id'], ['id'], ['onDelete' => 'CASCADE']);
-        $class_group->addForeignKeyConstraint($group,['group_id'],['id'],['onDelete' => 'CASCADE']);
+        $formationLevel_group = $schema->createTable('formationLevel_group');
+        $formationLevel_group->addColumn('formationLevel_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $formationLevel_group->addColumn('group_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $formationLevel_group->setPrimaryKey(['formationLevel_id', 'group_id']);
+        $formationLevel_group->addForeignKeyConstraint($formationLevel, ['formationLevel_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $formationLevel_group->addForeignKeyConstraint($group,['group_id'],['id'],['onDelete' => 'CASCADE']);
         
         // Table Curriculum
 
@@ -65,14 +64,14 @@ final class Version20241120093708 extends AbstractMigration
         $curriculum->addColumn('name', 'string', ['length' => 100]);
         $curriculum->setPrimaryKey(['id']);
 
-        // Table Curriculum - Class
+        // Table Curriculum - FormationLevel
 
-        $curriculum_class = $schema->createTable('curriculum_class');
-        $curriculum_class->addColumn('curriculum_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $curriculum_class->addColumn('class_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $curriculum_class->setPrimaryKey(['curriculum_id', 'class_id']);
-        $curriculum_class->addForeignKeyConstraint($curriculum,['curriculum_id'],['id'], ['onDelete' => 'CASCADE']);
-        $curriculum_class->addForeignKeyConstraint( $class,['class_id'],['id'],['onDelete' => 'CASCADE']);
+        $curriculum_formationLevel = $schema->createTable('curriculum_formationLevel');
+        $curriculum_formationLevel->addColumn('curriculum_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $curriculum_formationLevel->addColumn('formationLevel_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $curriculum_formationLevel->setPrimaryKey(['curriculum_id', 'formationLevel_id']);
+        $curriculum_formationLevel->addForeignKeyConstraint($curriculum,['curriculum_id'],['id'], ['onDelete' => 'CASCADE']);
+        $curriculum_formationLevel->addForeignKeyConstraint( $formationLevel,['formationLevel_id'],['id'],['onDelete' => 'CASCADE']);
 
         // Table Semester
 
@@ -108,6 +107,26 @@ final class Version20241120093708 extends AbstractMigration
         $subject_semester->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
         $subject_semester->addForeignKeyConstraint($semester, ['semester_id'], ['id'], ['onDelete' => 'CASCADE']);
 
+        // Table Teacher
+
+        $teacher = $schema->createTable('teacher');
+        $teacher->addColumn('id', 'integer',['autoincrement' => true, 'unsigned' => true]);
+        $teacher->addColumn('first_name', 'string', ['length' => 100]);
+        $teacher->addColumn('last_name', 'string', ['length' => 100]);
+        $teacher->addColumn('code', 'string', ['length' => 30]);
+        $teacher->addColumn('time_constraints','integer', ['unsigned' => true, 'notnull' => true]);
+        $teacher->addColumn('partTimeTutor', 'boolean', ['default' => false]);
+        $teacher->setPrimaryKey(['id']);
+
+        // Table Subject - Teacher
+        
+        $subject_teacher = $schema->createTable('subject_teacher');
+        $subject_teacher->addColumn('subject_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $subject_teacher->addColumn('teacher_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $subject_teacher->setPrimaryKey(['subject_id', 'teacher_id']);
+        $subject_teacher->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $subject_teacher->addForeignKeyConstraint($teacher, ['teacher_id'], ['id'], ['onDelete' => 'CASCADE']);
+
         // Table Course
 
         $course = $schema->createTable('course');
@@ -116,6 +135,15 @@ final class Version20241120093708 extends AbstractMigration
         $course->addColumn('position_x', 'integer');
         $course->addColumn('position_y', 'integer');
         $course->setPrimaryKey(['id']);
+
+        // Table Course - Teacher
+
+        $course_teacher = $schema->createTable('course_teacher');
+        $course_teacher->addColumn('course_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_teacher->addColumn('teacher_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_teacher->setPrimaryKey(['course_id', 'teacher_id']);
+        $course_teacher->addForeignKeyConstraint($course,['course_id'],['id'],['onDelete' => 'CASCADE']);
+        $course_teacher->addForeignKeyConstraint($teacher,['teacher_id'],['id'],['onDelete' => 'CASCADE']);
 
         // Table Course - Subject
         
@@ -132,9 +160,8 @@ final class Version20241120093708 extends AbstractMigration
         $course_type->addColumn('id', 'integer',['autoincrement' => true, 'unsigned' => true]);
         $course_type->addColumn('name', 'string', ['length' => 100]);
         $course_type->addColumn('color', 'string', ['length' => 50]);
-        $course_type->addColumn('scope', 'string', ['length' => 500, 'default' => 'class', 'notnull' => true]);
+        $course_type->addColumn('scope', 'string', ['length' => 800, 'default' => 'class', 'notnull' => true]);
         $course_type->setPrimaryKey(['id']);
-        // ADD scope VARCHAR(800)
 
         // Table Course_Type - Course
 
@@ -145,11 +172,11 @@ final class Version20241120093708 extends AbstractMigration
         $course_type_course->addForeignKeyConstraint($course_type, ['course_type_id'], ['id'], ['onDelete' => 'CASCADE']);
         $course_type_course->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
 
-        // Table Expected_Duration : format : matiere | type | durée                         
+        // Table Expected_Duration                          
 
         $expected_duration = $schema->createTable('expected_duration');
         $expected_duration->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
-        $expected_duration->addColumn('expected_duration', 'float');      // Durée
+        $expected_duration->addColumn('expected_duration', 'float');
         $expected_duration->setPrimaryKey(['id']);
 
         // Table Expected_Duration - Subject
@@ -169,42 +196,6 @@ final class Version20241120093708 extends AbstractMigration
         $expected_duration_course_type->setPrimaryKey(['expected_duration_id', 'course_type_id']);
         $expected_duration_course_type->addForeignKeyConstraint($expected_duration,['expected_duration_id'],['id'],['onDelete' => 'CASCADE']);
         $expected_duration_course_type->addForeignKeyConstraint($course_type,['course_type_id'],['id'],['onDelete' => 'CASCADE']);
-
-        // Table Teacher
-
-        $teacher = $schema->createTable('teacher');
-        $teacher->addColumn('id', 'integer',['autoincrement' => true, 'unsigned' => true]);
-        $teacher->addColumn('first_name', 'string', ['length' => 100]);
-        $teacher->addColumn('last_name', 'string', ['length' => 100]);
-        $teacher->addColumn('code', 'string', ['length' => 30]);
-        $teacher->addColumn('subjects_taught', 'string', ['length' => 1000]);
-        $teacher->addColumn('type', 'string', ['length' => 100]);
-        $teacher->setPrimaryKey(['id']);
-
-        // Table Course - Teacher
-
-        $course_teacher = $schema->createTable('course_teacher');
-        $course_teacher->addColumn('course_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $course_teacher->addColumn('teacher_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $course_teacher->setPrimaryKey(['course_id', 'teacher_id']);
-        $course_teacher->addForeignKeyConstraint($course,['course_id'],['id'],['onDelete' => 'CASCADE']);
-        $course_teacher->addForeignKeyConstraint($teacher,['teacher_id'],['id'],['onDelete' => 'CASCADE']);
-        
-
-        // Table Professor
-
-        $professor = $schema->createTable('professor');
-        $professor->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
-        $professor->addForeignKeyConstraint($teacher, ['id'], ['id'], ['onDelete' => 'CASCADE']);
-        $professor->setPrimaryKey(['id']);
-
-        // Table PartTimeTutor
-
-        $partTimeTutor = $schema->createTable('part_time_tutor');
-        $partTimeTutor->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
-        $partTimeTutor->addColumn('hourly_constraint', 'string', ['length' => 500]);
-        $partTimeTutor->addForeignKeyConstraint($teacher, ['id'], ['id'], ['onDelete' => 'CASCADE']);
-        $partTimeTutor->setPrimaryKey(['id']);
         
         // Table User
 
@@ -213,6 +204,59 @@ final class Version20241120093708 extends AbstractMigration
         $user->addColumn('email', 'string', ['length' => 150]);
         $user->addColumn('password', 'string', ['length' => 150]);
         $user->setPrimaryKey(['id']);
+
+        // Table Department
+
+        $department = $schema->createTable('department');
+        $department->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
+        $department->addColumn('name', 'string', ['length' => 100]);
+        $department->setPrimaryKey(['id']);
+        
+        // Table Department - FormationLevel
+        $department_formationLevel = $schema->createTable('department_formationLevel');
+        $department_formationLevel->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $department_formationLevel->addColumn('formationLevel_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $department_formationLevel->setPrimaryKey(['department_id', 'formationLevel_id']);
+        $department_formationLevel->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $department_formationLevel->addForeignKeyConstraint($formationLevel, ['formationLevel_id'], ['id'], ['onDelete' => 'CASCADE']);
+
+        // Table Department - Teacher
+
+        $department_teacher = $schema->createTable('department_teacher');
+        $department_teacher->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $department_teacher->addColumn('teacher_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $department_teacher->setPrimaryKey(['department_id', 'teacher_id']);
+        $department_teacher->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $department_teacher->addForeignKeyConstraint($teacher, ['teacher_id'], ['id'], ['onDelete' => 'CASCADE']);
+
+        // Table Department - Curriculum
+
+        $department_curriculum = $schema->createTable('department_curriculum');
+        $department_curriculum->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $department_curriculum->addColumn('curriculum_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $department_curriculum->setPrimaryKey(['department_id', 'curriculum_id']);
+        $department_curriculum->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $department_curriculum->addForeignKeyConstraint($curriculum, ['curriculum_id'], ['id'], ['onDelete' => 'CASCADE']);
+
+        // Table Department - User
+        $user_department = $schema->createTable('user_department');
+        $user_department->addColumn('user_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $user_department->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $user_department->setPrimaryKey(['user_id', 'department_id']);
+        $user_department->addForeignKeyConstraint($user, ['user_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $user_department->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
+
+        // Table Archive
+        $archive = $schema->createTable('archive');
+        $archive->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
+
+        // Table Archive - Department
+        $archive_department = $schema->createTable('archive_department');
+        $archive_department->addColumn('archive_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $archive_department->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $archive_department->setPrimaryKey(['archive_id', 'department_id']);
+        $archive_department->addForeignKeyConstraint($archive, ['archive_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $archive_department->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
     }
 
     public function down(Schema $schema): void
@@ -221,10 +265,10 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('half_group');
         $schema->dropTable('group');
         $schema->dropTable('group_half_group');
-        $schema->dropTable('class');
-        $schema->dropTable('class_group');
+        $schema->dropTable('formationLevel');
+        $schema->dropTable('formationLevel_group');
         $schema->dropTable('curriculum');
-        $schema->dropTable('curriculum_class');
+        $schema->dropTable('curriculum_formationLevel');
         $schema->dropTable('semester');
         $schema->dropTable('curriculum_semester');
         $schema->dropTable('subject');
@@ -238,8 +282,14 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('expected_duration_course_type');
         $schema->dropTable('teacher');
         $schema->dropTable('course_teacher');
-        $schema->dropTable('professor');
-        $schema->dropTable('part_time_tutor');
+        $schema->dropTable('subject_teacher');
         $schema->dropTable('user');
+        $schema->dropTable('department');
+        $schema->dropTable('department_formationLevel');
+        $schema->dropTable('department_teacher');
+        $schema->dropTable('department_curriculum');
+        $schema->dropTable('user_department');
+        $schema->dropTable('archive');
+        $schema->dropTable('archive_department');
     }
 }
