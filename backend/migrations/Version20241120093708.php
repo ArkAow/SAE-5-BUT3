@@ -249,6 +249,7 @@ final class Version20241120093708 extends AbstractMigration
         // Table Archive
         $archive = $schema->createTable('archive');
         $archive->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
+        $archive->setPrimaryKey(['id']);
 
         // Table Archive - Department
         $archive_department = $schema->createTable('archive_department');
