@@ -12,6 +12,21 @@ const ModifyTeachers = () => {
   const [isPartTime, setIsPartTime] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
+
+  const [editingTeacher, setEditingTeacher] = useState(null);
+  const [editedFirstName, setEditedFirstName] = useState("");
+  const [editedLastName, setEditedLastName] = useState("");
+  const [editedConstraint, setEditedConstraint] = useState(0);
+  const [editedIsPartTime, setEditedIsPartTime] = useState(false);
+
+  const startEditingTeacher = (teacher) => {
+    setEditingTeacher(teacher);
+    setEditedFirstName(teacher.firstName);
+    setEditedLastName(teacher.lastName);
+    setEditedConstraint(teacher.time_constraints || 0);
+    setEditedIsPartTime(teacher.is_partimetutor || false);
+  };
+
   const navigate = useNavigate();
 
   const goToHomePage = () => navigate("/homePage");
@@ -47,6 +62,42 @@ const ModifyTeachers = () => {
     } catch (error) {
       console.error(error);
       setToast({ message: "Erreur lors de la suppression de l'enseignant", type: "error", visible: true });
+    }
+  };
+
+  const handleEditTeacher = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const response = await fetch(routes.dev.teachers.update(), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editingTeacher.id,
+          firstName: editedFirstName,
+          lastName: editedLastName,
+          time_constraints: editedConstraint,
+          is_partimetutor: editedIsPartTime,
+        }),
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erreur lors de la modification.");
+      }
+  
+      setToast({ message: "Professeur modifié avec succès.", type: "success", visible: true });
+      setTeachers((prev) =>
+        prev.map((teacher) =>
+          teacher.id === editingTeacher.id
+            ? { ...teacher, firstName: editedFirstName, lastName: editedLastName, time_constraints: editedConstraint, is_partimetutor: editedIsPartTime }
+            : teacher
+        )
+      );
+      setEditingTeacher(null);
+    } catch (error) {
+      console.error(error);
+      setToast({ message: "Erreur lors de la modification de l'enseignant", type: "error", visible: true });
     }
   };
 
@@ -162,14 +213,23 @@ const ModifyTeachers = () => {
                   <ul className="space-y-4">
                     {teachers.map((teacher) => (
                       <li key={teacher.id} className="flex justify-between items-center bg-white rounded-lg p-2">
-                        <span className="text-base text-black">{teacher.code}
+                        <span className="text-base text-black max-w-[70%]">{teacher.code}
                           <span className="font-normal text-sm"> ({teacher.firstName} {teacher.lastName.toUpperCase()})</span>
                         </span>
-                        <button
-                          onClick={() => handleDeleteTeacher(teacher)}
-                          className="size-4 btn-default justify-items-center ml-2">
-                          <img src="images/cross.svg" alt="cross" className="size-3" />
-                        </button>
+                        <div>
+                          <button
+                            onClick={() => startEditingTeacher(teacher)}
+                            className="size-4 btn-default justify-items-center ml-1">
+                            <img src="images/options.svg" alt="Modifier" className="size-3" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTeacher(teacher)}
+                            className="size-4 btn-default justify-items-center ml-1">
+                            <img src="images/cross.svg" alt="Fermer" className="size-3" />
+                          </button> 
+                     
+                        </div>
+
                       </li>
                     ))}
                   </ul>
@@ -179,6 +239,54 @@ const ModifyTeachers = () => {
           </div>
         </div>
       </div>
+      {editingTeacher && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="tooltip-centered">
+            <h2 className="text-xl font-bold mb-4">Modifier l'enseignant</h2>
+            <form onSubmit={handleEditTeacher} className="space-y-4">
+              <input
+                type="text"
+                value={editedFirstName}
+                onChange={(e) => setEditedFirstName(e.target.value)}
+                placeholder="Prénom"
+                className="p-2 rounded w-full bg-gray-300"
+              />
+              <input
+                type="text"
+                value={editedLastName}
+                onChange={(e) => setEditedLastName(e.target.value)}
+                placeholder="Nom"
+                className="p-2 rounded w-full bg-gray-300"
+              />
+              <input
+                type="number"
+                min="0"
+                max="40"
+                value={editedConstraint}
+                onChange={(e) => setEditedConstraint(e.target.value)}
+                placeholder="Nombre maximum d'heures / semaines"
+                className="p-2 rounded w-full bg-gray-300"
+              />
+              <label className="flex items-center ml-3 space-x-2">
+                <input
+                  type="checkbox"
+                  checked={editedIsPartTime}
+                  onChange={(e) => setEditedIsPartTime(e.target.checked)}
+                />
+                <span>Enseignant à temps partiel</span>
+              </label>
+              <div className="flex justify-end space-x-2">
+                <button type="button" onClick={() => setEditingTeacher(null)} className="btn-default p-2">
+                  Annuler
+                </button>
+                <button type="submit" className="btn-default p-2">
+                  Valider
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

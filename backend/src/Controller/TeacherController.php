@@ -111,4 +111,35 @@ class TeacherController extends AbstractController
     
         return new JsonResponse(['message' => 'Professeur supprimé avec succès.'], 200);
     }
+
+    #[Route('/teacher/update', name: 'update_teachers', methods: ['PUT'])]
+    public function updateTeacher(EntityManagerInterface $entityManager, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $id = $data['id'] ?? null;
+        $firstName = $data['firstName'] ?? null;
+        $lastName = $data['lastName'] ?? null;
+        $timeConstraints = $data['time_constraints'] ?? null;
+        $isPartimeTutor = $data['is_partimetutor'] ?? null;
+
+        if (!$id || !$firstName || !$lastName) {
+            return new JsonResponse(['error' => 'Données invalides'], 400);
+        }
+
+        $teacher = $entityManager->getRepository(Teacher::class)->find($id);
+
+        if (!$teacher) {
+            return new JsonResponse(['error' => 'Enseignant introuvable'], 404);
+        }
+
+        $teacher->setFirstName($firstName);
+        $teacher->setLastName($lastName);
+        $teacher->setTimeConstraints($timeConstraints);
+        $teacher->setIsPartimeTutor($isPartimeTutor);
+
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
 }
