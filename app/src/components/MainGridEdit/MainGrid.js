@@ -410,7 +410,8 @@ const MainGrid = ({ curriculum }) => {
             </div>
           ) : (
             <DndProvider backend={HTML5Backend}>
-              <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"} mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
+              <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
+               mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
                 <div
                   className="grid"
                   style={{
