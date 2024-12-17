@@ -31,6 +31,9 @@ class Subject
     #[ORM\JoinTable(name: 'subject_semester')]
     private Collection $semesters;
 
+    #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'subjects')]
+    private Collection $teachers;
+
     public function __construct()
     {
         $this->expectedDurations = new ArrayCollection();
@@ -115,6 +118,25 @@ class Subject
     public function removeSemester(Semester $semester): self
     {
         $this->semesters->removeElement($semester);
+        return $this;
+    }
+
+    public function getTeachers(): Collection
+    {
+        return $this->teachers;
+    }
+
+    public function addTeacher(Teacher $teacher): self
+    {
+        if (!$this->teachers->contains($teacher)) {
+            $this->teachers->add($teacher);
+        }
+        return $this;
+    }
+
+    public function removeTeacher(Teacher $teacher): self
+    {
+        $this->teachers->removeElement($teacher);
         return $this;
     }
 }

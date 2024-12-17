@@ -7,13 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\InheritanceType("JOINED")]
-#[ORM\DiscriminatorColumn(name: "type", type: "string")]
-#[ORM\DiscriminatorMap([
-    "teacher" => Teacher::class,
-    "professor" => Professor::class,
-    "part_time_tutor" => PartTimeTutor::class
-])]
+#[ORM\Table(name: 'teacher')]
 class Teacher
 {
     #[ORM\Id]
@@ -29,9 +23,12 @@ class Teacher
 
     #[ORM\Column(type: "string", length: 30)]
     private string $code;
+    
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $time_constraints = 0;
 
-    #[ORM\Column(type: "string", length: 1000)]
-    private string $subjectsTaught;
+    #[ORM\Column(name: "partTimeTutor", type: "boolean", nullable: true)]
+    private ?bool $is_partimetutor = null;
 
     #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'teachers')]
     #[ORM\JoinTable(
@@ -40,6 +37,13 @@ class Teacher
         inverseJoinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
     private Collection $courses;
+
+    #[ORM\ManyToMany(targetEntity:Subject::class, inversedBy: 'teachers')]
+    private Collection $subjects;
+
+    #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'teachers')]
+    private Collection $departments;
+
 
     public function __construct()
     {
@@ -108,14 +112,69 @@ class Teacher
         return $this;
     }
 
-    public function getSubjectsTaught(): string
+    public function getSubjects()
     {
-        return $this->subjectsTaught;
+        return $this->subjects;
     }
 
-    public function setSubjectsTaught(string $subjectsTaught): self
+    public function addSubject(Subject $subject): self
     {
-        $this->subjectsTaught = $subjectsTaught;
+        if (!$this->subjects->contains($subject)) {
+            $this->subjects[] = $subject;
+            $subject->addTeacher($this);
+        }
+        return $this;
+    }
+
+    public function removeSubject(Subject $subject) : self
+    {
+        if ($this->subjects->removeElement($subject)) {
+            $subject->removeTeacher($this);
+        }
+        return $this;
+    }
+
+    public function getDepartments(): Collection
+    {
+        return $this->departments;
+    }
+
+    public function addDepartment(Department $department): self
+    {
+        if (!$this->departments->contains($department)) {
+            $this->departments[] = $department;
+            $department->addTeacher($this);
+        }
+        return $this;
+    }
+
+    public function removeDepartment(Department $department): self
+    {
+        if ($this->departments->removeElement($department)) {
+            $department->removeTeacher($this);
+        }
+        return $this;
+    }
+    
+    public function getTimeConstraints(): ?int
+    {
+        return $this->time_constraints;
+    }
+    
+    public function setTimeConstraints(?int $time_constraints): self
+    {
+        $this->time_constraints = $time_constraints;
+        return $this;
+    }
+    
+    public function getIsPartimeTutor(): ?bool
+    {
+        return $this->is_partimetutor;
+    }
+    
+    public function setIsPartimeTutor(?bool $is_partimetutor): self
+    {
+        $this->is_partimetutor = $is_partimetutor;
         return $this;
     }
 }

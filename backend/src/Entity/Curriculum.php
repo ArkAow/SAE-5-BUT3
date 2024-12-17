@@ -18,8 +18,8 @@ class Curriculum
     #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: ClassEntity::class, mappedBy: "curriculums")]
-    private Collection $classes;
+    #[ORM\ManyToMany(targetEntity: FormationLevel::class, mappedBy: "curriculums")]
+    private Collection $formationLevels;
 
     #[ORM\ManyToMany(targetEntity: Semester::class, inversedBy: 'curriculums')]
     #[ORM\JoinTable(name: 'curriculum_semester')]
@@ -27,7 +27,7 @@ class Curriculum
 
     public function __construct()
     {
-        $this->classes = new ArrayCollection();
+        $this->formationLevels = new ArrayCollection();
         $this->semesters = new ArrayCollection();
     }
 
@@ -47,22 +47,22 @@ class Curriculum
         return $this;
     }
 
-    public function getClasses(): Collection
+    public function getFormationLevels(): Collection
     {
-        return $this->classes;
+        return $this->formationLevels;
     }
 
-    public function addClass(ClassEntity $class): self
+    public function addFormationLevel(FormationLevel $formationLevel): self
     {
-        if (!$this->classes->contains($class)) {
-            $this->classes->add($class);
+        if (!$this->formationLevels->contains($formationLevel)) {
+            $this->formationLevels->add($formationLevel);
         }
         return $this;
     }
 
-    public function removeClass(ClassEntity $class): self
+    public function removeFormationLevel(FormationLevel $formationLevel): self
     {
-        $this->classes->removeElement($class);
+        $this->formationLevels->removeElement($formationLevel);
         return $this;
     }
 
