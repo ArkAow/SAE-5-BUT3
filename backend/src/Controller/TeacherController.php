@@ -79,6 +79,7 @@ class TeacherController extends AbstractController
         $teachers = $teacherRepository->findAll();
         
         // Affichage de TOUS les professeurs en liste avec TOUTES leurs données
+
         $data = array_map(function($teacher){
             return [
                 'id' => $teacher->getId(),

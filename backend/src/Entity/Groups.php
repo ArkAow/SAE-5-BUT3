@@ -18,12 +18,6 @@ class Groups
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: FormationLevel::class, inversedBy: "groups")]
-    #[ORM\JoinTable(name: "class_group")]
-    #[ORM\JoinColumn(name: "group_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    #[ORM\InverseJoinColumn(name: "class_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private Collection $classes;
-
     #[ORM\ManyToMany(targetEntity: HalfGroup::class, inversedBy: "groups")]
     #[ORM\JoinTable(name: "group_half_group")]
     #[ORM\JoinColumn(name: "group_id", referencedColumnName: "id", onDelete: "CASCADE")]
@@ -35,7 +29,7 @@ class Groups
 
     public function __construct()
     {
-        $this->classes = new ArrayCollection();
+        $this->formationLevels = new ArrayCollection();
         $this->halfGroups = new ArrayCollection();
     }
 
