@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
-#[ORM\Table(name: "class")]
-class ClassEntity
+#[ORM\Table(name: "formation_Level")]
+class FormationLevel
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,8 +22,8 @@ class ClassEntity
     private Collection $groups;
 
     #[ORM\ManyToMany(targetEntity: Curriculum::class, inversedBy: "classes")]
-    #[ORM\JoinTable(name: "curriculum_class")]
-    #[ORM\JoinColumn(name: "class_id", referencedColumnName: "id")]
+    #[ORM\JoinTable(name: "curriculum_formation_Level")]
+    #[ORM\JoinColumn(name: "formationLevel_id", referencedColumnName: "id")]
     #[ORM\InverseJoinColumn(name: "curriculum_id", referencedColumnName: "id")]
     private Collection $curriculums;
 
