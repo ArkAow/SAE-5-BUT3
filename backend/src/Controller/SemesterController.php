@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class SemesterController extends AbstractController
 {   
     //Route afin de récupérer les matières d'un semestre donné
-    #[Route('/api/semester/{id}/subjects', name: 'api_get_subjects', methods: ['GET'])]
+    #[Route('/semester/{id}/subjects', name: 'api_get_subjects', methods: ['GET'])]
     public function getSubjects(int $id, EntityManagerInterface $em): JsonResponse
     {
         //Connexion à la BDD afin de récupérer les données
