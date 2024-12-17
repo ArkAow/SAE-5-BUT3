@@ -34,7 +34,7 @@ const ManageData = () => {
             </span>
         </div>
         
-        <div className="flex flex-col justify-around items-center">
+        <div className="flex flex-col bg-cover justify-around items-center">
             <div className="flex justify-around items-center w-full max-w-[1200px] mt-8 px-8">
                 {/* Insert M3C Block */}
                 <div

@@ -26,6 +26,7 @@ const routes = {
       add: () => `${routes.dev.default}teacher/add`,
       get: () => `${routes.dev.default}teacher`,
       delete: () => `${routes.dev.default}teacher/delete`,
+      update: () => `${routes.dev.default}teacher/update`,
     }
   },
   insertM3C: "http://localhost:8600/insertM3C",

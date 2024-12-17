@@ -24,6 +24,9 @@
     .tooltip {
       @apply absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs border-2 border-gray-300
     }
+    .tooltip-centered {
+      @apply bg-white p-5 rounded-lg shadow-lg text-xs border-2 border-gray-300
+    }
   }
 
 /* Classe pour personnaliser la scrollbar dans l’infobulle */
