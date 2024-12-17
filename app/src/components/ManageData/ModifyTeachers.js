@@ -73,7 +73,7 @@ const ModifyTeachers = () => {
       setLastName("");
     } catch (error) {
       console.error(error);
-      setToast({ message: "Erreur lors de l'jout de l'enseignant", type: "error", visible: true });
+      setToast({ message: "Erreur lors de l'ajout de l'enseignant", type: "error", visible: true });
     }
   };
 
@@ -115,16 +115,16 @@ const ModifyTeachers = () => {
             <button type="submit" className="btn-default p-2">Ajouter</button>
           </form>
 
-          <div className="flex flex-col items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg transition-opacity duration-300">
-            <div className="text-white text-l font-bold m-1 overflow-y-auto custom-scrollbar-dark min-w-44 w-60 max-h-[300px]">
+          <div className="flex flex-col items-center justify-center bg-gray-600 bg-opacity-75 p-6 rounded-lg transition-opacity duration-300">
+            <div className="text-white text-l font-bold m-1 overflow-y-auto custom-scrollbar-light min-w-44 w-60 max-h-[300px]">
               {teachers.length === 0 ? (
                 <span>Il n'y a pas d'enseignants.</span>
               ) : (
                 <ul className="space-y-4">
                   {teachers.map((teacher) => (
-                    <li key={teacher.id} className="flex justify-between items-center bg-gray-800 rounded-lg p-4">
+                    <li key={teacher.id} className="flex justify-between items-center bg-white rounded-lg p-4">
                       <div>
-                        <span className="text-sm">{teacher.code}</span>
+                        <span className="text-sm text-black">{teacher.code}</span>
                         <button
                           onClick={() => handleDeleteTeacher(teacher)}
                           className="size-4 btn-default justify-items-center ml-2">
