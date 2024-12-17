@@ -18,21 +18,18 @@ class Groups
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: ClassEntity::class, inversedBy: "groups")]
-    #[ORM\JoinTable(name: "class_group")]
-    #[ORM\JoinColumn(name: "group_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    #[ORM\InverseJoinColumn(name: "class_id", referencedColumnName: "id", onDelete: "CASCADE")]
-    private Collection $classes;
-
     #[ORM\ManyToMany(targetEntity: HalfGroup::class, inversedBy: "groups")]
     #[ORM\JoinTable(name: "group_half_group")]
     #[ORM\JoinColumn(name: "group_id", referencedColumnName: "id", onDelete: "CASCADE")]
     #[ORM\InverseJoinColumn(name: "half_group_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private Collection $halfGroups;
 
+    #[ORM\ManyToMany(targetEntity: FormationLevel::class, mappedBy: "groups")]
+    private Collection $formationLevels;
+
     public function __construct()
     {
-        $this->classes = new ArrayCollection();
+        $this->formationLevels = new ArrayCollection();
         $this->halfGroups = new ArrayCollection();
     }
 
@@ -52,22 +49,22 @@ class Groups
         return $this;
     }
 
-    public function getClasses(): Collection
+    public function getFormationLevel(): Collection
     {
-        return $this->classes;
+        return $this->formationLevels;
     }
 
-    public function addClass(ClassEntity $class): self
+    public function addFormationLevel(FormationLevel $formationLevel): self
     {
-        if (!$this->classes->contains($class)) {
-            $this->classes[] = $class;
+        if (!$this->formationLevels->contains($formationLevel)) {
+            $this->formationLevels[] = $formationLevel;
         }
         return $this;
     }
 
-    public function removeClass(ClassEntity $class): self
+    public function removeFormationLevel(FormationLevel $formationLevel): self
     {
-        $this->classes->removeElement($class);
+        $this->formationLevels->removeElement($formationLevel);
         return $this;
     }
 
