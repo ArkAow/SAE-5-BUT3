@@ -25,7 +25,7 @@ class TeacherController extends AbstractController
     
         $teacherFirstname = trim($data['firstName']);
         $teacherLastname = trim($data['lastName']);
-        $teacher_timeConstraints = $data['constraints'] ?? 0;
+        $teacher_timeConstraints = $data['constraint'] ?? 0;
         $teacher_is_partimetutor = $data['is_partimetutor'] ?? 0;
     
         // Vérification si un professeur existe déjà par le nom ET le prénom

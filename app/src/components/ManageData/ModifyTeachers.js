@@ -8,6 +8,9 @@ const ModifyTeachers = () => {
   const [teachers, setTeachers] = useState([]);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [constraint, setConstraint] = useState();
+  const [isPartTime, setIsPartTime] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const navigate = useNavigate();
 
@@ -15,6 +18,7 @@ const ModifyTeachers = () => {
   const goToManageData = () => navigate("/ManageData");
 
   const fetchTeachers = async () => {
+    setLoading(true);
     try {
       const response = await fetch(routes.dev.teachers.get());
       if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
@@ -22,12 +26,12 @@ const ModifyTeachers = () => {
       setTeachers(data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteTeacher = async (teacher) => {
-    if (!window.confirm(`Voulez-vous vraiment supprimer ${teacher.firstName} ${teacher.lastName} ?`)) return;
-
     try {
       const response = await fetch(routes.dev.teachers.delete(), {
         method: "DELETE",
@@ -53,6 +57,11 @@ const ModifyTeachers = () => {
       setToast({ message: "Veuillez fournir un nom et un prénom.", type: "error", visible: true });
       return;
     }
+    if (constraint>40 || constraint<1) {
+      setToast({ message: "La contrainte horaire est invalide", type: "error", visible: true });
+      return;
+    }
+
     try {
       const response = await fetch(routes.dev.teachers.add(), {
         method: "POST",
@@ -60,6 +69,9 @@ const ModifyTeachers = () => {
         body: JSON.stringify({
           firstName: firstName.trim(),
           lastName: lastName.trim(),
+          constraint: constraint,
+          is_partimetutor: isPartTime,
+
         }),
       });
       if (!response.ok) {
@@ -71,6 +83,8 @@ const ModifyTeachers = () => {
       setTeachers((prev) => [...prev, { ...result, firstName, lastName}]);
       setFirstName("");
       setLastName("");
+      setConstraint(0);
+      setIsPartTime(false)
     } catch (error) {
       console.error(error);
       setToast({ message: "Erreur lors de l'ajout de l'enseignant", type: "error", visible: true });
@@ -95,7 +109,7 @@ const ModifyTeachers = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center flex-1 space-y-5 py-10">
-        <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
+        <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-around space-x-10">
           <form onSubmit={handleAddTeacher} className="flex flex-col space-y-4">
             <h1 className="text-white text-3xl font-bold mt-1">Ajouter un enseignant</h1>
             <input
@@ -112,30 +126,56 @@ const ModifyTeachers = () => {
               placeholder="Nom"
               className="p-2 rounded"
             />
+            <input
+              type="number"
+              min="0"
+              max="40"
+              value={constraint}
+              onChange={(e) => setConstraint(e.target.value)}
+              placeholder="Nombre maximum d'heures / semaines"
+              className="p-2 rounded"
+            />
+            <label className="flex justify-center items-center space-x-2 text-white w-full">
+              <input
+                type="checkbox"
+                checked={isPartTime}
+                onChange={(e) => setIsPartTime(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-500"
+              />
+              <span>Enseignant à temps partiel</span>
+            </label>
             <button type="submit" className="btn-default p-2">Ajouter</button>
           </form>
 
-          <div className="flex flex-col items-center justify-center bg-gray-600 bg-opacity-75 p-6 rounded-lg transition-opacity duration-300">
-            <div className="text-white text-l font-bold m-1 overflow-y-auto custom-scrollbar-light min-w-44 w-60 max-h-[300px]">
-              {teachers.length === 0 ? (
-                <span>Il n'y a pas d'enseignants.</span>
-              ) : (
-                <ul className="space-y-4">
-                  {teachers.map((teacher) => (
-                    <li key={teacher.id} className="flex justify-between items-center bg-white rounded-lg p-4">
-                      <div>
-                        <span className="text-sm text-black">{teacher.code}</span>
+          <div className="flex flex-col max-h-80 items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg transition-opacity duration-300">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg 
+              transition-opacity duration-300 opacity-100 w-60">
+                <div className="spinner"></div>
+                <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des enseignants...</div>
+              </div>
+            ) : (
+              <div className="text-white text-l font-bold m-1 overflow-y-auto custom-scrollbar-light min-w-44 w-60 max-h-[300px]">
+                {teachers.length === 0 ? (
+                  <span>Il n'y a pas d'enseignants.</span>
+                ) : (
+                  <ul className="space-y-4">
+                    {teachers.map((teacher) => (
+                      <li key={teacher.id} className="flex justify-between items-center bg-white rounded-lg p-2">
+                        <span className="text-base text-black">{teacher.code}
+                          <span className="font-normal text-sm"> ({teacher.firstName} {teacher.lastName.toUpperCase()})</span>
+                        </span>
                         <button
                           onClick={() => handleDeleteTeacher(teacher)}
                           className="size-4 btn-default justify-items-center ml-2">
                           <img src="images/cross.svg" alt="cross" className="size-3" />
                         </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
