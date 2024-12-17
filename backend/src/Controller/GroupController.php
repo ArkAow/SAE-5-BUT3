@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\ClassEntity;
+use App\Entity\FormationLevel;
 use App\Entity\Groups;
 use App\Entity\HalfGroup;
 use PHPUnit\TextUI\XmlConfiguration\Group;
@@ -89,7 +89,7 @@ class GroupController extends AbstractController
         $classID = $data['classID'];           // ID de la classe parente du nouveau groupe
 
         // Récupération de la promotion
-        $classRepository = $entityManager->getRepository(ClassEntity::class);
+        $classRepository = $entityManager->getRepository(FormationLevel::class);
         $class = $classRepository->find($classID);
 
         if (!$class) {
@@ -109,14 +109,14 @@ class GroupController extends AbstractController
         $entityManager->persist($group);
         // Récupération de l'id de la promotion
     
-        $classRepository = $entityManager->getRepository(ClassEntity::class);
+        $classRepository = $entityManager->getRepository(FormationLevel::class);
         $class = $classRepository->find($classID);
         //  Associer le groupe à la promotion si elle existe
         //  Sinon on retourne une erreur
 
         
         if ($class) {                           
-            $group->addClass($class);   
+            $group->addFormationLevel($class);   
         } else {
             return new JsonResponse(['error' => 'Promotion introuvable'], 404);
         }
