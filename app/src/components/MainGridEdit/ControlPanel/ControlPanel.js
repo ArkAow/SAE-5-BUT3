@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import { CourseButton } from "./CourseButton";
 import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
-import { CourseTypeButton } from "./CourseTypeButton"
+import { CourseTypeButton } from "./CourseTypeButton";
+import { SaveButton } from "./SaveButton";
 
 const ControlPanel = ({
+  isExpanded,
+  setIsExpanded,
   curriculum,
   setToast,
   groups,
@@ -24,7 +27,6 @@ const ControlPanel = ({
   selectedDuration,
   setSelectedDuration,
   addItem }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
@@ -50,7 +52,7 @@ const ControlPanel = ({
 
   return (
     <div
-      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[83.5vh] w-20" : "h-20 w-20"}`}>
+      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[84.5vh] w-20" : "h-20 w-20"}`}>
       <button
         onClick={handleToggleExpand}
         className={`${
@@ -103,6 +105,8 @@ const ControlPanel = ({
           isNoGroups={isNoGroups}/>
 
         <PrintButton />
+
+        <SaveButton />
       </div>
     </div>
   );

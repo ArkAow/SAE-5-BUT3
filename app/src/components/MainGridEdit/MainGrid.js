@@ -8,6 +8,7 @@ import routes from "../../Routes/routes.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
+  const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
   const [items, setItems] = useState({});
   const [selectedRow, setSelectedRow] = useState(0);
@@ -328,6 +329,8 @@ const MainGrid = ({ curriculum }) => {
           <div className="flex items-center justify-start gap-5 h-20 px-10">
             <div className="absolute top-6">
               <ControlPanel
+                isExpanded={isControlPanelExpanded}
+                setIsExpanded={setIsControlPanelIsExpanded}
                 curriculum={curriculum}
                 setToast={setToast}
                 groups={groups}
@@ -416,13 +419,14 @@ const MainGrid = ({ curriculum }) => {
 
           {groups.length === 0 ? (
             <div className="flex items-center justify-center w-full">
-              <div className="w-1/2 text-center text-primary mt-10 text-lg font-bold p-2 bg-white rounded-full">
+              <div className="w-1/2 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
                 Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
               </div>
             </div>
           ) : (
             <DndProvider backend={HTML5Backend}>
-              <div className="ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[85vw] -z-10">
+              <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
+               mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
                 <div
                   className="grid"
                   style={{

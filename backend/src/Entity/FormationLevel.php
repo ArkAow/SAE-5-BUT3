@@ -18,13 +18,10 @@ class FormationLevel
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: Groups::class, mappedBy: "classes")]
+    #[ORM\ManyToMany(targetEntity: Groups::class, inversedBy: "formationLevels")]
     private Collection $groups;
 
-    #[ORM\ManyToMany(targetEntity: Curriculum::class, inversedBy: "classes")]
-    #[ORM\JoinTable(name: "curriculum_formation_Level")]
-    #[ORM\JoinColumn(name: "formationLevel_id", referencedColumnName: "id")]
-    #[ORM\InverseJoinColumn(name: "curriculum_id", referencedColumnName: "id")]
+    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: "formationLevels")]
     private Collection $curriculums;
 
     public function __construct()
