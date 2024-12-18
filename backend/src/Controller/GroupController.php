@@ -14,15 +14,15 @@ use PHPUnit\TextUI\XmlConfiguration\Group;
 
 class GroupController extends AbstractController
 {
-    #[Route('groups/{promoID}', name: "get_all_groups_by_promo", methods: ['GET'])]
-    public function getAllGroupsByPromo(int $promoID, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('groups/{formationLevelID}', name: "get_all_groups_by_promo", methods: ['GET'])]
+    public function getAllGroupsByPromo(int $formationLevelID, EntityManagerInterface $entityManager): JsonResponse
     {
         // Recherche des groupes via la relation avec les classes liées à une promotion donnée
         $groupsRepository = $entityManager->getRepository(Groups::class);
         $groups = $groupsRepository->createQueryBuilder('g')
             ->join('g.formationLevels', 'c')
-            ->where('c.id = :promoID')
-            ->setParameter('promoID', $promoID)
+            ->where('c.id = :formationLevelID')
+            ->setParameter('formationLevelID', $formationLevelID)
             ->getQuery()
             ->getResult();
 
