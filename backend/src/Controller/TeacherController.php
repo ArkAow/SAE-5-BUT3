@@ -5,11 +5,9 @@ namespace App\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Teacher;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Professor;
 
 class TeacherController extends AbstractController
 {
@@ -27,8 +25,8 @@ class TeacherController extends AbstractController
     
         $teacherFirstname = trim($data['firstName']);
         $teacherLastname = trim($data['lastName']);
-        $teacher_timeConstraints = $data['constraints'];
-        $teacher_is_partimetutor = $data['is_partimetutor'];
+        $teacher_timeConstraints = $data['constraint'] ?? 0;
+        $teacher_is_partimetutor = $data['is_partimetutor'] ?? 0;
     
         // Vérification si un professeur existe déjà par le nom ET le prénom
         $teacherRepository = $entityManager->getRepository(Teacher::class);
@@ -112,5 +110,36 @@ class TeacherController extends AbstractController
         $entityManager->flush();
     
         return new JsonResponse(['message' => 'Professeur supprimé avec succès.'], 200);
+    }
+
+    #[Route('/teacher/update', name: 'update_teachers', methods: ['PUT'])]
+    public function updateTeacher(EntityManagerInterface $entityManager, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $id = $data['id'] ?? null;
+        $firstName = $data['firstName'] ?? null;
+        $lastName = $data['lastName'] ?? null;
+        $timeConstraints = $data['time_constraints'] ?? null;
+        $isPartimeTutor = $data['is_partimetutor'] ?? null;
+
+        if (!$id || !$firstName || !$lastName) {
+            return new JsonResponse(['error' => 'Données invalides'], 400);
+        }
+
+        $teacher = $entityManager->getRepository(Teacher::class)->find($id);
+
+        if (!$teacher) {
+            return new JsonResponse(['error' => 'Enseignant introuvable'], 404);
+        }
+
+        $teacher->setFirstName($firstName);
+        $teacher->setLastName($lastName);
+        $teacher->setTimeConstraints($timeConstraints);
+        $teacher->setIsPartimeTutor($isPartimeTutor);
+
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 }
