@@ -36,6 +36,66 @@ class CoursesController extends AbstractController
         return $this->json($response);
     }
 
+    #[Route('/subject/{id}/courses', name: 'get_course_by_the_subject', methods: ['GET'])]
+    public function getCourseByTheSubject(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $queryBuilder = $entityManager->createQueryBuilder();
+
+        $queryBuilder->select('course')
+            ->from(Course::class, 'course')
+            ->join('course.subjects', 'sub')
+            ->where('sub.id = :subjectId')
+            ->setParameter('subjectId', $id);
+
+        $courses = $queryBuilder->getQuery()->getResult();
+
+        $response = [];
+        foreach ($courses as $course) {
+            $response[] = [
+                'id' => $course->getId(),
+                'duration' => $course->getDuration(),
+                'positionX' => $course->getPositionX(),
+                'positionY' => $course->getPositionY(),
+                'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
+                'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
+                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
+            ];
+        }
+
+        return $this->json($response);
+    }
+
+    #[Route('/teacher/{id}/courses', name: 'get_courses_by_the_teacher', methods: ['GET'])]
+    public function getCourseByTheTeacher(int $teacherID, EntityManagerInterface $entityManager)
+    {
+        
+        $queryBuilder = $entityManager->createQueryBuilder();
+
+        $queryBuilder->select('course')
+            ->from(Course::class, 'course')
+            ->join('course.teachers', 't')
+            ->where('t.id = :teacherId')
+            ->setParameter('teacherId', $teacherID);
+
+        $courses = $queryBuilder->getQuery()->getResult();
+
+        $response = [];
+        foreach ($courses as $course) {
+            $response[] = [
+                'id' => $course->getId(),
+                'duration' => $course->getDuration(),
+                'positionX' => $course->getPositionX(),
+                'positionY' => $course->getPositionY(),
+                'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
+                'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
+                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
+            ];
+        }
+
+        return $this->json($response);
+    }
+
+
     #[Route('/courses/add', name: 'create_course', methods: ['POST'])]
     public function createCourse(
         Request $request,
