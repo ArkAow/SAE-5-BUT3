@@ -20,7 +20,7 @@ class GroupController extends AbstractController
         // Recherche des groupes via la relation avec les classes liées à une promotion donnée
         $groupsRepository = $entityManager->getRepository(Groups::class);
         $groups = $groupsRepository->createQueryBuilder('g')
-            ->join('g.classes', 'c')
+            ->join('g.formationLevels', 'c')
             ->where('c.id = :promoID')
             ->setParameter('promoID', $promoID)
             ->getQuery()
@@ -80,24 +80,24 @@ class GroupController extends AbstractController
         if (!isset($data['name']) || empty(trim($data['name']))) {
             return new JsonResponse(['error' => 'Le nom du groupe est obligatoire.'], 400);
         }
-        if (!isset($data['classID']) || empty(trim($data['classID']))) {
+        if (!isset($data['formationLevel']) || empty(trim($data['formationLevel']))) {
             return new JsonResponse(['error' => 'Le groupe doit être lié à une promotion.'], 400);
         }
 
         $groupName = trim($data['name']);       // Nom du groupe à ajouter
         $halfgroupsData = $data['halfgroups'] ?? [];    // Tous les half_groups liés au groupe (id et name)
-        $classID = $data['classID'];           // ID de la classe parente du nouveau groupe
+        $classID = $data['formationLevel'];           // ID de la classe parente du nouveau groupe
 
         // Récupération de la promotion
-        $classRepository = $entityManager->getRepository(FormationLevel::class);
-        $class = $classRepository->find($classID);
+        $formationLevelRepository = $entityManager->getRepository(FormationLevel::class);
+        $formationLevel = $formationLevelRepository->find($classID);
 
-        if (!$class) {
+        if (!$formationLevel) {
             return new JsonResponse(['error' => 'Promotion introuvable'], 404);
         }
 
         // Vérification si un groupe avec le même nom existe dans cette classe
-        foreach ($class->getGroups() as $existingGroup) {
+        foreach ($formationLevel->getGroups() as $existingGroup) {
             if ($existingGroup->getName() === $groupName) {
                 return new JsonResponse(['error' => 'Un groupe avec ce nom existe déjà dans cette promotion.'], 409);
             }
@@ -109,14 +109,14 @@ class GroupController extends AbstractController
         $entityManager->persist($group);
         // Récupération de l'id de la promotion
     
-        $classRepository = $entityManager->getRepository(FormationLevel::class);
-        $class = $classRepository->find($classID);
+        $formationLevelRepository = $entityManager->getRepository(FormationLevel::class);
+        $formationLevel = $formationLevelRepository->find($classID);
         //  Associer le groupe à la promotion si elle existe
         //  Sinon on retourne une erreur
 
         
-        if ($class) {                           
-            $group->addFormationLevel($class);   
+        if ($formationLevel) {                           
+            $group->addFormationLevel($formationLevel);   
         } else {
             return new JsonResponse(['error' => 'Promotion introuvable'], 404);
         }

@@ -33,7 +33,7 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, fetchGrou
   };
 
   const addGroups = async (newGroups) => {
-    const actualClassID = curriculum.formationLevels[0].id;
+    const actualformationLevelID = curriculum.formationLevels[0].id;
     const filteredNewGroups = newGroups.filter(
       (newGroup) => !groups.some((g) => g.name === newGroup.name)
     );
@@ -49,7 +49,7 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, fetchGrou
           body: JSON.stringify({
             name: group.name,
             halfgroups: group.subGroups || [],
-            classID: actualClassID,
+            formationLevel: actualformationLevelID,
           }),
         });
         if (!response.ok) {
