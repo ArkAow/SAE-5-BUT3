@@ -142,8 +142,8 @@ export const CourseButton = ({
                                 Choisir un professeur
                                 </option>
                                 {teachers.map((teacher) => (
-                                <option key={teacher.name} value={teacher.name}>
-                                    {teacher.name}
+                                <option key={teacher.code} value={teacher.code}>
+                                    {teacher.code}
                                 </option>
                                 ))}
                             </select>
