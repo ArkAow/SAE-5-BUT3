@@ -80,17 +80,17 @@ class GroupController extends AbstractController
         if (!isset($data['name']) || empty(trim($data['name']))) {
             return new JsonResponse(['error' => 'Le nom du groupe est obligatoire.'], 400);
         }
-        if (!isset($data['formationLevel']) || empty(trim($data['formationLevel']))) {
+        if (!isset($data['formationLevelID']) || empty(trim($data['formationLevelID']))) {
             return new JsonResponse(['error' => 'Le groupe doit être lié à une promotion.'], 400);
         }
 
         $groupName = trim($data['name']);       // Nom du groupe à ajouter
         $halfgroupsData = $data['halfgroups'] ?? [];    // Tous les half_groups liés au groupe (id et name)
-        $classID = $data['formationLevel'];           // ID de la classe parente du nouveau groupe
+        $formationLevelID = $data['formationLevelID'];           // ID de la classe parente du nouveau groupe
 
         // Récupération de la promotion
         $formationLevelRepository = $entityManager->getRepository(FormationLevel::class);
-        $formationLevel = $formationLevelRepository->find($classID);
+        $formationLevel = $formationLevelRepository->find($formationLevelID);
 
         if (!$formationLevel) {
             return new JsonResponse(['error' => 'Promotion introuvable'], 404);
@@ -106,11 +106,12 @@ class GroupController extends AbstractController
         // On créé le nouveau groupe.  
         $group = new Groups();
         $group->setName($groupName);
-        $entityManager->persist($group);
+        $formationLevel->addGroup($group);
+        $entityManager->persist($group, $formationLevel);
         // Récupération de l'id de la promotion
     
         $formationLevelRepository = $entityManager->getRepository(FormationLevel::class);
-        $formationLevel = $formationLevelRepository->find($classID);
+        $formationLevel = $formationLevelRepository->find($formationLevelID);
         //  Associer le groupe à la promotion si elle existe
         //  Sinon on retourne une erreur
 

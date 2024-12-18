@@ -19,6 +19,9 @@ class FormationLevel
     private string $name;
 
     #[ORM\ManyToMany(targetEntity: Groups::class, inversedBy: "formationLevels")]
+    #[ORM\JoinTable(name: "formation_Level_group")]
+    #[ORM\JoinColumn(name: "formationLevel_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\InverseJoinColumn(name: "group_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private Collection $groups;
 
     #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: "formationLevels")]
@@ -49,6 +52,20 @@ class FormationLevel
     public function getGroups(): Collection
     {
         return $this->groups;
+    }
+
+    public function addGroup(Groups $group): self
+    {
+        if (!$this->groups->contains($group)) {
+            $this->groups[] = $group;
+        }
+        return $this;
+    }
+
+    public function removeGroup(Groups $group): self
+    {
+        $this->groups->removeElement($group);
+        return $this;
     }
 
     public function getCurriculums(): Collection
