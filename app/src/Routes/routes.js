@@ -17,7 +17,7 @@ const routes = {
       delete: (id) => `${routes.dev.default}coursetypes/delete/${id}`,
     },
     subjects: {
-      get: (semesterId) => `${routes.dev.default}api/semester/${semesterId}/subjects`
+      get: (semesterId) => `${routes.dev.default}semester/${semesterId}/subjects`
     },
     semesters: {
       get: (curriculumId) => `${routes.dev.default}api/curriculum/${curriculumId}/semesters`
