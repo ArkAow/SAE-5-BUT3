@@ -57,7 +57,7 @@ class CurriculumController extends AbstractController
                         'id' => $class->getId(),
                         'name' => $class->getName(),
                     ];
-                }, $curriculum->getClasses()->toArray()),
+                }, $curriculum->getFormationLevels()->toArray()),
             ];
         }, $curriculums);
 
