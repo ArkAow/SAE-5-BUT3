@@ -2,27 +2,26 @@ import React, { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
 import CourseObject from "./CourseObject";
 import { getShade } from "../../services/colorService";
-
 const ITEM_TYPE = "rectangle";
 
-const Node = ({ positionKey, items, moveItem,removeNode }) => {
+const Node = ({ positionKey, items, moveItem, removeNode  }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipDirection, setTooltipDirection] = useState("right");
-const handleDeleteNode = (id) => {
-  removeNode(positionKey, id);
-};
-  const [, drop] = useDrop({
-    accept: ITEM_TYPE,
-    drop: (draggedItem) => {
-      if (draggedItem.positionKey !== positionKey && draggedItem.id) {
-        moveItem(draggedItem.positionKey, positionKey, draggedItem.id);
-      }
-      else {
-        console.error("Missing item's ID");
-      }
-    },
-  });
+  const handleDeleteNode = (id) => {
+    removeNode(positionKey, id);
+  };
+    const [, drop] = useDrop({
+      accept: ITEM_TYPE,
+      drop: (draggedItem) => {
+        if (draggedItem.positionKey !== positionKey && draggedItem.id) {
+          moveItem(draggedItem.positionKey, positionKey, draggedItem.id);
+        }
+        else {
+          console.error("Missing item's ID");
+        }
+      },
+    });
 
   const visibleItems = items?.slice(0, 3) || [];
   const remainingItemsCount = items?.length > 3 ? items.length - 3 : 0;
@@ -60,7 +59,8 @@ const handleDeleteNode = (id) => {
           positionKey={positionKey}
           id={items[0].id}
           onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setIsDragging(false)}/>
+          onDragEnd={() => setIsDragging(false)}
+          />
       )}
 
       {items?.length > 1 && (
@@ -104,7 +104,9 @@ const handleDeleteNode = (id) => {
                 small
                 positionKey={positionKey}
                 onDragStart={() => setIsDragging(true)}
-                onDragEnd={() => setIsDragging(false)}/>
+                onDragEnd={() => setIsDragging(false)}
+                onDeleteNode={handleDeleteNode}
+                />
               <strong>--------------</strong>
             </div>
           ))}

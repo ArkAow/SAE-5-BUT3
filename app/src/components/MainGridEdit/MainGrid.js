@@ -5,6 +5,7 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
+import handleDeleteNode from "./Node.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -32,22 +33,7 @@ const MainGrid = ({ curriculum }) => {
   const [isSubjectLoading, setIsSubjectLoading] = useState(true);
   const [isCourseTypeLoading, setIsCourseTypeLoading] = useState(true);
   
-  const removeNode = (positionKey, id) => {
-    setItems((prevItems) => {
-      const filteredItems = (prevItems[positionKey] || []).filter((item) => item.id !== id);
-
-      if (filteredItems.length === 0) {
-        const { [positionKey]: _, ...rest } = prevItems; // Supprime la clé si plus d'éléments
-        return rest;
-      }
-
-      return {
-        ...prevItems,
-        [positionKey]: filteredItems,
-      };
-    });
-  };
-
+  
   useEffect(() => {
     if (!isGroupLoading && !isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
       setLoading(false);
@@ -233,6 +219,21 @@ const MainGrid = ({ curriculum }) => {
         ...prevItems,
         [fromKey]: fromItems,
         [toKey]: [...toItems, draggedItem],
+      };
+    });
+  };
+  const removeNode = (positionKey, id) => {
+    setItems((prevItems) => {
+      const filteredItems = (prevItems[positionKey] || []).filter((item) => item.id !== id);
+
+      if (filteredItems.length === 0) {
+        const { [positionKey]: _, ...rest } = prevItems; // Supprime la clé si plus d'éléments
+        return rest;
+      }
+
+      return {
+        ...prevItems,
+        [positionKey]: filteredItems,
       };
     });
   };
