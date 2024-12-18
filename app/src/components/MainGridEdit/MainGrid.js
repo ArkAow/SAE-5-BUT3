@@ -276,7 +276,7 @@ const MainGrid = ({ curriculum }) => {
   {/* Gestion des GROUPES -------------------------------------------- */}
   const fetchGroups = async () => {
     try {
-      const classID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
+      const classID = curriculum.formationLevels[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
       const response = await fetch(routes.dev.groups.getGroups(classID));
       if (!response.ok) {
         throw new Error("Erreur lors du chargement des groups");
