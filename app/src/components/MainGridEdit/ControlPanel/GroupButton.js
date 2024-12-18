@@ -33,7 +33,7 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, fetchGrou
   };
 
   const addGroups = async (newGroups) => {
-    const actualClassID = curriculum.classes[0].id;
+    const actualClassID = curriculum.formationLevels[0].id;
     const filteredNewGroups = newGroups.filter(
       (newGroup) => !groups.some((g) => g.name === newGroup.name)
     );
