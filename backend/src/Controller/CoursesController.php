@@ -9,6 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\CourseTypeRepository;
+use App\Repository\SubjectRepository;
+use App\Repository\TeacherRepository;
 
 class CoursesController extends AbstractController
 {
@@ -26,15 +29,81 @@ class CoursesController extends AbstractController
                 'positionY' => $course->getPositionY(),
                 'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
                 'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
+                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
             ];
         }
 
         return $this->json($response);
     }
 
-    #[Route('/courses', name: 'create_course', methods: ['POST'])]
-    public function createCourse(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/subject/{id}/courses', name: 'get_course_by_the_subject', methods: ['GET'])]
+    public function getCourseByTheSubject(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
+        $queryBuilder = $entityManager->createQueryBuilder();
+
+        $queryBuilder->select('course')
+            ->from(Course::class, 'course')
+            ->join('course.subjects', 'sub')
+            ->where('sub.id = :subjectId')
+            ->setParameter('subjectId', $id);
+
+        $courses = $queryBuilder->getQuery()->getResult();
+
+        $response = [];
+        foreach ($courses as $course) {
+            $response[] = [
+                'id' => $course->getId(),
+                'duration' => $course->getDuration(),
+                'positionX' => $course->getPositionX(),
+                'positionY' => $course->getPositionY(),
+                'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
+                'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
+                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
+            ];
+        }
+
+        return $this->json($response);
+    }
+
+    #[Route('/teacher/{id}/courses', name: 'get_courses_by_the_teacher', methods: ['GET'])]
+    public function getCourseByTheTeacher(int $teacherID, EntityManagerInterface $entityManager)
+    {
+        
+        $queryBuilder = $entityManager->createQueryBuilder();
+
+        $queryBuilder->select('course')
+            ->from(Course::class, 'course')
+            ->join('course.teachers', 't')
+            ->where('t.id = :teacherId')
+            ->setParameter('teacherId', $teacherID);
+
+        $courses = $queryBuilder->getQuery()->getResult();
+
+        $response = [];
+        foreach ($courses as $course) {
+            $response[] = [
+                'id' => $course->getId(),
+                'duration' => $course->getDuration(),
+                'positionX' => $course->getPositionX(),
+                'positionY' => $course->getPositionY(),
+                'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
+                'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
+                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
+            ];
+        }
+
+        return $this->json($response);
+    }
+
+
+    #[Route('/courses/add', name: 'create_course', methods: ['POST'])]
+    public function createCourse(
+        Request $request,
+        EntityManagerInterface $entityManager, 
+        TeacherRepository $teacherRepository, 
+        CourseTypeRepository $courseTypeRepository,
+        SubjectRepository $subjectRepository
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
         if (empty($data['duration'])) {
@@ -49,6 +118,33 @@ class CoursesController extends AbstractController
         $course->setPositionX($data['positionX']);
         $course->setPositionY($data['positionY']);
 
+        if (!empty($data['teacherId'])) {
+            $teacher = $teacherRepository->find($data['teacherId']);
+            if ($teacher) {
+                $course->addTeacher($teacher);
+            } else {
+                return new JsonResponse(['error' => "Professeur ID '{$data['teacherId']}' introuvable."], 404);
+            }
+        }
+
+        if (!empty($data['subjectId'])) {
+            $subject = $subjectRepository->find($data['subjectId']);
+            if ($subject) {
+                $course->addSubject($subject);
+            } else {
+                return new JsonResponse(['error' => "Sujet ID '{$data['subjectId']}' introuvable."], 404);
+            }
+        }
+
+        if (!empty($data['courseTypeId'])) {
+            $courseType = $courseTypeRepository->find($data['courseTypeId']);
+            if ($courseType) {
+                $course->addCourseType($courseType);
+            } else {
+                return new JsonResponse(['error' => "CourseType ID '{$data['courseTypeId']}' introuvable."], 404);
+            }
+        }
+
         $entityManager->persist($course);
         $entityManager->flush();
 
@@ -59,6 +155,9 @@ class CoursesController extends AbstractController
                 'duration' => $course->getDuration(),
                 'positionX' => $course->getPositionX(),
                 'positionY' => $course->getPositionY(),
+                'courseType' => $courseType ? $courseType->getId() : null,
+                'teacher' => $teacher ? $teacher->getId() : null,
+                'subject' => $subject ? $subject->getId() : null,
             ],
         ], 201);
     }
@@ -68,7 +167,10 @@ class CoursesController extends AbstractController
         int $id,
         Request $request,
         CourseRepository $courseRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        CourseTypeRepository $courseTypeRepository,
+        SubjectRepository $subjectRepository,
+        TeacherRepository $teacherRepository
     ): JsonResponse {
         $course = $courseRepository->find($id);
 
@@ -87,6 +189,32 @@ class CoursesController extends AbstractController
         if (array_key_exists('positionY', $data)) {
             $course->setPositionY($data['positionY']);
         }
+        if (!empty($data['teacherId'])) {
+            $teacher = $teacherRepository->find($data['teacherId']);
+            if ($teacher) {
+                $course->addCourseType($teacher);
+            } else {
+                return new JsonResponse(['error' => "Teacher '{$data['teacher']}' introuvable."], 404);
+            }
+        }
+    
+        if (!empty($data['courseTypeId'])) {
+            $courseType = $courseTypeRepository->find($data['courseTypeId']);
+            if ($courseType) {
+                $course->addCourseType($courseType);
+            } else {
+                return new JsonResponse(['error' => "CourseType ID '{$data['courseTypeId']}' introuvable."], 404);
+            }
+        }
+
+        if (!empty($data['subjectsId'])) {
+            $subjects = $subjectRepository->find($data['subjectsId']);
+            if ($subjects) {
+                $course->addCourseType($subjects);
+            } else {
+                return new JsonResponse(['error' => "Sujet '{$data['subjectsId']}' introuvable."], 404);
+            }
+        }
 
         $entityManager->flush();
 
@@ -97,6 +225,9 @@ class CoursesController extends AbstractController
                 'duration' => $course->getDuration(),
                 'positionX' => $course->getPositionX(),
                 'positionY' => $course->getPositionY(),
+                'courseType' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
+                'teacher' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
+                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
             ],
         ]);
     }
