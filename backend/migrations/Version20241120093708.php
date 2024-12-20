@@ -132,8 +132,7 @@ final class Version20241120093708 extends AbstractMigration
         $course = $schema->createTable('course');
         $course->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $course->addColumn('duration', 'float');
-        $course->addColumn('position_x', 'integer');
-        $course->addColumn('position_y', 'integer');
+        $course->addColumn('week_position', 'integer');
         $course->setPrimaryKey(['id']);
 
         // Table Course - Group
