@@ -49,7 +49,7 @@ export const GroupButton = ({ curriculum, groups, setGroups, setToast, fetchGrou
           body: JSON.stringify({
             name: group.name,
             halfgroups: group.subGroups || [],
-            formationLevel: actualformationLevelID,
+            formationLevelID: actualformationLevelID,
           }),
         });
         if (!response.ok) {
