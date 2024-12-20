@@ -107,7 +107,7 @@ class CoursesController extends AbstractController
         /**
          * TODO-------------------------------------------------------
          * IL FAUDRAT CHANGER LES ID PAR D AUTRES IDENTIFIANTS
-         * commes les code pour les profs ou le nom pour les coursetypes
+         * le code pour les profs et le nom pour les coursetypes
          * -----------------------------------------------------------
          */
 

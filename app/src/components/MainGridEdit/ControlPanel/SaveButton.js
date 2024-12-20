@@ -4,7 +4,9 @@ import routes from "../../../Routes/routes";
 export const SaveButton = ({ items, setToast }) => {  
   const handleSave = async () => {
     try {
-      for (const course of items) {
+      const courses = Object.values(items).flat();
+
+      for (const course of courses) {
         const response = await fetch(routes.dev.courses.add(), {
           method: "POST",
           headers: {
@@ -12,17 +14,13 @@ export const SaveButton = ({ items, setToast }) => {
           },
           body: JSON.stringify({
             duration: course.duration,
-            positionX: course.pos.x,
-            positionY: course.pos.x,
+            positionX: course.pos?.x || 0,
+            positionY: course.pos?.y || 0,
             teacher: course.teacher,
             courseType: course.courseType,
             subject: course.subject,
           }),
         });
-
-        if (!response.ok) {
-          throw new Error(`Erreur lors de la sauvegarde du cours ${course.id}`);
-        }
       }
 
       setToast({
