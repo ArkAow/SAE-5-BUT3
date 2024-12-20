@@ -135,16 +135,20 @@ export const CourseButton = ({
                         <div className="mb-4">
                             <label className="block mb-1 font-bold">Professeur :</label>
                             <select
-                                value={selectedTeacher}
-                                onChange={(e) => setSelectedTeacher(e.target.value)}
+                                value={selectedTeacher?.code || ""}
+                                onChange={(e) => {
+                                    const selectedCode = e.target.value;
+                                    const selected = teachers.find((teacher) => teacher.code === selectedCode);
+                                    setSelectedTeacher(selected || null);
+                                }}
                                 className="w-full p-2 border rounded">
                                 <option value="" disabled>
-                                Choisir un professeur
+                                    Choisir un professeur
                                 </option>
                                 {teachers.map((teacher) => (
-                                <option key={teacher.code} value={teacher.code}>
-                                    {teacher.code}
-                                </option>
+                                    <option key={teacher.code} value={teacher.code}>
+                                        {teacher.code}
+                                    </option>
                                 ))}
                             </select>
                         </div>

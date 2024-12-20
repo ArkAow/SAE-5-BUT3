@@ -15,14 +15,14 @@ const MainGrid = ({ curriculum }) => {
   const [selectedCol, setSelectedCol] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [availableSemesters, setAvailableSemesters] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState({});
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [currentCourses, setCurrentCourses] = useState([]);
   const [groups, setGroups] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
-  const [selectedCourseType, setSelectedCourseType] = useState(null);
-  const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [selectedCourseType, setSelectedCourseType] = useState({});
+  const [selectedTeacher, setSelectedTeacher] = useState({});
   const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
@@ -131,7 +131,7 @@ const MainGrid = ({ curriculum }) => {
       initialItems[positionKey].push({
         color: course.courseType?.color || "#ffffff",
         courseType: course.courseType.name,
-        teacher: course.teacher.name || "N/A",
+        teacher: course.teacher.code || "N/A",
         duration: course.duration || 1.0,
         id: course.id || Date.now() + index,
       });
@@ -164,13 +164,15 @@ const MainGrid = ({ curriculum }) => {
   }, []);
 
   const addItem = () => {
+    console.log(items);
+
+
     const positionKey = `${selectedRow}-${selectedCol}`;
     const newItem = {
       color: selectedCourseType.color,
       courseType: selectedCourseType.name,
-      teacher: selectedTeacher,
+      teacher: selectedTeacher.code,
       duration: selectedDuration,
-      pos: { x: selectedCol, y: selectedRow },
       id: Date.now(),
     };
   
@@ -180,8 +182,9 @@ const MainGrid = ({ curriculum }) => {
     }));
   
     const newCourse = {
-      teacher: { name: selectedTeacher },
-      courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
+      teacher: selectedTeacher,
+      courseType: selectedCourseType,
+      subject: selectedSubject,
       duration: selectedDuration,
       pos: { x: selectedCol, y: selectedRow },
       id: Date.now(),

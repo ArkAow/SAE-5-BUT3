@@ -9,9 +9,11 @@ const Node = ({ positionKey, items, moveItem,removeNode }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipDirection, setTooltipDirection] = useState("right");
-const handleDeleteNode = (id) => {
-  removeNode(positionKey, id);
-};
+
+  const handleDeleteNode = (id) => {
+    removeNode(positionKey, id);
+  };
+  
   const [, drop] = useDrop({
     accept: ITEM_TYPE,
     drop: (draggedItem) => {

@@ -108,8 +108,7 @@ const ControlPanel = ({
         <PrintButton />
 
         <SaveButton 
-          courses={items}/>
-
+          items={items}/>
       </div>
     </div>
   );
