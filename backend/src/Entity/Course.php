@@ -19,10 +19,7 @@ class Course
     private float $duration;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $positionX = null;
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $positionY = null;
+    private ?int $weekPosition = null;
 
     #[ORM\ManyToMany(targetEntity: CourseType::class, inversedBy: 'courses')]
     #[ORM\JoinTable(
@@ -31,6 +28,22 @@ class Course
         inverseJoinColumns: [new ORM\JoinColumn(name: 'course_type_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
     private Collection $courseTypes;
+
+    #[ORM\ManyToMany(targetEntity: Groups::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_group',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $groups;
+
+    #[ORM\ManyToMany(targetEntity: HalfGroup::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_half_group',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'half_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $halfGroups;
 
     #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'courses')]
     private Collection $teachers;
@@ -61,25 +74,14 @@ class Course
         return $this;
     }
 
-    public function getPositionX(): ?int
+    public function getWeekPosition(): ?int
     {
-        return $this->positionX;
+        return $this->weekPosition;
     }
 
-    public function setPositionX(?int $positionX): self
+    public function setWeekPosition(?int $weekPosition): self
     {
-        $this->positionX = $positionX;
-        return $this;
-    }
-
-    public function getPositionY(): ?int
-    {
-        return $this->positionY;
-    }
-
-    public function setPositionY(?int $positionY): self
-    {
-        $this->positionY = $positionY;
+        $this->weekPosition = $weekPosition;
         return $this;
     }
 
@@ -144,6 +146,50 @@ class Course
     {
         if ($this->subjects->removeElement($subject)){
             $subject->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getGroups():Collection
+    {
+        return $this->groups;
+    }
+
+    public function addGroup(Groups $group): self
+    {
+        if (!$this->groups->contains($group)){
+            $this->groups->add($group);
+            $group->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeGroup(Groups $group): self
+    {
+        if ($this->groups->removeElement($group)){
+            $group->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getHalfGroups():Collection
+    {
+        return $this->halfGroups;
+    }
+
+    public function addHalfGroup(HalfGroup $halfGroup): self
+    {
+        if (!$this->halfGroups->contains($halfGroup)){
+            $this->halfGroups->add($halfGroup);
+            $halfGroup->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeHalfGroup(HalfGroup $halfGroup): self
+    {
+        if ($this->halfGroups->removeElement($halfGroup)){
+            $halfGroup->removeCourse($this);
         }
         return $this;
     }
