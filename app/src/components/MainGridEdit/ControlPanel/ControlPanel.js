@@ -26,7 +26,8 @@ const ControlPanel = ({
   setSelectedTeacher,
   selectedDuration,
   setSelectedDuration,
-  addItem }) => {
+  addItem,
+  items }) => {
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
@@ -106,7 +107,9 @@ const ControlPanel = ({
 
         <PrintButton />
 
-        <SaveButton />
+        <SaveButton 
+          courses={items}/>
+
       </div>
     </div>
   );
