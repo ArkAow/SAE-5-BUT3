@@ -170,6 +170,7 @@ const MainGrid = ({ curriculum }) => {
       courseType: selectedCourseType.name,
       teacher: selectedTeacher,
       duration: selectedDuration,
+      pos: { x: selectedCol, y: selectedRow },
       id: Date.now(),
     };
   
@@ -350,6 +351,7 @@ const MainGrid = ({ curriculum }) => {
                 selectedDuration={selectedDuration}
                 setSelectedDuration={setSelectedDuration}
                 addItem={addItem}
+                items={items}
               />
             </div>
 
