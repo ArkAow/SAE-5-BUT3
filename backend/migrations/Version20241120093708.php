@@ -321,7 +321,6 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('user_department');
         $schema->dropTable('archive');
         $schema->dropTable('archive_department');
-        $schema->dropTable('course_formationLevel');
-        
+        $schema->dropTable('course_formationLevel');   
     }
 }

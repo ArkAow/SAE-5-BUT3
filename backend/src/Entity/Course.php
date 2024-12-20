@@ -45,6 +45,14 @@ class Course
     )]
     private ?Collection $halfGroups;
 
+    #[ORM\ManyToMany(targetEntity: FormationLevel::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_formation_level',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'formationLevel_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $formationLevel;
+
     #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'courses')]
     private Collection $teachers;
     
@@ -190,6 +198,28 @@ class Course
     {
         if ($this->halfGroups->removeElement($halfGroup)){
             $halfGroup->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getFormationLevel():Collection
+    {
+        return $this->formationLevel;
+    }
+
+    public function addFormationLevel(FormationLevel $formationLevel): self
+    {
+        if (!$this->formationLevel->contains($formationLevel)){
+            $this->formationLevel->add($formationLevel);
+            $formationLevel->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeFormationLevel(FormationLevel $formationLevel): self
+    {
+        if ($this->formationLevel->removeElement($formationLevel)){
+            $formationLevel->removeCourse($this);
         }
         return $this;
     }

@@ -27,6 +27,9 @@ class FormationLevel
     #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: "formationLevels")]
     private Collection $curriculums;
 
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "formationLevels")]
+    private Collection $courses;
+
     public function __construct()
     {
         $this->groups = new ArrayCollection();
@@ -84,6 +87,25 @@ class FormationLevel
     public function removeCurriculum(Curriculum $curriculum): self
     {
         $this->curriculums->removeElement($curriculum);
+        return $this;
+    }
+
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Course $course): self
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses[] = $course;
+        }
+        return $this;
+    }
+
+    public function removeCourse(Course $course): self
+    {
+        $this->courses->removeElement($course);
         return $this;
     }
 }
