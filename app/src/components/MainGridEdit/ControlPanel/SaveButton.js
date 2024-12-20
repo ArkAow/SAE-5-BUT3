@@ -1,8 +1,7 @@
 import React from "react";
 import routes from "../../../Routes/routes";
 
-export const SaveButton = ({ items }) => {
-  
+export const SaveButton = ({ items, setToast }) => {  
   const handleSave = async () => {
     try {
       for (const course of items) {
@@ -26,10 +25,18 @@ export const SaveButton = ({ items }) => {
         }
       }
 
-      alert("Tous les cours ont été sauvegardés avec succès !");
+      setToast({
+        message: "Sauvegarde effectuée",
+        type: "success",
+        visible: true,
+      });
     } catch (error) {
       console.error("Erreur lors de la sauvegarde :", error);
-      alert("Une erreur s'est produite lors de la sauvegarde des cours.");
+      setToast({
+        message: "Erreur lors de la sauvegarde",
+        type: "error",
+        visible: true,
+      });
     }
   };
 

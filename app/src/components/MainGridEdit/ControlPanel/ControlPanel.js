@@ -107,7 +107,8 @@ const ControlPanel = ({
 
         <PrintButton />
 
-        <SaveButton 
+        <SaveButton
+          setToast={setToast}
           items={items}/>
       </div>
     </div>
