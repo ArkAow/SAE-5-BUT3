@@ -35,6 +35,7 @@ class Groups
     {
         $this->formationLevels = new ArrayCollection();
         $this->halfGroups = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int

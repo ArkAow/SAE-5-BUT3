@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Format;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'course')]
@@ -51,7 +52,7 @@ class Course
         joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'formationLevel_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
-    private ?Collection $formationLevel;
+    private ?Collection $formationLevels;
 
     #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'courses')]
     private Collection $teachers;
@@ -64,6 +65,9 @@ class Course
         $this->teachers = new ArrayCollection();
         $this->subjects = new ArrayCollection();
         $this->courseTypes = new ArrayCollection();
+        $this->groups = new ArrayCollection();
+        $this->halfGroups = new ArrayCollection();
+        $this->formationLevels = new ArrayCollection();
     }
 
     public function getId(): int
@@ -204,13 +208,13 @@ class Course
 
     public function getFormationLevel():Collection
     {
-        return $this->formationLevel;
+        return $this->formationLevels;
     }
 
     public function addFormationLevel(FormationLevel $formationLevel): self
     {
-        if (!$this->formationLevel->contains($formationLevel)){
-            $this->formationLevel->add($formationLevel);
+        if (!$this->formationLevels->contains($formationLevel)){
+            $this->formationLevels->add($formationLevel);
             $formationLevel->addCourse($this);
         }
         return $this;
@@ -218,7 +222,7 @@ class Course
 
     public function removeFormationLevel(FormationLevel $formationLevel): self
     {
-        if ($this->formationLevel->removeElement($formationLevel)){
+        if ($this->formationLevels->removeElement($formationLevel)){
             $formationLevel->removeCourse($this);
         }
         return $this;
