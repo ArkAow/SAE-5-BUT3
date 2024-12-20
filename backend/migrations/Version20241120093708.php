@@ -136,6 +136,24 @@ final class Version20241120093708 extends AbstractMigration
         $course->addColumn('position_y', 'integer');
         $course->setPrimaryKey(['id']);
 
+        // Table Course - Group
+
+        $course_group = $schema->createTable('course_group');
+        $course_group->addColumn('course_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_group->addColumn('group_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_group->setPrimaryKey(['course_id', 'group_id']);
+        $course_group->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $course_group->addForeignKeyConstraint($group, ['group_id'], ['id'], ['onDelete' => 'CASCADE']);
+        
+        // Table Course - HalfGroup
+
+        $course_half_group = $schema->createTable('course_half_group');
+        $course_half_group->addColumn('course_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_half_group->addColumn('half_group_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_half_group->setPrimaryKey(['course_id', 'half_group_id']);
+        $course_half_group->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $course_half_group->addForeignKeyConstraint($half_group, ['half_group_id'], ['id'], ['onDelete' => 'CASCADE']);
+
         // Table Course - Teacher
 
         $course_teacher = $schema->createTable('course_teacher');
@@ -170,7 +188,7 @@ final class Version20241120093708 extends AbstractMigration
         $course_type_course->addColumn('course_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $course_type_course->setPrimaryKey(['course_type_id', 'course_id']);
         $course_type_course->addForeignKeyConstraint($course_type, ['course_type_id'], ['id'], ['onDelete' => 'CASCADE']);
-        $course_type_course->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $course_type_course->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);    
 
         // Table Expected_Duration                          
 
@@ -213,6 +231,7 @@ final class Version20241120093708 extends AbstractMigration
         $department->setPrimaryKey(['id']);
         
         // Table Department - FormationLevel
+        
         $department_formationLevel = $schema->createTable('department_formation_Level');
         $department_formationLevel->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
         $department_formationLevel->addColumn('formationLevel_id','integer', ['unsigned' => true, 'notnull' => true]);
@@ -263,6 +282,8 @@ final class Version20241120093708 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $schema->dropTable('course_group');
+        $schema->dropTable('course_half_group');
         $schema->dropTable('half_group');
         $schema->dropTable('group');
         $schema->dropTable('group_half_group');
