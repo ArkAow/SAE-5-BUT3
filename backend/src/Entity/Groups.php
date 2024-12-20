@@ -25,6 +25,7 @@ class Groups
     private Collection $halfGroups;
 
     #[ORM\ManyToMany(targetEntity: FormationLevel::class, mappedBy: "groups")]
+    #[ORM\JoinTable(name: "formation_Level_group")]
     private Collection $formationLevels;
 
     public function __construct()

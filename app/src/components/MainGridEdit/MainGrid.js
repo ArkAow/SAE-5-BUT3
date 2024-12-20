@@ -31,7 +31,22 @@ const MainGrid = ({ curriculum }) => {
   const [isSemesterLoading, setIsSemesterLoading] = useState(true);
   const [isSubjectLoading, setIsSubjectLoading] = useState(true);
   const [isCourseTypeLoading, setIsCourseTypeLoading] = useState(true);
+  
+  const removeNode = (positionKey, id) => {
+    setItems((prevItems) => {
+      const filteredItems = (prevItems[positionKey] || []).filter((item) => item.id !== id);
 
+      if (filteredItems.length === 0) {
+        const { [positionKey]: _, ...rest } = prevItems; // Supprime la clé si plus d'éléments
+        return rest;
+      }
+
+      return {
+        ...prevItems,
+        [positionKey]: filteredItems,
+      };
+    });
+  };
 
   useEffect(() => {
     if (!isGroupLoading && !isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
@@ -439,6 +454,7 @@ const MainGrid = ({ curriculum }) => {
                             positionKey={positionKey}
                             items={cellItems}
                             moveItem={moveItem}
+                            removeNode={removeNode}
                           />
                         );
                       })}

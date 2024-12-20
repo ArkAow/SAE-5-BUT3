@@ -5,10 +5,10 @@ import { formatDuration } from "../../services/durationService";
 
 const ITEM_TYPE = "rectangle";
 
-const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, onDelete, onEdit }) => {
+const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, onDeleteNode, onEdit }) => {
   const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
-    item: { positionKey,id },
+    item: { positionKey, id },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -80,7 +80,7 @@ const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, o
             Modifier
           </button>
           <button
-            onClick={onDelete}
+            onClick={onDeleteNode(id)}
             className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs">
             Supprimer
           </button>
