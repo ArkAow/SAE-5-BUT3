@@ -13,11 +13,11 @@ export const SaveButton = ({ items }) => {
           },
           body: JSON.stringify({
             duration: course.duration,
-            positionX: course.positionX,
-            positionY: course.positionY,
-            teacherId: course.teacherId,
-            courseTypeId: course.courseTypeId,
-            subjectId: course.subjectId,
+            positionX: course.pos.x,
+            positionY: course.pos.x,
+            teacher: course.teacher,
+            courseType: course.courseType,
+            subject: course.subject,
           }),
         });
 

@@ -164,9 +164,6 @@ const MainGrid = ({ curriculum }) => {
   }, []);
 
   const addItem = () => {
-    console.log(items);
-
-
     const positionKey = `${selectedRow}-${selectedCol}`;
     const newItem = {
       color: selectedCourseType.color,

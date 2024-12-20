@@ -18,7 +18,7 @@ class SemesterController extends AbstractController
         $connection = $em->getConnection();
         //Requete SQL nous permettant de récupérer les données
         $sql = '
-            SELECT sub.id, sub.name 
+            SELECT sub.id, sub.name, sub.code
             FROM subject sub
             INNER JOIN subject_semester subsem ON subsem.subject_id = sub.id
             WHERE subsem.semester_id = :semesterId

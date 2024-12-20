@@ -61,7 +61,7 @@ export const CourseButton = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!selectedTeacher) {
+        if (!selectedTeacher.code) {
           setError("Veuillez sélectionner un professeur.");
           return;
         }
@@ -162,7 +162,7 @@ export const CourseButton = ({
                                 onChange={(e) => setSelectedDuration(Number(e.target.value))}
                                 className="w-full bg-gray-300 rounded-full pl-6"/>
                         </div>
-                        {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
+                        {error && <p className="text-red-700 text-sm text-center w-full m-2">{error}</p>}
                         <button
                             onClick={handleSubmit}
                             className="px-3 py-2 w-full btn-default">
