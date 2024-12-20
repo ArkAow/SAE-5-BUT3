@@ -171,6 +171,15 @@ final class Version20241120093708 extends AbstractMigration
         $course_subject->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
         $course_subject->addForeignKeyConstraint($subject, ['subject_id'], ['id'], ['onDelete' => 'CASCADE']);
 
+        // Table Course - FormationLevel
+        
+        $course_formationLevel = $schema->createTable('course_formation_level');
+        $course_formationLevel->addColumn('course_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_formationLevel->addColumn('formationLevel_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_formationLevel->setPrimaryKey(['course_id', 'formationLevel_id']);
+        $course_formationLevel->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $course_formationLevel->addForeignKeyConstraint($formationLevel, ['formationLevel_id'], ['id'], ['onDelete' => 'CASCADE']);
+
         // Table Course_Type
 
         $course_type = $schema->createTable('course_type');
@@ -312,5 +321,7 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('user_department');
         $schema->dropTable('archive');
         $schema->dropTable('archive_department');
+        $schema->dropTable('course_formationLevel');
+        
     }
 }
