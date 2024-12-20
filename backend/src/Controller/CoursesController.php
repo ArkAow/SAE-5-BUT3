@@ -104,6 +104,13 @@ class CoursesController extends AbstractController
         CourseTypeRepository $courseTypeRepository,
         SubjectRepository $subjectRepository
     ): JsonResponse {
+        /**
+         * TODO-------------------------------------------------------
+         * IL FAUDRAT CHANGER LES ID PAR D AUTRES IDENTIFIANTS
+         * commes les code pour les profs ou le nom pour les coursetypes
+         * -----------------------------------------------------------
+         */
+
         $data = json_decode($request->getContent(), true);
 
         if (empty($data['duration'])) {
