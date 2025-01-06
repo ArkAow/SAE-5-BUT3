@@ -186,6 +186,21 @@ const MainGrid = ({ curriculum }) => {
   
     setCurrentCourses((prevCourses) => [...prevCourses, newCourse]);
   };
+
+  const deleteItem = (positionKey, id) => {
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      if (updatedItems[positionKey]) {
+        updatedItems[positionKey] = updatedItems[positionKey].filter((item) => item.id !== id);
+        if (updatedItems[positionKey].length === 0) {
+          delete updatedItems[positionKey];
+        }
+      }
+      return updatedItems;
+    });
+  
+    setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
+  };
   
   const moveItem = (fromKey, toKey, id) => {
     setItems((prevItems) => {
@@ -219,21 +234,6 @@ const MainGrid = ({ curriculum }) => {
         ...prevItems,
         [fromKey]: fromItems,
         [toKey]: [...toItems, draggedItem],
-      };
-    });
-  };
-  const removeNode = (positionKey, id) => {
-    setItems((prevItems) => {
-      const filteredItems = (prevItems[positionKey] || []).filter((item) => item.id !== id);
-
-      if (filteredItems.length === 0) {
-        const { [positionKey]: _, ...rest } = prevItems; // Supprime la clé si plus d'éléments
-        return rest;
-      }
-
-      return {
-        ...prevItems,
-        [positionKey]: filteredItems,
       };
     });
   };
@@ -455,7 +455,7 @@ const MainGrid = ({ curriculum }) => {
                             positionKey={positionKey}
                             items={cellItems}
                             moveItem={moveItem}
-                            removeNode={removeNode}
+                            deleteItem={deleteItem}
                           />
                         );
                       })}

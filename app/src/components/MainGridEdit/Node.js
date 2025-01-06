@@ -4,24 +4,22 @@ import CourseObject from "./CourseObject";
 import { getShade } from "../../services/colorService";
 const ITEM_TYPE = "rectangle";
 
-const Node = ({ positionKey, items, moveItem, removeNode  }) => {
+const Node = ({ positionKey, items, deleteItem, moveItem  }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipDirection, setTooltipDirection] = useState("right");
-  const handleDeleteNode = (id) => {
-    removeNode(positionKey, id);
-  };
-    const [, drop] = useDrop({
-      accept: ITEM_TYPE,
-      drop: (draggedItem) => {
-        if (draggedItem.positionKey !== positionKey && draggedItem.id) {
-          moveItem(draggedItem.positionKey, positionKey, draggedItem.id);
-        }
-        else {
-          console.error("Missing item's ID");
-        }
-      },
-    });
+
+  const [, drop] = useDrop({
+    accept: ITEM_TYPE,
+    drop: (draggedItem) => {
+      if (draggedItem.positionKey !== positionKey && draggedItem.id) {
+        moveItem(draggedItem.positionKey, positionKey, draggedItem.id);
+      }
+      else {
+        console.error("Missing item's ID");
+      }
+    },
+  });
 
   const visibleItems = items?.slice(0, 3) || [];
   const remainingItemsCount = items?.length > 3 ? items.length - 3 : 0;
@@ -60,6 +58,7 @@ const Node = ({ positionKey, items, moveItem, removeNode  }) => {
           id={items[0].id}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => setIsDragging(false)}
+          deleteItem={deleteItem}
           />
       )}
 
@@ -105,7 +104,7 @@ const Node = ({ positionKey, items, moveItem, removeNode  }) => {
                 positionKey={positionKey}
                 onDragStart={() => setIsDragging(true)}
                 onDragEnd={() => setIsDragging(false)}
-                onDeleteNode={handleDeleteNode}
+                deleteItem={deleteItem}
                 />
               <strong>--------------</strong>
             </div>
