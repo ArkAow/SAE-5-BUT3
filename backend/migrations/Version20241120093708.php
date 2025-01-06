@@ -78,6 +78,8 @@ final class Version20241120093708 extends AbstractMigration
         $semester = $schema->createTable('semester');
         $semester->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $semester->addColumn('name', 'string', ['length' => 100]);
+        $semester->addColumn('week_start', 'integer');
+        $semester->addColumn('week_duration', 'integer');
         $semester->setPrimaryKey(['id']);
         
         // Table Semester - Curriculum
@@ -222,6 +224,24 @@ final class Version20241120093708 extends AbstractMigration
         $expected_duration_course_type->setPrimaryKey(['expected_duration_id', 'course_type_id']);
         $expected_duration_course_type->addForeignKeyConstraint($expected_duration,['expected_duration_id'],['id'],['onDelete' => 'CASCADE']);
         $expected_duration_course_type->addForeignKeyConstraint($course_type,['course_type_id'],['id'],['onDelete' => 'CASCADE']);
+
+        // Table Expected_Duration - Teacher
+
+        $expected_duration_teacher = $schema->createTable('expected_duration_teacher');
+        $expected_duration_teacher->addColumn('expected_duration_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $expected_duration_teacher->addColumn('teacher_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $expected_duration_teacher->setPrimaryKey(['expected_duration_id', 'teacher_id']);
+        $expected_duration_teacher->addForeignKeyConstraint($expected_duration,['expected_duration_id'],['id'],['onDelete' => 'CASCADE']);
+        $expected_duration_teacher->addForeignKeyConstraint($teacher,['teacher_id'],['id'],['onDelete' => 'CASCADE']);
+
+        // Table Expected_Duration - Course
+
+        $course_expected_duration = $schema->createTable('course_expected_duration');
+        $course_expected_duration->addColumn('course_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_expected_duration->addColumn('expected_duration_id', 'integer', ['unsigned' => true, 'notnull' => true]);
+        $course_expected_duration->setPrimaryKey(['course_id', 'expected_duration_id']);
+        $course_expected_duration->addForeignKeyConstraint($expected_duration,['expected_duration_id'],['id'],['onDelete' => 'CASCADE']);
+        $course_expected_duration->addForeignKeyConstraint($course,['course_id'],['id'],['onDelete' => 'CASCADE']);
         
         // Table User
 
@@ -292,6 +312,8 @@ final class Version20241120093708 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $schema->dropTable('course_group');
         $schema->dropTable('course_half_group');
+        $schema->dropTable('course_expected_duration');
+        $schema->dropTable('expected_duration_teacher');
         $schema->dropTable('half_group');
         $schema->dropTable('group');
         $schema->dropTable('group_half_group');
@@ -321,6 +343,6 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('user_department');
         $schema->dropTable('archive');
         $schema->dropTable('archive_department');
-        $schema->dropTable('course_formationLevel');   
+        $schema->dropTable('course_formation_level'); 
     }
 }
