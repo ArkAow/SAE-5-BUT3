@@ -4,17 +4,18 @@ namespace App\Repository;
 
 use App\Entity\Clas;
 use App\Entity\ClassEntity;
+use App\Entity\FormationLevel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Clas>
  */
-class ClasRepository extends ServiceEntityRepository
+class FormationLevelRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ClassEntity::class);
+        parent::__construct($registry, FormationLevel::class);
     }
 
 //    /**

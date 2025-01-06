@@ -52,12 +52,12 @@ class CurriculumController extends AbstractController
             return [
                 'id' => $curriculum->getId(),
                 'name' => $curriculum->getName(),
-                'classes' => array_map(function ($class) {
+                'formationLevels' => array_map(function ($formationLevel) {
                     return [
-                        'id' => $class->getId(),
-                        'name' => $class->getName(),
+                        'id' => $formationLevel->getId(),
+                        'name' => $formationLevel->getName(),
                     ];
-                }, $curriculum->getClasses()->toArray()),
+                }, $curriculum->getFormationLevels()->toArray()),
             ];
         }, $curriculums);
 

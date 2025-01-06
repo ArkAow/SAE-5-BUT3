@@ -33,6 +33,10 @@ class Subject
 
     #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'subjects')]
     private Collection $teachers;
+    
+    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'subjects')]
+    #[ORM\JoinTable(name: 'course_subject')]
+    private Collection $courses;
 
     public function __construct()
     {
@@ -137,6 +141,30 @@ class Subject
     public function removeTeacher(Teacher $teacher): self
     {
         $this->teachers->removeElement($teacher);
+        return $this;
+    }
+
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Course $course): self
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses->add($course);
+            $course->addSubject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourse(Course $course): self
+    {
+        if ($this->courses->removeElement($course)) {
+            $course->removeSubject($this);
+        }
+
         return $this;
     }
 }
