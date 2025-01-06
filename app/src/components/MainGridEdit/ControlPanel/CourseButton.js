@@ -173,8 +173,8 @@ export const CourseButton = ({
                             </div>
                         )}
 
-                        <div className="mb-1 bg-gray-200 p-2 rounded-t-xl">
-                            <label className="block mb-1 font-bold">Type de cours :</label>
+                        <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
+                            <label className="w-32 block mb-1 font-bold">Type de cours :</label>
                             <select
                                 value={selectedCourseType.name}
                                 onChange={(e) => {
@@ -193,8 +193,8 @@ export const CourseButton = ({
                             </select>
                         </div>
 
-                        <div className="mb-1 bg-gray-200 p-2">
-                            <label className="block mb-1 font-bold">Professeur :</label>
+                        <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
+                            <label className="block mb-1 font-bold w-24">Professeur :</label>
                             <select
                                 value={selectedTeacher}
                                 onChange={(e) => setSelectedTeacher(e.target.value)}
@@ -223,8 +223,8 @@ export const CourseButton = ({
                             />
                         </div>
 
-                        <div className="mb-3 bg-gray-200 p-2 rounded-xl">
-                            <label className="block mb-1 font-bold">Groupe :</label>
+                        <div className="flex items-center gap-2 mb-3 bg-gray-200 p-2 rounded-xl">
+                            <label className="w-16 block mb-1 font-bold">Groupe :</label>
                             <select
                                 value={groupList[selectedCol] || ""}
                                 onChange={(e) => {
