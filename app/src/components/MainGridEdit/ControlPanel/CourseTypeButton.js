@@ -119,7 +119,7 @@ export const CourseTypeButton = ({
               Modifier les types de cours
             </h3>
             {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
-            <ul className="mb-3">
+            <ul className="mb-1 bg-gray-200 p-2 rounded-t-xl">
               {courseTypes.map((type) => (
                 <li
                   key={type.name}
@@ -128,7 +128,7 @@ export const CourseTypeButton = ({
                     <span
                       className="inline-block w-4 h-4 rounded-full"
                       style={{ backgroundColor: type.color }}></span>
-                    <span>{type.name}</span>
+                    <span className="bg-white rounded-full px-4">{type.name}</span>
                   </div>
                   {!initialCourseTypes.some(
                     (initialType) => initialType.name === type.name
@@ -144,16 +144,18 @@ export const CourseTypeButton = ({
             </ul>
 
             <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                placeholder="Nom du type de cours"
-                className="p-2 border rounded"
-                value={newCourseTypeName}
-                onChange={(e) => setNewCourseTypeName(e.target.value)}/>
-              <input
-                type="color"
-                value={newCourseTypeColor}
-                onChange={(e) => setNewCourseTypeColor(e.target.value)}/>
+              <div className="flex items-center gap-2 bg-gray-200 p-2 rounded-b-xl">
+                <input
+                  type="text"
+                  placeholder="Nom du type de cours"
+                  className="p-2 border rounded w-4/5"
+                  value={newCourseTypeName}
+                  onChange={(e) => setNewCourseTypeName(e.target.value)}/>
+                <input
+                  type="color"
+                  value={newCourseTypeColor}
+                  onChange={(e) => setNewCourseTypeColor(e.target.value)}/>
+              </div>
               <button
                 onClick={handleAddCourseType}
                 className="w-full p-2 btn-default">
