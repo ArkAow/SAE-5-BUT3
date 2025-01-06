@@ -80,7 +80,7 @@ const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, d
             Modifier
           </button>
           <button
-            onClick={() => deleteItem(id)}
+            onClick={() => deleteItem(positionKey, id)}
             className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs">
             Supprimer
           </button>

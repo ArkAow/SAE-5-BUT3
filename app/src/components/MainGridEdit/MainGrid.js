@@ -242,6 +242,18 @@ const MainGrid = ({ curriculum }) => {
       return updatedItems;
     });
   
+    setAvailableSubjects((prevSubjects) => {
+      const updatedSubjects = prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = subject.courses.filter((course) => course.id !== id);
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+  
+      return updatedSubjects;
+    });
+  
     setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
   };
   
