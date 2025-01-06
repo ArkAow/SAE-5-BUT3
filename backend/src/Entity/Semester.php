@@ -17,6 +17,8 @@ class Semester
 
     #[ORM\Column(type: 'string', length: 100)]
     private string $name;
+    private int $week_start;
+    private int $week_duration;
 
     #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: 'semesters')]
     private Collection $curriculums;
@@ -40,9 +42,31 @@ class Semester
         return $this->name;
     }
 
+    public function getWeekStart() : int
+    {
+        return $this->week_start;
+    }
+
+    public function getWeekDuration() : int
+    {
+        return $this->week_duration;
+    }
+
     public function setName(string $name): self
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function setWeekStart(int $week_start): self
+    {
+        $this->week_start = $week_start;
+        return $this;
+    }
+
+    public function setWeekDuration(int $week_duration): self
+    {
+        $this->week_duration = $week_duration;
         return $this;
     }
 
