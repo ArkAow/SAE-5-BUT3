@@ -214,10 +214,12 @@ export const CourseButton = ({
                             <label className="block mb-1 font-bold">Durée (en heure):</label>
                             <input
                                 type="number"
+                                min={0}
+                                max={50}
                                 step="0.5"
                                 value={selectedDuration}
                                 onChange={(e) => setSelectedDuration(Number(e.target.value))}
-                                className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-6"
+                                className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-2"
                             />
                         </div>
 
