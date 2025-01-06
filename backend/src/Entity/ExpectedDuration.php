@@ -31,10 +31,14 @@ class ExpectedDuration
     #[ORM\JoinTable(name: "expected_duration_subject",joinColumns: [new ORM\JoinColumn(name: "expected_duration_id", referencedColumnName: "id", onDelete: "CASCADE")],inverseJoinColumns: [new ORM\JoinColumn(name: "subject_id", referencedColumnName: "id", onDelete: "CASCADE")])]
     private Collection $subjects;
 
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "expectedDurations")]
+    private Collection $courses;
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
         $this->courseTypes = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int
@@ -96,7 +100,25 @@ class ExpectedDuration
         if ($this->subjects->removeElement($subject)) {
             $subject->removeExpectedDuration($this);
         }
+        return $this;
+    }
 
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Course $course): self
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses[] = $course;
+        }
+        return $this;
+    }
+
+    public function removeCourse(Course $course): self
+    {
+        $this->courses->removeElement($course);
         return $this;
     }
 }
