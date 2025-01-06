@@ -149,42 +149,85 @@ const MainGrid = ({ curriculum }) => {
     fetchCourseTypes();
   }, []);
 
-  const addItem = () => {
-    const positionKey = `${selectedRow}-${selectedCol}`;
-    const newItem = {
-      color: selectedCourseType.color,
-      courseType: selectedCourseType.name,
-      teacher: selectedTeacher,
-      duration: selectedDuration,
-      id: Date.now(),
-    };
+  const addItem = (payload) => {
+    if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
+      console.error("Les informations de base sont manquantes.");
+      return;
+    }
   
-    setItems((prevItems) => ({
-      ...prevItems,
-      [positionKey]: [...(prevItems[positionKey] || []), newItem],
-    }));
+    const newItems = [];
+    const newCourses = [];
   
-    const newCourse = {
-      teacher: { name: selectedTeacher },
-      courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
-      duration: selectedDuration,
-      pos: { x: selectedCol, y: selectedRow },
-      id: Date.now(),
-    };
+    if (payload.isRepeat) {
+      const exceptionsArray = payload.exceptions ? payload.exceptions.map((val) => parseInt(val.trim(), 10) - 1) : [];
+
+      for (let week = payload.repeatFrom; week <= payload.repeatTo; week++) {
+        if (exceptionsArray.includes(week)) continue;
+        
+        const positionKey = `${week}-${selectedCol}`;
+        const newItem = {
+          color: selectedCourseType.color,
+          courseType: selectedCourseType.name,
+          teacher: selectedTeacher,
+          duration: selectedDuration,
+          id: Date.now() + week,
+        };
+  
+        newItems.push({ positionKey, newItem });
+  
+        const newCourse = {
+          teacher: { name: selectedTeacher },
+          courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
+          duration: selectedDuration,
+          pos: { x: selectedCol, y: week },
+          id: newItem.id,
+        };
+  
+        newCourses.push(newCourse);
+      }
+    } else {
+      const positionKey = `${selectedRow}-${selectedCol}`;
+      const newItem = {
+        color: selectedCourseType.color,
+        courseType: selectedCourseType.name,
+        teacher: selectedTeacher,
+        duration: selectedDuration,
+        id: Date.now(),
+      };
+  
+      newItems.push({ positionKey, newItem });
+  
+      const newCourse = {
+        teacher: { name: selectedTeacher },
+        courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
+        duration: selectedDuration,
+        pos: { x: selectedCol, y: selectedRow },
+        id: newItem.id,
+      };
+  
+      newCourses.push(newCourse);
+    }
+  
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      newItems.forEach(({ positionKey, newItem }) => {
+        updatedItems[positionKey] = [...(updatedItems[positionKey] || []), newItem];
+      });
+      return updatedItems;
+    });
   
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
-          const updatedCourses = [...(subject.courses || []), newCourse];
+          const updatedCourses = [...(subject.courses || []), ...newCourses];
           return { ...subject, courses: updatedCourses };
         }
         return subject;
       });
-  
       return updatedSubjects;
     });
   
-    setCurrentCourses((prevCourses) => [...prevCourses, newCourse]);
+    setCurrentCourses((prevCourses) => [...prevCourses, ...newCourses]);
   };
 
   const deleteItem = (positionKey, id) => {
