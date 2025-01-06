@@ -11,6 +11,7 @@ const ControlPanel = ({
   curriculum,
   setToast,
   groups,
+  groupList,
   setGroups,
   fetchGroups,
   selectedRow,
@@ -77,6 +78,7 @@ const ControlPanel = ({
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton
           isNoGroups={isNoGroups}
+          groupList={groupList}
           selectedRow={selectedRow}
           setSelectedRow={setSelectedRow}
           selectedCol={selectedCol}

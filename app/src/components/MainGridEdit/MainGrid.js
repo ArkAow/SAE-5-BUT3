@@ -335,6 +335,7 @@ const MainGrid = ({ curriculum }) => {
                 curriculum={curriculum}
                 setToast={setToast}
                 groups={groups}
+                groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
                 selectedRow={selectedRow}

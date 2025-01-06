@@ -4,6 +4,7 @@ import routes from "../../../Routes/routes";
 
 export const CourseButton = ({
     isNoGroups,
+    groupList,
     selectedRow,
     setSelectedRow,
     selectedCol,
@@ -16,7 +17,7 @@ export const CourseButton = ({
     selectedDuration,
     setSelectedDuration,
     addItem,
-}) => {  
+}) => {
     const [isFocused, setIsFocused] = useState(false);
     const [error, setError] = useState("");
     const [teachers, setTeachers] = useState([]);
@@ -43,27 +44,24 @@ export const CourseButton = ({
 
     const fetchTeachers = async () => {
         try {
-          const response = await fetch(routes.dev.teachers.get());
-          if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
-          const data = await response.json();
-          setTeachers(data);
+            const response = await fetch(routes.dev.teachers.get());
+            if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
+            const data = await response.json();
+            setTeachers(data);
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
-      };
+    };
 
     const NodePortal = ({ children }) => {
-        return createPortal(
-            children,
-            document.getElementById("portal-root")
-        );
+        return createPortal(children, document.getElementById("portal-root"));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!selectedTeacher) {
-          setError("Veuillez sélectionner un professeur.");
-          return;
+            setError("Veuillez sélectionner un professeur.");
+            return;
         }
         setError("");
         addItem();
@@ -71,7 +69,7 @@ export const CourseButton = ({
 
     useEffect(() => {
         fetchTeachers();
-      }, []);
+    }, []);
 
     return (
         <div className="relative" ref={containerRef}>
@@ -85,31 +83,38 @@ export const CourseButton = ({
             {/* Tooltip rendu dans le portail global */}
             {isFocused && (
                 <NodePortal>
-                    <div
-                        className="tooltip"
-                        ref={tooltipRef}>
+                    <div className="tooltip" ref={tooltipRef}>
                         <h3 className="mb-5 font-bold text-base">Ajouter un cours</h3>
-                        <div className="flex flex-row gap-4">
-                            <div className="flex flex-row mb-5">
-                                <label className="mr-2 text-clip text-nowrap">Ligne :</label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="3"
-                                    value={selectedRow}
-                                    onChange={(e) => setSelectedRow(Number(e.target.value))}
-                                    className="w-14 bg-gray-300 rounded-full pl-6"/>
-                            </div>
-                            <div className="flex flex-row mb-5">
-                                <label className="mr-2 text-clip text-nowrap">Colonne :</label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="7"
-                                    value={selectedCol}
-                                    onChange={(e) => setSelectedCol(Number(e.target.value))}
-                                    className="w-14 bg-gray-300 rounded-full pl-6"/>
-                            </div>                            
+
+                        <div className="mb-4">
+                            <label className="block mb-1 font-bold">Groupe :</label>
+                            <select
+                                value={groupList[selectedCol] || ""}
+                                onChange={(e) => {
+                                    const selectedIndex = groupList.indexOf(e.target.value);
+                                    setSelectedCol(selectedIndex !== -1 ? selectedIndex : 0);
+                                }}
+                                className="w-full p-2 border rounded">
+                                <option value="" disabled>
+                                    Choisir un groupe
+                                </option>
+                                {groupList.map((group, index) => (
+                                    <option key={index} value={group}>
+                                        {group}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block mb-1 font-bold">Semaine :</label>
+                            <input
+                                type="number"
+                                min="0"
+                                max="7"
+                                value={selectedRow}
+                                onChange={(e) => setSelectedRow(Number(e.target.value))}
+                                className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-6"/>
                         </div>
 
                         <div className="mb-4">
@@ -122,7 +127,7 @@ export const CourseButton = ({
                                 }}
                                 className="w-full p-2 border rounded">
                                 <option value="" disabled>
-                                Choisir un type de cours
+                                    Choisir un type de cours
                                 </option>
                                 {courseTypes.map((type) => (
                                     <option key={type.name} value={type.name}>
@@ -139,12 +144,12 @@ export const CourseButton = ({
                                 onChange={(e) => setSelectedTeacher(e.target.value)}
                                 className="w-full p-2 border rounded">
                                 <option value="" disabled>
-                                Choisir un professeur
+                                    Choisir un professeur
                                 </option>
                                 {teachers.map((teacher) => (
-                                <option key={teacher.code} value={teacher.code}>
-                                    {teacher.code}
-                                </option>
+                                    <option key={teacher.code} value={teacher.code}>
+                                        {teacher.code}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -156,12 +161,10 @@ export const CourseButton = ({
                                 step="0.5"
                                 value={selectedDuration}
                                 onChange={(e) => setSelectedDuration(Number(e.target.value))}
-                                className="w-full bg-gray-300 rounded-full pl-6"/>
+                                className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-6"/>
                         </div>
                         {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
-                        <button
-                            onClick={handleSubmit}
-                            className="px-3 py-2 w-full btn-default">
+                        <button onClick={handleSubmit} className="px-3 py-2 w-full btn-default">
                             Ajouter
                         </button>
                     </div>
