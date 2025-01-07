@@ -17,8 +17,12 @@ class Semester
 
     #[ORM\Column(type: 'string', length: 100)]
     private string $name;
-    private int $week_start;
-    private int $week_duration;
+
+    #[ORM\Column(type: 'integer')]
+    private ?int $week_start = null;
+
+    #[ORM\Column(type: 'integer')]
+    private ?int $week_duration = null;
 
     #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: 'semesters')]
     private Collection $curriculums;

@@ -68,6 +68,9 @@ class Course
     #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'courses')]
     private Collection $subjects;
 
+    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: 'courses')]
+    private Collection $comments;
+
     public function __construct()
     {
         $this->teachers = new ArrayCollection();
@@ -76,6 +79,7 @@ class Course
         $this->groups = new ArrayCollection();
         $this->halfGroups = new ArrayCollection();
         $this->formationLevels = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
     public function getId(): int
     {
@@ -253,6 +257,28 @@ class Course
     {
         if ($this->expectedDuration->removeElement($expectedDuration)){
             $expectedDuration->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getComments():Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)){
+            $this->comments->add($comment);
+            $comment->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)){
+            $comment->removeCourse($this);
         }
         return $this;
     }
