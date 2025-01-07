@@ -34,6 +34,14 @@ class ExpectedDuration
     #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "expectedDurations")]
     private Collection $courses;
 
+    #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'expectedDurations')]
+    #[ORM\JoinTable(
+        name: 'expected_duration_teacher',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'expected_duration_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $teacher;
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
