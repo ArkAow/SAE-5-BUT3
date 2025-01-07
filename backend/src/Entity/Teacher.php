@@ -44,6 +44,9 @@ class Teacher
     #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'teachers')]
     private Collection $departments;
 
+    #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, mappedBy: "teachers")]
+    private Collection $expected_duration;
+
 
     public function __construct()
     {
@@ -176,5 +179,17 @@ class Teacher
     {
         $this->is_partimetutor = $is_partimetutor;
         return $this;
+    }
+
+    public function getExpectedDuration() {
+        return $this->expected_duration;
+    }
+
+    public function addExpectedDuration(ExpectedDuration $expectedDuration) {
+        
+    }
+
+    public function removeExpectedDuration(ExpectedDuration $expectedDuration) {
+        
     }
 }
