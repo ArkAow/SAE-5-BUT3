@@ -316,7 +316,6 @@ const MainGrid = ({ curriculum }) => {
     return ["Tous", ...mainGroups, ...subGroups];
   };
 
-  const GRID_ROW_LENGTH = 25;
   const groupList = getGroupList();
 
   return (
@@ -453,10 +452,13 @@ const MainGrid = ({ curriculum }) => {
                       {groupName}
                     </div>
                   ))}
-                  {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
+                  {Array.from(
+                    { length: selectedSemester.week_duration },
+                    (_, i) => selectedSemester.week_start + i
+                  ).map((week, rowIndex) => (
                     <React.Fragment key={`row-${rowIndex}`}>
                       <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
-                        S{rowIndex + 1}
+                        S{week}
                       </div>
                       {groupList.map((_, colIndex) => {
                         const positionKey = `${rowIndex}-${colIndex}`;
