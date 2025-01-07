@@ -38,6 +38,14 @@ class Course
     )]
     private ?Collection $groups;
 
+    #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_expected_duration',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'expected_duration_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $expectedDuration;
+
     #[ORM\ManyToMany(targetEntity: HalfGroup::class, inversedBy: 'courses')]
     #[ORM\JoinTable(
         name: 'course_half_group',
@@ -60,6 +68,9 @@ class Course
     #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'courses')]
     private Collection $subjects;
 
+    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: 'courses')]
+    private Collection $comments;
+
     public function __construct()
     {
         $this->teachers = new ArrayCollection();
@@ -68,8 +79,8 @@ class Course
         $this->groups = new ArrayCollection();
         $this->halfGroups = new ArrayCollection();
         $this->formationLevels = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
-
     public function getId(): int
     {
         return $this->id;
@@ -224,6 +235,50 @@ class Course
     {
         if ($this->formationLevels->removeElement($formationLevel)){
             $formationLevel->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getExpectedDuration():Collection
+    {
+        return $this->expectedDuration;
+    }
+
+    public function addExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if (!$this->expectedDuration->contains($expectedDuration)){
+            $this->expectedDuration->add($expectedDuration);
+            $expectedDuration->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeExpectedDuration(expectedDuration $expectedDuration): self
+    {
+        if ($this->expectedDuration->removeElement($expectedDuration)){
+            $expectedDuration->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getComments():Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)){
+            $this->comments->add($comment);
+            $comment->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)){
+            $comment->removeCourse($this);
         }
         return $this;
     }
