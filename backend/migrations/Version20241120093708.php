@@ -78,8 +78,8 @@ final class Version20241120093708 extends AbstractMigration
         $semester = $schema->createTable('semester');
         $semester->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $semester->addColumn('name', 'string', ['length' => 100]);
-        $semester->addColumn('week_start', 'integer');
-        $semester->addColumn('week_duration', 'integer');
+        $semester->addColumn('week_start', 'integer', ['nullable' => true]);
+        $semester->addColumn('week_duration', 'integer', ['nullable' => true]);
         $semester->setPrimaryKey(['id']);
         
         // Table Semester - Curriculum
@@ -286,6 +286,7 @@ final class Version20241120093708 extends AbstractMigration
         $department_curriculum->addForeignKeyConstraint($curriculum, ['curriculum_id'], ['id'], ['onDelete' => 'CASCADE']);
 
         // Table Department - User
+
         $user_department = $schema->createTable('user_department');
         $user_department->addColumn('user_id','integer', ['unsigned' => true, 'notnull' => true]);
         $user_department->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
@@ -294,17 +295,44 @@ final class Version20241120093708 extends AbstractMigration
         $user_department->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
 
         // Table Archive
+
         $archive = $schema->createTable('archive');
         $archive->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $archive->setPrimaryKey(['id']);
 
         // Table Archive - Department
+
         $archive_department = $schema->createTable('archive_department');
         $archive_department->addColumn('archive_id','integer', ['unsigned' => true, 'notnull' => true]);
         $archive_department->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
         $archive_department->setPrimaryKey(['archive_id', 'department_id']);
         $archive_department->addForeignKeyConstraint($archive, ['archive_id'], ['id'], ['onDelete' => 'CASCADE']);
         $archive_department->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
+
+        // Table Comment
+
+        $comment = $schema->createTable('comment');
+        $comment->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
+        $comment->addColumn('text', 'string', ['length' => 500]);
+        $comment->setPrimaryKey(['id']);
+
+        // Table User - Comment
+
+        $user_comment = $schema->createTable('user_comment');
+        $user_comment->addColumn('user_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $user_comment->addColumn('comment_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $user_comment->setPrimaryKey(['user_id', 'comment_id']);
+        $user_comment->addForeignKeyConstraint($user, ['user_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $user_comment->addForeignKeyConstraint($comment, ['comment_id'], ['id'], ['onDelete' => 'CASCADE']);
+
+        // Table Comment - Course
+
+        $comment_course = $schema->createTable('comment_course');
+        $comment_course->addColumn('comment_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $comment_course->addColumn('course_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $comment_course->setPrimaryKey(['comment_id', 'course_id']);
+        $comment_course->addForeignKeyConstraint($comment, ['comment_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $comment_course->addForeignKeyConstraint($course, ['course_id'], ['id'], ['onDelete' => 'CASCADE']);
     }
 
     public function down(Schema $schema): void
@@ -314,6 +342,8 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('course_half_group');
         $schema->dropTable('course_expected_duration');
         $schema->dropTable('expected_duration_teacher');
+        $schema->dropTable('user_comment');
+        $schema->dropTable('comment_course');
         $schema->dropTable('half_group');
         $schema->dropTable('group');
         $schema->dropTable('group_half_group');
@@ -336,6 +366,7 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('course_teacher');
         $schema->dropTable('subject_teacher');
         $schema->dropTable('user');
+        $schema->dropTable('comment');
         $schema->dropTable('department');
         $schema->dropTable('department_formation_Level');
         $schema->dropTable('department_teacher');
