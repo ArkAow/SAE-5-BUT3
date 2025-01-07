@@ -61,24 +61,48 @@ export const CourseButton = ({
         return createPortal(children, document.getElementById("portal-root"));
     };
 
+    const checkPayloadExceptions = (from, to, exceptions) => {
+        if (exceptions.some((val) => isNaN(val))) {
+            setError("Les exceptions ne doivent contenir que des chiffres.");
+            return false;
+        }
+        if (exceptions.includes('0')) {
+            setError("'0' n'est pas une valeur valide.");
+            return false;
+        }
+        if (exceptions.some((val) => val < from || val > to)) {
+            setError(`Les exceptions doivent être entre ${from} et ${to}.`);
+            return false;
+        }
+    
+        return true;
+    };
+    
     const handleSubmit = (e) => {
         e.preventDefault();
+    
         if (!selectedTeacher) {
             setError("Veuillez sélectionner un professeur.");
             return;
         }
         setError("");
+
         const payload = {
             teacher: selectedTeacher,
             courseType: selectedCourseType,
             duration: selectedDuration,
             group: groupList[selectedCol],
         };
+    
         if (isRepeat) {
             payload.isRepeat = isRepeat;
             payload.repeatFrom = repeatFrom;
             payload.repeatTo = repeatTo;
             payload.exceptions = exceptions.split(";").map((val) => val.trim()).filter(Boolean);
+    
+            if (!checkPayloadExceptions(repeatFrom, repeatTo, payload.exceptions)) {
+                return;
+            }
         } else {
             payload.week = selectedRow;
         }
@@ -128,7 +152,7 @@ export const CourseButton = ({
                                         className="tooltip-select">
                                         {Array.from({ length: 8 }, (_, i) => (
                                             <option key={i} value={i}>
-                                            Semaine {i}
+                                            Semaine {i+1}
                                             </option>
                                         ))}
                                         </select>
@@ -141,7 +165,7 @@ export const CourseButton = ({
                                         className="tooltip-select">
                                         {Array.from({ length: 8 }, (_, i) => (
                                             <option key={i} value={i}>
-                                            Semaine {i}
+                                            Semaine {i+1}
                                             </option>
                                         ))}
                                         </select>
