@@ -386,6 +386,7 @@ const MainGrid = ({ curriculum }) => {
                 isExpanded={isControlPanelExpanded}
                 setIsExpanded={setIsControlPanelIsExpanded}
                 curriculum={curriculum}
+                selectedSemester={selectedSemester}
                 setToast={setToast}
                 groups={groups}
                 groupList={groupList}

@@ -9,6 +9,7 @@ const ControlPanel = ({
   isExpanded,
   setIsExpanded,
   curriculum,
+  selectedSemester,
   setToast,
   groups,
   groupList,
@@ -69,6 +70,7 @@ const ControlPanel = ({
         <CourseButton
           isNoGroups={isNoGroups}
           groupList={groupList}
+          selectedSemester={selectedSemester}
           courseTypes={courseTypes}
           addItem={addItem}/>
 

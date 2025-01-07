@@ -5,6 +5,7 @@ import routes from "../../../Routes/routes";
 export const CourseButton = ({
     isNoGroups,
     groupList,
+    selectedSemester,
     courseTypes,
     addItem,
 }) => {
@@ -58,6 +59,10 @@ export const CourseButton = ({
     };
 
     const checkPayloadExceptions = (from, to, exceptions) => {
+        if (from >= to) {
+            setError("La valeur 'De' doit être inférieure à la valeur 'À'.");
+            return false;
+        }
         if (exceptions.some((val) => isNaN(val))) {
             setError("Les exceptions ne doivent contenir que des chiffres.");
             return false;
@@ -147,9 +152,11 @@ export const CourseButton = ({
                                         value={repeatFrom}
                                         onChange={(e) => setRepeatFrom(Number(e.target.value))}
                                         className="tooltip-select">
-                                        {Array.from({ length: 8 }, (_, i) => (
+                                        {Array.from(
+                                            { length: selectedSemester?.week_duration || 20 },
+                                            (_, i) => (
                                             <option key={i} value={i}>
-                                            Semaine {i+1}
+                                            Semaine {i+(selectedSemester?.week_start || 1)}
                                             </option>
                                         ))}
                                         </select>
@@ -160,9 +167,11 @@ export const CourseButton = ({
                                         value={repeatTo}
                                         onChange={(e) => setRepeatTo(Number(e.target.value))}
                                         className="tooltip-select">
-                                        {Array.from({ length: 8 }, (_, i) => (
+                                        {Array.from(
+                                            { length: selectedSemester?.week_duration || 20 },
+                                            (_, i) => (
                                             <option key={i} value={i}>
-                                            Semaine {i+1}
+                                            Semaine {i+(selectedSemester?.week_start || 1)}
                                             </option>
                                         ))}
                                         </select>
@@ -183,14 +192,18 @@ export const CourseButton = ({
                         ) : (
                             <div className="flex items-center gap-2 mb-3 bg-gray-200 p-2 rounded-b-xl">
                                 <label className="w-20 block mb-1 font-bold">Semaine :</label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="7"
+                                <select
                                     value={selectedRow}
                                     onChange={(e) => setSelectedRow(Number(e.target.value))}
-                                    className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-2"
-                                />
+                                    className="tooltip-select">
+                                    {Array.from(
+                                        { length: selectedSemester?.week_duration || 20 },
+                                        (_, i) => (
+                                        <option key={i} value={i}>
+                                        Semaine {i+(selectedSemester?.week_start || 1)}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         )}
 
