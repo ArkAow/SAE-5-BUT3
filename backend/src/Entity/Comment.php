@@ -20,12 +20,10 @@ class Comment
     #[ORM\Column]
     private ?string $text = null;
 
-    #[ORM\Column]
-    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'comments')]
     private Collection $users;
 
-    #[ORM\Column]
-    #[ORM\ManyToMany(targetEntity: Course::class)]
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'comments')]
     private Collection $courses;
 
     public function __construct(){
