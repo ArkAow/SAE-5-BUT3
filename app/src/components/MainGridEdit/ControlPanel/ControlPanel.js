@@ -14,19 +14,9 @@ const ControlPanel = ({
   groupList,
   setGroups,
   fetchGroups,
-  selectedRow,
-  setSelectedRow,
-  selectedCol,
-  setSelectedCol,
   courseTypes,
   setCourseTypes,
   updateCoursesForRemovedType,
-  selectedCourseType,
-  setSelectedCourseType,
-  selectedTeacher,
-  setSelectedTeacher,
-  selectedDuration,
-  setSelectedDuration,
   addItem }) => {
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -79,17 +69,7 @@ const ControlPanel = ({
         <CourseButton
           isNoGroups={isNoGroups}
           groupList={groupList}
-          selectedRow={selectedRow}
-          setSelectedRow={setSelectedRow}
-          selectedCol={selectedCol}
-          setSelectedCol={setSelectedCol}
           courseTypes={courseTypes}
-          selectedCourseType={selectedCourseType}
-          setSelectedCourseType={setSelectedCourseType}
-          selectedTeacher={selectedTeacher}
-          setSelectedTeacher={setSelectedTeacher}
-          selectedDuration={selectedDuration}
-          setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
 
         <CourseTypeButton 

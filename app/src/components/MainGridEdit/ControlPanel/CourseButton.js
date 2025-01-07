@@ -5,17 +5,7 @@ import routes from "../../../Routes/routes";
 export const CourseButton = ({
     isNoGroups,
     groupList,
-    selectedRow,
-    setSelectedRow,
-    selectedCol,
-    setSelectedCol,
     courseTypes,
-    selectedCourseType,
-    setSelectedCourseType,
-    selectedTeacher,
-    setSelectedTeacher,
-    selectedDuration,
-    setSelectedDuration,
     addItem,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -27,6 +17,12 @@ export const CourseButton = ({
     const [teachers, setTeachers] = useState([]);
     const containerRef = useRef(null);
     const tooltipRef = useRef(null);
+
+    const [selectedRow, setSelectedRow] = useState(0);
+    const [selectedCol, setSelectedCol] = useState(0);
+    const [selectedCourseType, setSelectedCourseType] = useState(courseTypes ? courseTypes[0] : {});
+    const [selectedTeacher, setSelectedTeacher] = useState("");
+    const [selectedDuration, setSelectedDuration] = useState(1.0);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -71,10 +67,9 @@ export const CourseButton = ({
             return false;
         }
         if (exceptions.some((val) => val < from || val > to)) {
-            setError(`Les exceptions doivent être entre ${from} et ${to}.`);
+            setError(`Les exceptions doivent être entre ${from+1} et ${to+1}.`);
             return false;
         }
-    
         return true;
     };
     
@@ -92,6 +87,8 @@ export const CourseButton = ({
             courseType: selectedCourseType,
             duration: selectedDuration,
             group: groupList[selectedCol],
+            row: selectedRow,
+            col: selectedCol,
         };
     
         if (isRepeat) {
@@ -100,7 +97,7 @@ export const CourseButton = ({
             payload.repeatTo = repeatTo;
             payload.exceptions = exceptions.split(";").map((val) => val.trim()).filter(Boolean);
     
-            if (!checkPayloadExceptions(repeatFrom, repeatTo, payload.exceptions)) {
+            if (!checkPayloadExceptions(payload.repeatFrom, payload.repeatTo, payload.exceptions)) {
                 return;
             }
         } else {

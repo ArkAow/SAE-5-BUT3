@@ -12,8 +12,6 @@ const MainGrid = ({ curriculum }) => {
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
   const [items, setItems] = useState({});
-  const [selectedRow, setSelectedRow] = useState(0);
-  const [selectedCol, setSelectedCol] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
@@ -22,9 +20,6 @@ const MainGrid = ({ curriculum }) => {
   const [groups, setGroups] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
-  const [selectedCourseType, setSelectedCourseType] = useState(null);
-  const [selectedTeacher, setSelectedTeacher] = useState("");
-  const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
   const [isLoading, setLoading] = useState(true);
@@ -137,7 +132,6 @@ const MainGrid = ({ curriculum }) => {
         }
         const data = await response.json();
         setCourseTypes(data);
-        setSelectedCourseType(data[0] || null);
       } catch (error) {
         console.error(error);
       }
@@ -150,6 +144,12 @@ const MainGrid = ({ curriculum }) => {
   }, []);
 
   const addItem = (payload) => {
+    const selectedTeacher = payload.teacher;
+    const selectedCourseType = payload.courseType;
+    const selectedDuration = payload.duration
+    const selectedRow = payload.row;
+    const selectedCol = payload.col
+
     if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
       console.error("Les informations de base sont manquantes.");
       return;
@@ -393,19 +393,9 @@ const MainGrid = ({ curriculum }) => {
                 groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
-                selectedRow={selectedRow}
-                setSelectedRow={setSelectedRow}
-                selectedCol={selectedCol}
-                setSelectedCol={setSelectedCol}
                 courseTypes={courseTypes}
                 setCourseTypes={setCourseTypes}
                 updateCoursesForRemovedType={updateCoursesForRemovedType}
-                selectedCourseType={selectedCourseType}
-                setSelectedCourseType={setSelectedCourseType}
-                selectedTeacher={selectedTeacher}
-                setSelectedTeacher={setSelectedTeacher}
-                selectedDuration={selectedDuration}
-                setSelectedDuration={setSelectedDuration}
                 addItem={addItem}
               />
             </div>
