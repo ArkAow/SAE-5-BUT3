@@ -66,7 +66,7 @@ export const CourseButton = ({
             setError("'0' n'est pas une valeur valide.");
             return false;
         }
-        if (exceptions.some((val) => val < from || val > to)) {
+        if (exceptions.some((val) => val < from+1 || val > to+1)) {
             setError(`Les exceptions doivent être entre ${from+1} et ${to+1}.`);
             return false;
         }
