@@ -453,8 +453,8 @@ const MainGrid = ({ curriculum }) => {
                     </div>
                   ))}
                   {Array.from(
-                    { length: selectedSemester.week_duration },
-                    (_, i) => selectedSemester.week_start + i
+                    { length: selectedSemester.week_duration || 20 }, // La durée par défaut est 20 si week_duration est indéfini
+                    (_, i) => (selectedSemester.week_start || 1) + i // La semaine de départ par défaut est 1 si week_start est indéfini
                   ).map((week, rowIndex) => (
                     <React.Fragment key={`row-${rowIndex}`}>
                       <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
