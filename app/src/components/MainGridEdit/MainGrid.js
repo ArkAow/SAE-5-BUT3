@@ -168,21 +168,19 @@ const MainGrid = ({ curriculum }) => {
         const newItem = {
           color: selectedCourseType.color,
           courseType: selectedCourseType.name,
-          teacher: selectedTeacher,
+          teacher: selectedTeacher.code,
           duration: selectedDuration,
           id: Date.now() + week,
         };
-  
         newItems.push({ positionKey, newItem });
   
         const newCourse = {
-          teacher: { name: selectedTeacher },
+          teacher: selectedTeacher,
           courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
           duration: selectedDuration,
           pos: { x: selectedCol, y: week },
           id: newItem.id,
         };
-  
         newCourses.push(newCourse);
       }
     } else {
@@ -190,21 +188,19 @@ const MainGrid = ({ curriculum }) => {
       const newItem = {
         color: selectedCourseType.color,
         courseType: selectedCourseType.name,
-        teacher: selectedTeacher,
+        teacher: selectedTeacher.code,
         duration: selectedDuration,
         id: Date.now(),
       };
-  
       newItems.push({ positionKey, newItem });
   
       const newCourse = {
-        teacher: { name: selectedTeacher },
+        teacher: selectedTeacher,
         courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
         duration: selectedDuration,
         pos: { x: selectedCol, y: selectedRow },
         id: newItem.id,
       };
-  
       newCourses.push(newCourse);
     }
   

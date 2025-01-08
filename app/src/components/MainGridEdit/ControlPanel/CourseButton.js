@@ -22,7 +22,7 @@ export const CourseButton = ({
     const [selectedRow, setSelectedRow] = useState(0);
     const [selectedCol, setSelectedCol] = useState(0);
     const [selectedCourseType, setSelectedCourseType] = useState(courseTypes ? courseTypes[0] : {});
-    const [selectedTeacher, setSelectedTeacher] = useState("");
+    const [selectedTeacherCode, setSelectedTeacherCode] = useState("");
     const [selectedDuration, setSelectedDuration] = useState(1.0);
 
     useEffect(() => {
@@ -81,12 +81,13 @@ export const CourseButton = ({
     const handleSubmit = (e) => {
         e.preventDefault();
     
-        if (!selectedTeacher) {
+        if (!selectedTeacherCode) {
             setError("Veuillez sélectionner un professeur.");
             return;
         }
         setError("");
 
+        const selectedTeacher = teachers.find((teacher) => teacher.code === selectedTeacherCode);
         const payload = {
             teacher: selectedTeacher,
             courseType: selectedCourseType,
@@ -230,8 +231,8 @@ export const CourseButton = ({
                         <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
                             <label className="block mb-1 font-bold w-24">Professeur :</label>
                             <select
-                                value={selectedTeacher}
-                                onChange={(e) => setSelectedTeacher(e.target.value)}
+                                value={selectedTeacherCode}
+                                onChange={(e) => setSelectedTeacherCode(e.target.value)}
                                 className="tooltip-select">
                                 <option value="" disabled>
                                     Choisir un professeur
