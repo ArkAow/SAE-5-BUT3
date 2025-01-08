@@ -5,15 +5,12 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
-import handleDeleteNode from "./Node.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
   const [items, setItems] = useState({});
-  const [selectedRow, setSelectedRow] = useState(0);
-  const [selectedCol, setSelectedCol] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState({});
@@ -22,9 +19,6 @@ const MainGrid = ({ curriculum }) => {
   const [groups, setGroups] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
-  const [selectedCourseType, setSelectedCourseType] = useState({});
-  const [selectedTeacher, setSelectedTeacher] = useState({});
-  const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
   const [isSaving, setSaving] = useState(false);
@@ -138,7 +132,6 @@ const MainGrid = ({ curriculum }) => {
         }
         const data = await response.json();
         setCourseTypes(data);
-        setSelectedCourseType(data[0] || null);
       } catch (error) {
         console.error(error);
       }
@@ -150,43 +143,91 @@ const MainGrid = ({ curriculum }) => {
     fetchCourseTypes();
   }, []);
 
-  const addItem = () => {
-    const positionKey = `${selectedRow}-${selectedCol}`;
-    const newItem = {
-      color: selectedCourseType.color,
-      courseType: selectedCourseType.name,
-      teacher: selectedTeacher.code,
-      duration: selectedDuration,
-      id: Date.now(),
-    };
+  const addItem = (payload) => {
+    const selectedTeacher = payload.teacher;
+    const selectedCourseType = payload.courseType;
+    const selectedDuration = payload.duration
+    const selectedRow = payload.row;
+    const selectedCol = payload.col
+
+    if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
+      console.error("Les informations de base sont manquantes.");
+      return;
+    }
   
-    setItems((prevItems) => ({
-      ...prevItems,
-      [positionKey]: [...(prevItems[positionKey] || []), newItem],
-    }));
+    const newItems = [];
+    const newCourses = [];
   
-    const newCourse = {
-      teacher: selectedTeacher,
-      courseType: selectedCourseType,
-      subject: selectedSubject,
-      duration: selectedDuration,
-      pos: { x: selectedCol, y: selectedRow },
-      id: Date.now(),
-    };
+    if (payload.isRepeat) {
+      const exceptionsArray = payload.exceptions ? payload.exceptions.map((val) => parseInt(val.trim(), 10) - 1) : [];
+
+      for (let week = payload.repeatFrom; week <= payload.repeatTo; week++) {
+        if (exceptionsArray.includes(week)) continue;
+        
+        const positionKey = `${week}-${selectedCol}`;
+        const newItem = {
+          color: selectedCourseType.color,
+          courseType: selectedCourseType.name,
+          teacher: selectedTeacher,
+          duration: selectedDuration,
+          id: Date.now() + week,
+        };
+  
+        newItems.push({ positionKey, newItem });
+  
+        const newCourse = {
+          teacher: { name: selectedTeacher },
+          courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
+          duration: selectedDuration,
+          pos: { x: selectedCol, y: week },
+          id: newItem.id,
+        };
+  
+        newCourses.push(newCourse);
+      }
+    } else {
+      const positionKey = `${selectedRow}-${selectedCol}`;
+      const newItem = {
+        color: selectedCourseType.color,
+        courseType: selectedCourseType.name,
+        teacher: selectedTeacher,
+        duration: selectedDuration,
+        id: Date.now(),
+      };
+  
+      newItems.push({ positionKey, newItem });
+  
+      const newCourse = {
+        teacher: { name: selectedTeacher },
+        courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
+        duration: selectedDuration,
+        pos: { x: selectedCol, y: selectedRow },
+        id: newItem.id,
+      };
+  
+      newCourses.push(newCourse);
+    }
+  
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      newItems.forEach(({ positionKey, newItem }) => {
+        updatedItems[positionKey] = [...(updatedItems[positionKey] || []), newItem];
+      });
+      return updatedItems;
+    });
   
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
-          const updatedCourses = [...(subject.courses || []), newCourse];
+          const updatedCourses = [...(subject.courses || []), ...newCourses];
           return { ...subject, courses: updatedCourses };
         }
         return subject;
       });
-  
       return updatedSubjects;
     });
   
-    setCurrentCourses((prevCourses) => [...prevCourses, newCourse]);
+    setCurrentCourses((prevCourses) => [...prevCourses, ...newCourses]);
   };
 
   const deleteItem = (positionKey, id) => {
@@ -346,24 +387,15 @@ const MainGrid = ({ curriculum }) => {
                 isExpanded={isControlPanelExpanded}
                 setIsExpanded={setIsControlPanelIsExpanded}
                 curriculum={curriculum}
+                selectedSemester={selectedSemester}
                 setToast={setToast}
                 groups={groups}
                 groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
-                selectedRow={selectedRow}
-                setSelectedRow={setSelectedRow}
-                selectedCol={selectedCol}
-                setSelectedCol={setSelectedCol}
                 courseTypes={courseTypes}
                 setCourseTypes={setCourseTypes}
                 updateCoursesForRemovedType={updateCoursesForRemovedType}
-                selectedCourseType={selectedCourseType}
-                setSelectedCourseType={setSelectedCourseType}
-                selectedTeacher={selectedTeacher}
-                setSelectedTeacher={setSelectedTeacher}
-                selectedDuration={selectedDuration}
-                setSelectedDuration={setSelectedDuration}
                 addItem={addItem}
                 subjects={availableSubjects}
                 isSaving={isSaving}

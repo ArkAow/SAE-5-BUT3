@@ -24,6 +24,7 @@
 
 ### ----- Backend -----
 ###> symfony/framework-bundle ###
+/backend/.env
 /backend/.env.local
 /backend/.env.local.php
 /backend/.env.*.local

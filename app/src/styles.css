@@ -22,10 +22,13 @@
       @apply text-white font-bold bg-primary border hover:bg-primaryshade border-white rounded-lg shadow-sm
     }
     .tooltip {
-      @apply absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg w-80 text-xs border-2 border-gray-300
+      @apply absolute top-32 left-32 bg-white p-5 rounded-lg shadow-lg min-w-80 text-xs border-2 border-gray-300
     }
     .tooltip-centered {
       @apply bg-white p-5 rounded-lg shadow-lg text-xs border-2 border-gray-300
+    }
+    .tooltip-select {
+      @apply w-full p-1 border rounded-full bg-primary text-white
     }
   }
 

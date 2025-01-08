@@ -9,24 +9,15 @@ const ControlPanel = ({
   isExpanded,
   setIsExpanded,
   curriculum,
+  selectedSemester,
   setToast,
   groups,
   groupList,
   setGroups,
   fetchGroups,
-  selectedRow,
-  setSelectedRow,
-  selectedCol,
-  setSelectedCol,
   courseTypes,
   setCourseTypes,
   updateCoursesForRemovedType,
-  selectedCourseType,
-  setSelectedCourseType,
-  selectedTeacher,
-  setSelectedTeacher,
-  selectedDuration,
-  setSelectedDuration,
   addItem,
   subjects,
   isSaving,
@@ -81,17 +72,9 @@ const ControlPanel = ({
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton
           isNoGroups={isNoGroups}
-          selectedRow={selectedRow}
-          setSelectedRow={setSelectedRow}
-          selectedCol={selectedCol}
-          setSelectedCol={setSelectedCol}
+          groupList={groupList}
+          selectedSemester={selectedSemester}
           courseTypes={courseTypes}
-          selectedCourseType={selectedCourseType}
-          setSelectedCourseType={setSelectedCourseType}
-          selectedTeacher={selectedTeacher}
-          setSelectedTeacher={setSelectedTeacher}
-          selectedDuration={selectedDuration}
-          setSelectedDuration={setSelectedDuration}
           addItem={addItem}/>
 
         <CourseTypeButton 
