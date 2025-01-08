@@ -11,6 +11,7 @@ const ControlPanel = ({
   curriculum,
   setToast,
   groups,
+  groupList,
   setGroups,
   fetchGroups,
   selectedRow,
@@ -27,7 +28,9 @@ const ControlPanel = ({
   selectedDuration,
   setSelectedDuration,
   addItem,
-  items }) => {
+  subjects,
+  isSaving,
+  setSaving }) => {
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
@@ -108,8 +111,12 @@ const ControlPanel = ({
         <PrintButton />
 
         <SaveButton
+          subjects={subjects}
+          groups={groups}
+          groupList={groupList}
           setToast={setToast}
-          items={items}/>
+          isSaving={isSaving}
+          setSaving={setSaving}/>
       </div>
     </div>
   );

@@ -27,6 +27,7 @@ const MainGrid = ({ curriculum }) => {
   const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
+  const [isSaving, setSaving] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [isGroupLoading, setIsGroupLoading] = useState(true);
   const [isSemesterLoading, setIsSemesterLoading] = useState(true);
@@ -320,7 +321,7 @@ const MainGrid = ({ curriculum }) => {
   const groupList = getGroupList();
 
   return (
-    <div className="min-h-screen py-10">
+    <div className={`min-h-screen py-10 ${isSaving ? 'cursor-wait' : 'cursor-default'}`}>
       {isLoading ? (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] space-y-10">
         <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
@@ -347,6 +348,7 @@ const MainGrid = ({ curriculum }) => {
                 curriculum={curriculum}
                 setToast={setToast}
                 groups={groups}
+                groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
                 selectedRow={selectedRow}
@@ -363,7 +365,9 @@ const MainGrid = ({ curriculum }) => {
                 selectedDuration={selectedDuration}
                 setSelectedDuration={setSelectedDuration}
                 addItem={addItem}
-                items={items}
+                subjects={availableSubjects}
+                isSaving={isSaving}
+                setSaving={setSaving}
               />
             </div>
 

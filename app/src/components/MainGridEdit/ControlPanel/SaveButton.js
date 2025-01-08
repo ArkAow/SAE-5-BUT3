@@ -1,45 +1,32 @@
 import React from "react";
 import routes from "../../../Routes/routes";
+import { determineCourseGroup } from "../../../services/courseGroupService";
 
-export const SaveButton = ({ items, setToast }) => {  
-  const handleSave = async () => {
-    try {
-      const courses = Object.values(items).flat();
-
-      for (const course of courses) {
-        const response = await fetch(routes.dev.courses.add(), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            duration: course.duration,
-            positionX: course.pos?.x || 0,
-            positionY: course.pos?.y || 0,
-            teacher: course.teacher,
-            courseType: course.courseType,
-            subject: course.subject,
-          }),
+export const SaveButton = ({ subjects, groups, groupList, setToast, isSaving, setSaving }) => {  
+  const handleSave = () => {
+    setSaving(true);
+  
+    subjects.forEach((subject) => {
+      if (subject.courses) {
+        subject.courses.forEach((course) => {
+          const courseGroupType = determineCourseGroup(course, groups, groupList);
+          const IS_COURSE_GROUP_TYPE_HALF_GROUP = courseGroupType == 'half_group';
+          const IS_COURSE_GROUP_TYPE_GROUP = courseGroupType == 'group';
+          const IS_COURSE_GROUP_TYPE_FORMATION_LEVEL = courseGroupType == 'formation_level';
         });
       }
+    });
 
-      setToast({
-        message: "Sauvegarde effectuée",
-        type: "success",
-        visible: true,
-      });
-    } catch (error) {
-      console.error("Erreur lors de la sauvegarde :", error);
-      setToast({
-        message: "Erreur lors de la sauvegarde",
-        type: "error",
-        visible: true,
-      });
-    }
+    setToast({
+      message: "Prévisionnel sauvegardé avec succès",
+      type: "success",
+      visible: true,
+    });
+    setSaving(false);
   };
 
   return (
-    <button className="btn-control-panel" onClick={handleSave}>
+    <button className={`btn-control-panel ${isSaving ? 'bg-white cursor-wait' : ''}`} onClick={handleSave}>
       <img
         src="/images/save.svg"
         alt="save icon"
