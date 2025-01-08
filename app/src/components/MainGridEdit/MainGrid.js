@@ -5,6 +5,7 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
+import handleDeleteNode from "./Node.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -32,22 +33,7 @@ const MainGrid = ({ curriculum }) => {
   const [isSubjectLoading, setIsSubjectLoading] = useState(true);
   const [isCourseTypeLoading, setIsCourseTypeLoading] = useState(true);
   
-  const removeNode = (positionKey, id) => {
-    setItems((prevItems) => {
-      const filteredItems = (prevItems[positionKey] || []).filter((item) => item.id !== id);
-
-      if (filteredItems.length === 0) {
-        const { [positionKey]: _, ...rest } = prevItems; // Supprime la clé si plus d'éléments
-        return rest;
-      }
-
-      return {
-        ...prevItems,
-        [positionKey]: filteredItems,
-      };
-    });
-  };
-
+  
   useEffect(() => {
     if (!isGroupLoading && !isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
       setLoading(false);
@@ -201,6 +187,33 @@ const MainGrid = ({ curriculum }) => {
   
     setCurrentCourses((prevCourses) => [...prevCourses, newCourse]);
   };
+
+  const deleteItem = (positionKey, id) => {
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      if (updatedItems[positionKey]) {
+        updatedItems[positionKey] = updatedItems[positionKey].filter((item) => item.id !== id);
+        if (updatedItems[positionKey].length === 0) {
+          delete updatedItems[positionKey];
+        }
+      }
+      return updatedItems;
+    });
+  
+    setAvailableSubjects((prevSubjects) => {
+      const updatedSubjects = prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = subject.courses.filter((course) => course.id !== id);
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+  
+      return updatedSubjects;
+    });
+  
+    setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
+  };
   
   const moveItem = (fromKey, toKey, id) => {
     setItems((prevItems) => {
@@ -304,7 +317,6 @@ const MainGrid = ({ curriculum }) => {
     return ["Tous", ...mainGroups, ...subGroups];
   };
 
-  const GRID_ROW_LENGTH = 25;
   const groupList = getGroupList();
 
   return (
@@ -442,10 +454,13 @@ const MainGrid = ({ curriculum }) => {
                       {groupName}
                     </div>
                   ))}
-                  {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
+                  {Array.from(
+                    { length: selectedSemester.week_duration || 20 }, // La durée par défaut est 20 si week_duration est indéfini
+                    (_, i) => (selectedSemester.week_start || 1) + i // La semaine de départ par défaut est 1 si week_start est indéfini
+                  ).map((week, rowIndex) => (
                     <React.Fragment key={`row-${rowIndex}`}>
                       <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
-                        S{rowIndex + 1}
+                        S{week}
                       </div>
                       {groupList.map((_, colIndex) => {
                         const positionKey = `${rowIndex}-${colIndex}`;
@@ -456,7 +471,7 @@ const MainGrid = ({ curriculum }) => {
                             positionKey={positionKey}
                             items={cellItems}
                             moveItem={moveItem}
-                            removeNode={removeNode}
+                            deleteItem={deleteItem}
                           />
                         );
                       })}

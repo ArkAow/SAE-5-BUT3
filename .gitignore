@@ -35,3 +35,5 @@
 
 ### fichiers excels
 /backend/public/uploads
+
+/backend/.env

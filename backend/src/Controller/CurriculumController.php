@@ -21,7 +21,7 @@ class CurriculumController extends AbstractController
         $connection = $em->getConnection();
         //Requête SQL 
         $sql = '
-            SELECT s.id, s.name 
+            SELECT *
             FROM semester s
             INNER JOIN curriculum_semester cursem ON cursem.semester_id = s.id
             WHERE cursem.curriculum_id = :curriculumId
