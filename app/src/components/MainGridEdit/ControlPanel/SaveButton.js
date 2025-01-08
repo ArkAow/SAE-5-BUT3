@@ -13,6 +13,13 @@ export const SaveButton = ({ subjects, groups, groupList, setToast, isSaving, se
           const IS_COURSE_GROUP_TYPE_HALF_GROUP = courseGroupType == 'half_group';
           const IS_COURSE_GROUP_TYPE_GROUP = courseGroupType == 'group';
           const IS_COURSE_GROUP_TYPE_FORMATION_LEVEL = courseGroupType == 'formation_level';
+
+          const payload = {
+            teacher: course.teacher.id,
+            courseType: course.courseType.name,
+            duration: course.duration,
+            group: course.group?.id,
+          };
         });
       }
     });
