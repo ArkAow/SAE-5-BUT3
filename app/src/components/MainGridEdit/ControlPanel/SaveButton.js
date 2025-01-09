@@ -16,7 +16,7 @@ export const SaveButton = ({ modifiedCourses, setModifiedCourses, setToast, isSa
           subjectId: course.subject?.id,
           weekPosition: course.pos?.y,
           ...(course.groupInfo.groupType === "formation_level" && { formationLevelId: course.groupInfo.groupID }),
-          ...(course.groupInfo.groupType === "group" && { groupPosition: course.groupInfo.groupID }),
+          ...(course.groupInfo.groupType === "group" && { groupId: course.groupInfo.groupID }),
           ...(course.groupInfo.groupType === "half_group" && { halfGroupId: course.groupInfo.groupID }),
         };
 

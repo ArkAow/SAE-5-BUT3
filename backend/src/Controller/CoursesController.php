@@ -19,24 +19,52 @@ use App\Repository\HalfGroupRepository;
 
 class CoursesController extends AbstractController
 {
+    /**
+     * Formatte les données d'un cours pour la réponse JSON.
+     */
+    private function formatCourse(Course $course): array
+    {
+        return [
+            'id' => $course->getId(),
+            'duration' => $course->getDuration(),
+            'weekPosition' => $course->getWeekPosition(),
+            'formation_level' => $course->getFormationLevel(),
+            'group' => $course->getGroups(),
+            'half_group' => $course->getHalfGroups(),
+            'courseTypes' => array_map(
+                fn($type) => [
+                    'id' => $type->getId(),
+                    'name' => $type->getName(),
+                    'color' => $type->getColor(),
+                ],
+                $course->getCourseTypes()->toArray()
+            ),
+            'teachers' => array_map(
+                fn($teacher) => [
+                    'id' => $teacher->getId(),
+                    'firstName' => $teacher->getFirstName(),
+                    'lastName' => $teacher->getLastName(),
+                ],
+                $course->getTeachers()->toArray()
+            ),
+            'subjects' => array_map(
+                fn($subject) => [
+                    'id' => $subject->getId(),
+                    'name' => $subject->getName(),
+                    'code' => $subject->getCode(),
+                ],
+                $course->getSubjects()->toArray()
+            ),
+        ];
+    }
+
     #[Route('/courses', name: 'get_courses', methods: ['GET'])]
     public function getCourses(CourseRepository $courseRepository): JsonResponse
     {
         $courses = $courseRepository->findAll();
-        
-        $response = [];
-        foreach ($courses as $course) {
-            $response[] = [
-                'id' => $course->getId(),
-                'duration' => $course->getDuration(),
-                'positionX' => $course->getPositionX(),
-                'positionY' => $course->getPositionY(),
-                'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
-                'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
-                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
-            ];
-        }
-
+    
+        $response = array_map([$this, 'formatCourse'], $courses);
+    
         return $this->json($response);
     }
 
@@ -44,58 +72,35 @@ class CoursesController extends AbstractController
     public function getCourseByTheSubject(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
         $queryBuilder = $entityManager->createQueryBuilder();
-
+    
         $queryBuilder->select('course')
             ->from(Course::class, 'course')
             ->join('course.subjects', 'sub')
             ->where('sub.id = :subjectId')
             ->setParameter('subjectId', $id);
-
+    
         $courses = $queryBuilder->getQuery()->getResult();
-
-        $response = [];
-        foreach ($courses as $course) {
-            $response[] = [
-                'id' => $course->getId(),
-                'duration' => $course->getDuration(),
-                'positionX' => $course->getPositionX(),
-                'positionY' => $course->getPositionY(),
-                'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
-                'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
-                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
-            ];
-        }
-
+    
+        $response = array_map([$this, 'formatCourse'], $courses);
+    
         return $this->json($response);
     }
 
     #[Route('/teacher/{id}/courses', name: 'get_courses_by_the_teacher', methods: ['GET'])]
-    public function getCourseByTheTeacher(int $teacherID, EntityManagerInterface $entityManager)
+    public function getCourseByTheTeacher(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
-        
         $queryBuilder = $entityManager->createQueryBuilder();
-
+    
         $queryBuilder->select('course')
             ->from(Course::class, 'course')
             ->join('course.teachers', 't')
             ->where('t.id = :teacherId')
-            ->setParameter('teacherId', $teacherID);
-
+            ->setParameter('teacherId', $id);
+    
         $courses = $queryBuilder->getQuery()->getResult();
-
-        $response = [];
-        foreach ($courses as $course) {
-            $response[] = [
-                'id' => $course->getId(),
-                'duration' => $course->getDuration(),
-                'positionX' => $course->getPositionX(),
-                'positionY' => $course->getPositionY(),
-                'courseTypes' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
-                'teachers' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
-                'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
-            ];
-        }
-
+    
+        $response = array_map([$this, 'formatCourse'], $courses);
+    
         return $this->json($response);
     }
 
@@ -146,8 +151,8 @@ class CoursesController extends AbstractController
             }
         }
 
-        if (!empty($data['groupPosition'])) {
-            $group = $groupsRepository->find($data['groupPosition']);
+        if (!empty($data['groupId'])) {
+            $group = $groupsRepository->find($data['groupId']);
             if ($group) {
                 foreach ($course->getGroups() as $existingGroup) {
                     $course->removeGroup($existingGroup);

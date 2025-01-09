@@ -265,7 +265,7 @@ const MainGrid = ({ curriculum }) => {
 
       setAvailableSubjects((prevSubjects) => {
         const updatedSubjects = [...prevSubjects];
-        const currentSubject = updatedSubjects[currentSubjectIndex];  
+        const currentSubject = updatedSubjects[currentSubjectIndex];
         currentSubject.courses = currentSubject.courses.map((course) => {
           if (
             course.teacher.name === draggedItem.teacher &&
