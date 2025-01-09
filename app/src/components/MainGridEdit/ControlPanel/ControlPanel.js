@@ -72,6 +72,7 @@ const ControlPanel = ({
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton
           isNoGroups={isNoGroups}
+          groups={groups}
           groupList={groupList}
           selectedSemester={selectedSemester}
           courseTypes={courseTypes}
@@ -95,8 +96,6 @@ const ControlPanel = ({
 
         <SaveButton
           subjects={subjects}
-          groups={groups}
-          groupList={groupList}
           setToast={setToast}
           isSaving={isSaving}
           setSaving={setSaving}/>

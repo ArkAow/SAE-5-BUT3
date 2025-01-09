@@ -1,35 +1,59 @@
 import React from "react";
 import routes from "../../../Routes/routes";
-import { determineCourseGroup } from "../../../services/courseGroupService";
 
-export const SaveButton = ({ subjects, groups, groupList, setToast, isSaving, setSaving }) => {  
-  const handleSave = () => {
+export const SaveButton = ({ subjects, setToast, isSaving, setSaving }) => {  
+  const handleSave = async () => {
     setSaving(true);
-  
-    subjects.forEach((subject) => {
-      if (subject.courses) {
-        subject.courses.forEach((course) => {
-          const courseGroupType = determineCourseGroup(course, groups, groupList);
-          const IS_COURSE_GROUP_TYPE_HALF_GROUP = courseGroupType == 'half_group';
-          const IS_COURSE_GROUP_TYPE_GROUP = courseGroupType == 'group';
-          const IS_COURSE_GROUP_TYPE_FORMATION_LEVEL = courseGroupType == 'formation_level';
+    let hasError = false;
 
-          const payload = {
-            teacher: course.teacher.id,
-            courseType: course.courseType.name,
-            duration: course.duration,
-            group: course.group?.id,
-          };
-        });
+    try {
+      for (const subject of subjects) {
+        if (subject.courses) {
+          for (const course of subject.courses) {
+            const payload = {
+              id: course.id || undefined, // Ajout de l'ID pour mise à jour
+              teacherId: course.teacher.id,
+              courseTypeName: course.courseType.name,
+              duration: course.duration,
+              subjectId: subject.id,
+              weekPosition: course.pos.y,
+              ...(course.groupInfo.groupType === "formation_level" && { formationLevelId: course.groupInfo.groupID }),
+              ...(course.groupInfo.groupType === "group" && { groupPosition: course.groupInfo.groupID }),
+              ...(course.groupInfo.groupType === "half_group" && { halfGroupId: course.groupInfo.groupID }),
+            };
+
+            console.log(payload);
+
+            const response = await fetch(routes.dev.courses.save(), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error(`Erreur lors de la sauvegarde du cours :`, errorData);
+              hasError = true;
+            }
+          }
+        }
       }
-    });
 
-    setToast({
-      message: "Prévisionnel sauvegardé avec succès",
-      type: "success",
-      visible: true,
-    });
-    setSaving(false);
+      setToast({
+        message: hasError ? "Certaines erreurs se sont produites lors de la sauvegarde." : "Prévisionnel sauvegardé avec succès.",
+        type: hasError ? "error" : "success",
+        visible: true,
+      });
+    } catch (error) {
+      console.error("Erreur inattendue :", error);
+      setToast({
+        message: "Erreur inattendue lors de la sauvegarde.",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

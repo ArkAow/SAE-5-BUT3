@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import routes from "../../../Routes/routes";
+import { determineCourseGroup, getGroupID } from "../../../services/courseGroupService";
 
 export const CourseButton = ({
     isNoGroups,
+    groups,
     groupList,
     selectedSemester,
     courseTypes,
@@ -88,11 +90,14 @@ export const CourseButton = ({
         setError("");
 
         const selectedTeacher = teachers.find((teacher) => teacher.code === selectedTeacherCode);
+        const groupType = determineCourseGroup(selectedCol, groups, groupList);
+        const groupID = getGroupID(selectedCol, groups, groupList);
+
         const payload = {
             teacher: selectedTeacher,
             courseType: selectedCourseType,
             duration: selectedDuration,
-            group: groupList[selectedCol],
+            groupInfo: { groupType, groupID },
             row: selectedRow,
             col: selectedCol,
         };

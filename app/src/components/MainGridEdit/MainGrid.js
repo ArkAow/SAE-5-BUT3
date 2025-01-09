@@ -148,7 +148,8 @@ const MainGrid = ({ curriculum }) => {
     const selectedCourseType = payload.courseType;
     const selectedDuration = payload.duration
     const selectedRow = payload.row;
-    const selectedCol = payload.col
+    const selectedCol = payload.col;
+    const selectGroupInfo = payload.groupInfo;
 
     if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
       console.error("Les informations de base sont manquantes.");
@@ -179,6 +180,7 @@ const MainGrid = ({ curriculum }) => {
           courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
           duration: selectedDuration,
           pos: { x: selectedCol, y: week },
+          groupInfo: selectGroupInfo,
           id: newItem.id,
         };
         newCourses.push(newCourse);
@@ -199,6 +201,7 @@ const MainGrid = ({ curriculum }) => {
         courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
         duration: selectedDuration,
         pos: { x: selectedCol, y: selectedRow },
+        groupInfo: selectGroupInfo,
         id: newItem.id,
       };
       newCourses.push(newCourse);

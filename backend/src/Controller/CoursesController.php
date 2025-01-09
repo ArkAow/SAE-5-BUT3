@@ -99,71 +99,11 @@ class CoursesController extends AbstractController
         return $this->json($response);
     }
 
-
-    #[Route('/courses/add/half_group', name: 'create_course_by_halfgroup', methods: ['POST'])]
-    public function addCourseByHalfGroup(
+    #[Route('/courses/save', name: 'save_course', methods: ['POST'])]
+    public function saveCourse(
         Request $request,
         EntityManagerInterface $entityManager,
-        HalfGroupRepository $halfGroupRepository,
-        TeacherRepository $teacherRepository,
-        CourseTypeRepository $courseTypeRepository,
-        SubjectRepository $subjectRepository
-    ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
-
-        if (empty($data['duration']) || empty($data['halfgroupId']) || empty($data['weekPosition'])) {
-            return new JsonResponse(['error' => 'Les champs duration, halfgroupId et weekPosition sont obligatoires.'], 400);
-        }
-
-        $halfGroup = $halfGroupRepository->find($data['halfgroupId']);
-        if (!$halfGroup) {
-            return new JsonResponse(['error' => "HalfGroup ID '{$data['halfgroupId']}' introuvable."], 404);
-        }
-
-        $course = new Course();
-        $course->addHalfGroup($halfGroup);
-        $course->setDuration($data['duration']);
-        $course->setWeekPosition($data['weekPosition']);
-
-        if (!empty($data['teacherId'])) {
-            $teacher = $teacherRepository->find($data['teacherId']);
-            if ($teacher) {
-                $course->addTeacher($teacher);
-            } else {
-                return new JsonResponse(['error' => "Teacher ID '{$data['teacherId']}' introuvable."], 404);
-            }
-        }
-
-        if (!empty($data['subjectId'])) {
-            $subject = $subjectRepository->find($data['subjectId']);
-            if ($subject) {
-                $course->addSubject($subject);
-            } else {
-                return new JsonResponse(['error' => "Subject ID '{$data['subjectId']}' introuvable."], 404);
-            }
-        }
-
-        if (!empty($data['courseTypeId'])) {
-            $courseType = $courseTypeRepository->find($data['courseTypeId']);
-            if ($courseType) {
-                $course->addCourseType($courseType);
-            } else {
-                return new JsonResponse(['error' => "CourseType ID '{$data['courseTypeId']}' introuvable."], 404);
-            }
-        }
-
-        $entityManager->persist($course);
-        $entityManager->flush();
-
-        return new JsonResponse(['message' => 'Le cours a été crée avec succès.', 'courseId' => $course->getId()], 201);
-    }
-
-    #[Route('/courses/{id}', name: 'update_course', methods: ['PUT'])]
-    public function updateCourse(
-        int $id,
-        Request $request,
         CourseRepository $courseRepository,
-        EntityManagerInterface $entityManager,
         GroupsRepository $groupsRepository,
         HalfGroupRepository $halfGroupRepository,
         FormationLevelRepository $formationLevelRepository,
@@ -171,29 +111,48 @@ class CoursesController extends AbstractController
         CourseTypeRepository $courseTypeRepository,
         SubjectRepository $subjectRepository
     ): JsonResponse {
-        $course = $courseRepository->find($id);
-        if (!$course) {
-            return new JsonResponse(['error' => 'Cours non trouvé.'], 404);
-        }
-
         $data = json_decode($request->getContent(), true);
 
-        if (!empty($data['duration'])) {
-            $course->setDuration((float) $data['duration']);
-        }
-        if (!empty($data['weekPosition'])) {
-            $course->setWeekPosition((int) $data['weekPosition']);
+        // Vérification des champs obligatoires
+        if (empty($data['duration']) || empty($data['weekPosition']) || empty($data['subjectId'])) {
+            return new JsonResponse(['error' => 'Les champs duration, weekPosition et subjectId sont obligatoires.'], 400);
         }
 
-        if (!empty($data['groupId'])) {
-            $group = $groupsRepository->find($data['groupId']);
+        $course = null;
+
+        // Si un ID de cours est fourni, on tente une mise à jour
+        if (!empty($data['id'])) {
+            $course = $courseRepository->find($data['id']);
+            if (!$course) {
+                // Sinon, création d'un nouveau cours
+                $course = new Course();
+            }
+        } else {
+            return new JsonResponse(['error' => "Cours ID obligatoires."], 404);
+        }
+
+        // Mise à jour des champs
+        $course->setDuration((float) $data['duration']);
+        $course->setWeekPosition((int) $data['weekPosition']);
+
+        // Association des relations (Formation Level, Group, HalfGroup, Teacher, CourseType, Subject)
+        if (!empty($data['formationLevelId'])) {
+            $formationLevel = $formationLevelRepository->find($data['formationLevelId']);
+            if ($formationLevel) {
+                foreach ($course->getFormationLevel() as $existingFormationLevel) {
+                    $course->removeFormationLevel($existingFormationLevel);
+                }
+                $course->addFormationLevel($formationLevel);
+            }
+        }
+
+        if (!empty($data['groupPosition'])) {
+            $group = $groupsRepository->find($data['groupPosition']);
             if ($group) {
                 foreach ($course->getGroups() as $existingGroup) {
-                    $course->removeGroup($existingGroup); // Retirer les anciens groupes
+                    $course->removeGroup($existingGroup);
                 }
-                $course->addGroup($group); // Ajouter le nouveau groupe
-            } else {
-                return new JsonResponse(['error' => "Groupe ID '{$data['groupId']}' introuvable."], 404);
+                $course->addGroup($group);
             }
         }
 
@@ -204,20 +163,6 @@ class CoursesController extends AbstractController
                     $course->removeHalfGroup($existingHalfGroup);
                 }
                 $course->addHalfGroup($halfGroup);
-            } else {
-                return new JsonResponse(['error' => "HalfGroup ID '{$data['halfGroupId']}' introuvable."], 404);
-            }
-        }
-
-        if (!empty($data['formationLevelId'])) {
-            $formationLevel = $formationLevelRepository->find($data['formationLevelId']);
-            if ($formationLevel) {
-                foreach ($course->getFormationLevels() as $existingFormationLevel) {
-                    $course->removeFormationLevel($existingFormationLevel);
-                }
-                $course->addFormationLevel($formationLevel);
-            } else {
-                return new JsonResponse(['error' => "FormationLevel ID '{$data['formationLevelId']}' introuvable."], 404);
             }
         }
 
@@ -225,20 +170,16 @@ class CoursesController extends AbstractController
             $teacher = $teacherRepository->find($data['teacherId']);
             if ($teacher) {
                 $course->addTeacher($teacher);
-            } else {
-                return new JsonResponse(['error' => "Professeur ID '{$data['teacherId']}' introuvable."], 404);
             }
         }
 
-        if (!empty($data['courseTypeId'])) {
-            $courseType = $courseTypeRepository->find($data['courseTypeId']);
+        if (!empty($data['courseTypeName'])) {
+            $courseType = $courseTypeRepository->findOneBy(['name' => $data['courseTypeName']]);
             if ($courseType) {
                 foreach ($course->getCourseTypes() as $existingCourseType) {
                     $course->removeCourseType($existingCourseType);
                 }
                 $course->addCourseType($courseType);
-            } else {
-                return new JsonResponse(['error' => "CourseType ID '{$data['courseTypeId']}' introuvable."], 404);
             }
         }
 
@@ -246,22 +187,22 @@ class CoursesController extends AbstractController
             $subject = $subjectRepository->find($data['subjectId']);
             if ($subject) {
                 $course->addSubject($subject);
-            } else {
-                return new JsonResponse(['error' => "Sujet ID '{$data['subjectId']}' introuvable."], 404);
             }
         }
 
+        // Sauvegarde en base de données
+        $entityManager->persist($course);
         $entityManager->flush();
 
         return $this->json([
-            'message' => 'Cours mis à jour avec succès.',
+            'message' => 'Cours sauvegardé avec succès.',
             'course' => [
                 'id' => $course->getId(),
                 'duration' => $course->getDuration(),
+                'weekPosition' => $course->getWeekPosition(),
                 'groupPosition' => array_map(fn($group) => $group->getId(), $course->getGroups()->toArray()),
                 'halfGroupPosition' => array_map(fn($halfGroup) => $halfGroup->getId(), $course->getHalfGroups()->toArray()),
                 'formationLevelPosition' => array_map(fn($level) => $level->getId(), $course->getFormationLevel()->toArray()),
-                'weekPosition' => $course->getWeekPosition(),
                 'courseType' => array_map(fn($type) => $type->getId(), $course->getCourseTypes()->toArray()),
                 'teacher' => array_map(fn($teacher) => $teacher->getId(), $course->getTeachers()->toArray()),
                 'subjects' => array_map(fn($subject) => $subject->getId(), $course->getSubjects()->toArray()),
@@ -269,143 +210,6 @@ class CoursesController extends AbstractController
         ]);
     }
 
-    #[Route('/courses/add/formationlevel', name: 'create_course_by_formationlevel', methods: ['POST'])]
-    public function addCourseByFormationLevel(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        FormationLevelRepository $formationLevelRepository,
-        TeacherRepository $teacherRepository,
-        CourseTypeRepository $courseTypeRepository,
-        SubjectRepository $subjectRepository
-    ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
-
-        if (empty($data['duration']) || empty($data['formationLevelId']) || empty($data['weekPosition'])) {
-            return new JsonResponse(['error' => 'Les champs duration, formationLevelId et weekPosition sont obligatoires.'], 400);
-        }
-
-        $formationLevel = $formationLevelRepository->find($data['formationLevelId']);
-        if (!$formationLevel) {
-            return new JsonResponse(['error' => "FormationLevel ID '{$data['formationLevelId']}' introuvable."], 404);
-        }
-
-        $course = new Course();
-        $course->addFormationLevel($formationLevel);
-        $course->setDuration($data['duration']);
-        $course->setWeekPosition($data['weekPosition']);
-
-        if (!empty($data['teacherId'])) {
-            $teacher = $teacherRepository->find($data['teacherId']);
-            if ($teacher) {
-                $course->addTeacher($teacher);
-            } else {
-                return new JsonResponse(['error' => "Teacher ID '{$data['teacherId']}' introuvable."], 404);
-            }
-        }
-
-        if (!empty($data['subjectId'])) {
-            $subject = $subjectRepository->find($data['subjectId']);
-            if ($subject) {
-                $course->addSubject($subject);
-            } else {
-                return new JsonResponse(['error' => "Subject ID '{$data['subjectId']}' introuvable."], 404);
-            }
-        }
-
-        if (!empty($data['courseTypeId'])) {
-            $courseType = $courseTypeRepository->find($data['courseTypeId']);
-            if ($courseType) {
-                $course->addCourseType($courseType);
-            } else {
-                return new JsonResponse(['error' => "CourseType ID '{$data['courseTypeId']}' introuvable."], 404);
-            }
-        }
-
-        $entityManager->persist($course);
-        $entityManager->flush();
-
-        return new JsonResponse(['message' => 'Le cours a été crée avec succès.', 'courseId' => $course->getId()], 201);
-    }
-
-    #[Route('/courses/add/group', name: 'create_course_by_group', methods: ['POST'])]
-    public function createCourse_by_Group(
-        Request $request,
-        EntityManagerInterface $entityManager, 
-        TeacherRepository $teacherRepository, 
-        CourseTypeRepository $courseTypeRepository,
-        SubjectRepository $subjectRepository,
-        GroupsRepository $groupRepository
-    ): JsonResponse {
-        /**
-         * TODO-------------------------------------------------------
-         * IL FAUDRAT CHANGER LES ID PAR D AUTRES IDENTIFIANTS
-         * le code pour les profs et le nom pour les coursetypes
-         * -----------------------------------------------------------
-         */
-
-        $data = json_decode($request->getContent(), true);
-
-        if (empty($data['duration'])) {
-            return new JsonResponse(['error' => 'La durée est obligatoire.'], 400);
-        }
-        if (empty($data['groupPosition']) || empty($data['weekPosition'])) {
-            return new JsonResponse(['error' => 'La position est obligatoire.'], 400);
-        }
-
-        $group = $groupRepository->find($data['groupPosition']);
-        if (!$group) {
-            dump($data['groupPosition']);
-            die('Group not found');
-        }
-
-        $course = new Course();
-        $course->addGroup($group);
-        $course->setWeekPosition($data['weekPosition']);
-        $course->setDuration($data['duration']);
-
-        if (!empty($data['teacherId'])) {
-            $teacher = $teacherRepository->find($data['teacherId']);
-            if ($teacher) {
-                $course->addTeacher($teacher);
-            } else {
-                return new JsonResponse(['error' => "Professeur ID '{$data['teacherId']}' introuvable."], 404);
-            }
-        }
-
-        if (!empty($data['subjectId'])) {
-            $subject = $subjectRepository->find($data['subjectId']);
-            if ($subject) {
-                $course->addSubject($subject);
-            } else {
-                return new JsonResponse(['error' => "Sujet ID '{$data['subjectId']}' introuvable."], 404);
-            }
-        }
-
-        if (!empty($data['courseTypeId'])) {
-            $courseType = $courseTypeRepository->find($data['courseTypeId']);
-            if ($courseType) {
-                $course->addCourseType($courseType);
-            } else {
-                return new JsonResponse(['error' => "CourseType ID '{$data['courseTypeId']}' introuvable."], 404);
-            }
-        }
-
-        $entityManager->persist($course);
-        $entityManager->flush();
-
-        return $this->json([
-            'message' => 'Cours créé avec succès.',
-            'course' => [
-                'id' => $course->getId(),
-                'duration' => $course->getDuration(),
-                'groupPosition' => $group->getId(),
-                'weekPosition' => $course->getWeekPosition(),
-                'courseType' => $courseType ? $courseType->getId() : null,
-                'teacher' => $teacher ? $teacher->getId() : null,
-                'subject' => $subject ? $subject->getId() : null,
-            ],
-        ], 201);
-    }
 
     #[Route('/courses/delete/{id}', name: 'delete_course', methods: ['DELETE'])]
     public function deleteCourse(
