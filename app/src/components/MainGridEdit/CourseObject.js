@@ -4,8 +4,17 @@ import { getShade, isBlack } from "../../services/colorService";
 import { formatDuration } from "../../services/durationService";
 
 const ITEM_TYPE = "rectangle";
-
-const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, deleteItem, onEdit }) => {
+const CourseObject = ({
+  color,
+  teacher,
+  courseType,
+  duration,
+  positionKey,
+  id,
+  modifItem,
+  deleteItem,
+  courseTypes,
+}) => {
   const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
     item: { positionKey, id },
@@ -16,6 +25,10 @@ const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, d
 
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipRef = useRef(null);
+  const [showModal, setShowModal] = useState(false);
+  const [editedData, setEditedData] = useState({ teacher, courseType, duration });
+  const [selectedTeacher, setSelectedTeacher] = useState("");
+  const [teachers, setTeachers] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -40,6 +53,16 @@ const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, d
     setShowTooltip(true);
   };
 
+  const handleEditClick = () => {
+    setShowModal(true);
+    setShowTooltip(false);
+  };
+
+  const handleSave = () => {
+    modifItem({ ...editedData, positionKey, id });
+    setShowModal(false);
+  };
+
   return (
     <div
       ref={drag}
@@ -62,7 +85,9 @@ const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, d
 
       {/* Paramètres */}
       <img
-        src={`${isBlack(color) ? "images/cogWheel-white.svg" : "images/cogWheel-black.svg"}`}
+        src={`${
+          isBlack(color) ? "images/cogWheel-white.svg" : "images/cogWheel-black.svg"
+        }`}
         alt="cogWheel"
         className={`absolute -top-3 -right-2 m-1 w-4 h-4 rounded-full cursor-pointer`}
         style={{ backgroundColor: color }}
@@ -73,17 +98,105 @@ const CourseObject = ({ color, teacher, courseType, duration, positionKey, id, d
       {showTooltip && (
         <div
           ref={tooltipRef}
-          className="absolute -top-3 -right-8 mt-5 mr-5 p-2 bg-gray-800 bg-opacity-75 text-white rounded shadow-lg z-10 flex flex-col space-y-2">
+          className="absolute -top-3 -right-8 mt-5 mr-5 p-2 bg-gray-800 bg-opacity-75 text-white rounded shadow-lg z-10 flex flex-col space-y-2"
+        >
           <button
-            onClick={onEdit}
-            className="w-full py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-xs">
+            onClick={handleEditClick}
+            className="w-full py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-xs"
+          >
             Modifier
           </button>
           <button
             onClick={() => deleteItem(positionKey, id)}
-            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs">
-            Supprimer
+            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs"
+          >Supprimer
           </button>
+        </div>
+      )}
+
+      {/* Modale */}
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-20">
+          <div className="bg-white p-5 rounded shadow-lg w-1/3">
+            <h3 className="text-lg font-bold mb-4">Modifier un cours</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}
+            >
+              <label className="block mb-1 font-bold w-24">Professeur :</label>
+                    <select
+                        value={selectedTeacher}
+                        onChange={(e) => setSelectedTeacher(e.target.value)}
+                        className="tooltip-select">
+                        <option value="" disabled>
+                            Choisir un professeur
+                        </option>
+                        {teachers?.map((teacher) => (
+                            <option key={teacher.code} value={teacher.code}>
+                                {teacher.code}
+                            </option>
+                        ))}
+                        
+                    </select>
+
+              <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
+                <label className="w-32 block mb-1 font-bold">Type de cours :</label>
+                <select
+                  value={editedData.courseType}
+                  onChange={(e) =>
+                    setEditedData({ ...editedData, courseType: e.target.value })
+                  }
+                  className="tooltip-select"
+                >
+                  <option value="" disabled>
+                    Choisir un type de cours
+                  </option>
+                  {courseTypes?.map((type) => (
+                    <option key={type.name} value={type.name}>
+                      {type.name}
+                    </option>
+                  )) || (
+                    <option value="" disabled>
+                      Aucun type de cours disponible
+                    </option>
+                  )}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
+                <label className="w-32 block mb-1 font-bold">Durée (heures) :</label>
+                <input
+                  type="number"
+                  value={editedData.duration}
+                  onChange={(e) =>
+                    setEditedData({
+                      ...editedData,
+                      duration: parseInt(e.target.value, 10),
+                    })
+                  }
+                  className="w-full border rounded px-2 py-1"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Enregistrer
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

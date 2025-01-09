@@ -20,6 +20,8 @@ const MainGrid = ({ curriculum }) => {
 
   const [courseTypes, setCourseTypes] = useState([]);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEditItem, setCurrentEditItem] = useState(null);
 
   const [isLoading, setLoading] = useState(true);
   const [isGroupLoading, setIsGroupLoading] = useState(true);
@@ -36,7 +38,7 @@ const MainGrid = ({ curriculum }) => {
     }
   }, [isGroupLoading, isSemesterLoading, isSubjectLoading, isCourseTypeLoading]);
 
-  {/* Gestion des SEMESTRES et MATIERES -------------------------------------------- */}
+  /* Gestion des SEMESTRES et MATIERES -------------------------------------------- */
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
@@ -121,7 +123,7 @@ const MainGrid = ({ curriculum }) => {
   }, [currentCourses]);
 
   
-  {/* Gestion des COURS -------------------------------------------- */}
+  /* Gestion des COURS -------------------------------------------- */
   useEffect(() => {
     const fetchCourseTypes = async () => {
       try {
@@ -255,6 +257,51 @@ const MainGrid = ({ curriculum }) => {
   
     setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
   };
+  const handleEditClick = (positionKey, id) => {
+    const itemToEdit = items[positionKey]?.find((item) => item.id === id);
+    if (itemToEdit) {
+      setCurrentEditItem({ positionKey, ...itemToEdit });
+      setIsEditing(true);
+    }
+  };
+  const modifItem = (updatedData) => {
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      const { positionKey, id, teacher, courseType, duration } = updatedData;
+  
+      if (updatedItems[positionKey]) {
+        updatedItems[positionKey] = updatedItems[positionKey].map((item) =>
+          item.id === id ? { ...item, teacher, courseType, duration } : item
+        );
+      }
+  
+      return updatedItems;
+    });
+  
+    setAvailableSubjects((prevSubjects) => {
+      return prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = subject.courses.map((course) =>
+            course.id === updatedData.id
+              ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
+              : course
+          );
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+    });
+  
+    setCurrentCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course.id === updatedData.id
+          ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
+          : course
+      )
+    );
+  
+    setIsEditing(false); // Ferme la modale
+  };
   
   const moveItem = (fromKey, toKey, id) => {
     setItems((prevItems) => {
@@ -328,7 +375,7 @@ const MainGrid = ({ curriculum }) => {
     });
   };  
 
-  {/* Gestion des GROUPES -------------------------------------------- */}
+  /* Gestion des GROUPES -------------------------------------------- */
   const fetchGroups = async () => {
     try {
       const classID = curriculum.formationLevels[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
@@ -504,6 +551,7 @@ const MainGrid = ({ curriculum }) => {
                             items={cellItems}
                             moveItem={moveItem}
                             deleteItem={deleteItem}
+                            modifItem={modifItem}
                           />
                         );
                       })}
