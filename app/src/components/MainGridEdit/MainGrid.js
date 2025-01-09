@@ -156,7 +156,7 @@ const MainGrid = ({ curriculum }) => {
             throw new Error("Erreur lors du chargement des cours.");
           }
           const data = await response.json();
-          console.log(subject,data);
+          console.log(data);
         }
       } catch (error) {
         console.error("Erreur inattendue :", error);
@@ -174,7 +174,7 @@ const MainGrid = ({ curriculum }) => {
     const selectedDuration = payload.duration
     const selectedRow = payload.row;
     const selectedCol = payload.col;
-    const selectGroupInfo = payload.groupInfo;
+    const selectedGroup = payload.group;
 
     if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
       console.error("Les informations de base sont manquantes.");
@@ -207,7 +207,7 @@ const MainGrid = ({ curriculum }) => {
           duration: selectedDuration,
           subject: selectedSubject,
           pos: { x: selectedCol, y: week },
-          groupInfo: selectGroupInfo,
+          group: selectedGroup,
         };
         newCourses.push(newCourse);
         setModifiedCourses((prevModifiedCourses) => [...prevModifiedCourses, newCourse]);
@@ -230,7 +230,7 @@ const MainGrid = ({ curriculum }) => {
         duration: selectedDuration,
         subject: selectedSubject,
         pos: { x: selectedCol, y: selectedRow },
-        groupInfo: selectGroupInfo,
+        groupInfo: selectedGroup,
       };
       newCourses.push(newCourse);
       setModifiedCourses((prevModifiedCourses) => [...prevModifiedCourses, newCourse]);

@@ -15,9 +15,9 @@ export const SaveButton = ({ modifiedCourses, setModifiedCourses, setToast, isSa
           duration: course.duration,
           subjectId: course.subject?.id,
           weekPosition: course.pos?.y,
-          ...(course.groupInfo.groupType === "formation_level" && { formationLevelId: course.groupInfo.groupID }),
-          ...(course.groupInfo.groupType === "group" && { groupId: course.groupInfo.groupID }),
-          ...(course.groupInfo.groupType === "half_group" && { halfGroupId: course.groupInfo.groupID }),
+          ...(course.group.groupType === "formation_level" && { formationLevelId: course.group.groupID }),
+          ...(course.group.groupType === "group" && { groupId: course.group.groupID }),
+          ...(course.group.groupType === "half_group" && { halfGroupId: course.group.groupID }),
         };
 
         const response = await fetch(routes.dev.courses.save(), {

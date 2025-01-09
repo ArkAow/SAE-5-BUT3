@@ -24,46 +24,48 @@ class CoursesController extends AbstractController
      */
     private function formatCourse(Course $course): array
     {
+        $group = null;
+        if ($course->getFormationLevel()->count() > 0) {
+            $formationLevel = $course->getFormationLevel()->first();
+            $group = [
+                'groupType' => 'formation_level',
+                'groupID' => $formationLevel->getId(),
+            ];
+        } elseif ($course->getGroups()->count() > 0) {
+            $groupEntity = $course->getGroups()->first();
+            $group = [
+                'groupType' => 'group',
+                'groupID' => $groupEntity->getId(),
+            ];
+        } elseif ($course->getHalfGroups()->count() > 0) {
+            $halfGroup = $course->getHalfGroups()->first();
+            $group = [
+                'groupType' => 'half_group',
+                'groupID' => $halfGroup->getId(),
+            ];
+        }
+    
         return [
             'id' => $course->getId(),
             'duration' => $course->getDuration(),
             'weekPosition' => $course->getWeekPosition(),
-            'formation_level' => array_map(
-                fn($formation_level) => ['id' => $formation_level->getId(), 'name' => $formation_level->getName()],
-                $course->getFormationLevel()->toArray()
-            ),
-            'group' => array_map(
-                fn($group) => ['id' => $group->getId(), 'name' => $group->getName()],
-                $course->getGroups()->toArray()
-            ),
-            'half_group' => array_map(
-                fn($halfGroup) => ['id' => $halfGroup->getId(), 'name' => $halfGroup->getName()],
-                $course->getHalfGroups()->toArray()
-            ),
-            'courseTypes' => array_map(
-                fn($type) => [
-                    'id' => $type->getId(),
-                    'name' => $type->getName(),
-                    'color' => $type->getColor(),
-                ],
-                $course->getCourseTypes()->toArray()
-            ),
-            'teachers' => array_map(
-                fn($teacher) => [
-                    'id' => $teacher->getId(),
-                    'firstName' => $teacher->getFirstName(),
-                    'lastName' => $teacher->getLastName(),
-                ],
-                $course->getTeachers()->toArray()
-            ),
-            'subjects' => array_map(
-                fn($subject) => [
-                    'id' => $subject->getId(),
-                    'name' => $subject->getName(),
-                    'code' => $subject->getCode(),
-                ],
-                $course->getSubjects()->toArray()
-            ),
+            'courseType' => $course->getCourseTypes()->first() ? [
+                'id' => $course->getCourseTypes()->first()->getId(),
+                'name' => $course->getCourseTypes()->first()->getName(),
+                'color' => $course->getCourseTypes()->first()->getColor(),
+            ] : null,
+            'teacher' => $course->getTeachers()->first() ? [
+                'id' => $course->getTeachers()->first()->getId(),
+                'firstName' => $course->getTeachers()->first()->getFirstName(),
+                'lastName' => $course->getTeachers()->first()->getLastName(),
+                'code' => $course->getTeachers()->first()->getCode(),
+            ] : null,
+            'subject' => $course->getSubjects()->first() ? [
+                'id' => $course->getSubjects()->first()->getId(),
+                'name' => $course->getSubjects()->first()->getName(),
+                'code' => $course->getSubjects()->first()->getCode(),
+            ] : null,
+            'group' => $group,
         ];
     }
 

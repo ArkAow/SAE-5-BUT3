@@ -97,7 +97,7 @@ export const CourseButton = ({
             teacher: selectedTeacher,
             courseType: selectedCourseType,
             duration: selectedDuration,
-            groupInfo: { groupType, groupID },
+            group: { groupType, groupID },
             row: selectedRow,
             col: selectedCol,
         };
