@@ -28,9 +28,18 @@ class CoursesController extends AbstractController
             'id' => $course->getId(),
             'duration' => $course->getDuration(),
             'weekPosition' => $course->getWeekPosition(),
-            'formation_level' => $course->getFormationLevel(),
-            'group' => $course->getGroups(),
-            'half_group' => $course->getHalfGroups(),
+            'formation_level' => array_map(
+                fn($formation_level) => ['id' => $formation_level->getId(), 'name' => $formation_level->getName()],
+                $course->getFormationLevel()->toArray()
+            ),
+            'group' => array_map(
+                fn($group) => ['id' => $group->getId(), 'name' => $group->getName()],
+                $course->getGroups()->toArray()
+            ),
+            'half_group' => array_map(
+                fn($halfGroup) => ['id' => $halfGroup->getId(), 'name' => $halfGroup->getName()],
+                $course->getHalfGroups()->toArray()
+            ),
             'courseTypes' => array_map(
                 fn($type) => [
                     'id' => $type->getId(),
