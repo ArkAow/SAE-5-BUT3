@@ -20,6 +20,8 @@ const ControlPanel = ({
   updateCoursesForRemovedType,
   addItem,
   subjects,
+  modifiedCourses,
+  setModifiedCourses,
   isSaving,
   setSaving }) => {
   const [delayedExpanded, setDelayedExpanded] = useState(true);
@@ -95,7 +97,8 @@ const ControlPanel = ({
         <PrintButton />
 
         <SaveButton
-          subjects={subjects}
+          modifiedCourses={modifiedCourses}
+          setModifiedCourses={setModifiedCourses}
           setToast={setToast}
           isSaving={isSaving}
           setSaving={setSaving}/>

@@ -11,6 +11,7 @@ const MainGrid = ({ curriculum }) => {
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
   const [items, setItems] = useState({});
+  const [modifiedCourses, setModifiedCourses] = useState([])
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState({});
@@ -72,7 +73,6 @@ const MainGrid = ({ curriculum }) => {
       const subjects = await response.json();
       setAvailableSubjects(subjects);
       setSelectedSubject(subjects[0] || null);
-      setCurrentCourses(subjects[0]?.courses || []);
     } catch (error) {
       console.error(error);
     }
@@ -95,12 +95,12 @@ const MainGrid = ({ curriculum }) => {
     const subjectId = parseInt(e.target.value, 10);
     const selected = availableSubjects.find((s) => s.id === subjectId);
     setSelectedSubject(selected);
-    setCurrentCourses(selected?.courses || []);
   };
 
   useEffect(() => {
     const initialItems = {};
-    currentCourses.forEach((course, index) => {
+    const courses = selectedSubject.courses || [];
+    courses.forEach((course, index) => {
       const row = course.pos.y;
       const col = course.pos.x;
       const positionKey = `${row}-${col}`;
@@ -119,7 +119,7 @@ const MainGrid = ({ curriculum }) => {
     });
 
     setItems(initialItems);
-  }, [currentCourses]);
+  }, [selectedSubject]);
 
   
   {/* Gestion des COURS -------------------------------------------- */}
@@ -176,14 +176,16 @@ const MainGrid = ({ curriculum }) => {
         newItems.push({ positionKey, newItem });
   
         const newCourse = {
+          itemID: newItem.id,
           teacher: selectedTeacher,
           courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
           duration: selectedDuration,
+          subject: selectedSubject,
           pos: { x: selectedCol, y: week },
           groupInfo: selectGroupInfo,
-          id: newItem.id,
         };
         newCourses.push(newCourse);
+        setModifiedCourses((prevModifiedCourses) => [...prevModifiedCourses, newCourse]);
       }
     } else {
       const positionKey = `${selectedRow}-${selectedCol}`;
@@ -197,16 +199,17 @@ const MainGrid = ({ curriculum }) => {
       newItems.push({ positionKey, newItem });
   
       const newCourse = {
+        itemID: newItem.id,
         teacher: selectedTeacher,
         courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
         duration: selectedDuration,
+        subject: selectedSubject,
         pos: { x: selectedCol, y: selectedRow },
         groupInfo: selectGroupInfo,
-        id: newItem.id,
       };
       newCourses.push(newCourse);
+      setModifiedCourses((prevModifiedCourses) => [...prevModifiedCourses, newCourse]);
     }
-  
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       newItems.forEach(({ positionKey, newItem }) => {
@@ -225,8 +228,6 @@ const MainGrid = ({ curriculum }) => {
       });
       return updatedSubjects;
     });
-  
-    setCurrentCourses((prevCourses) => [...prevCourses, ...newCourses]);
   };
 
   const deleteItem = (positionKey, id) => {
@@ -244,7 +245,7 @@ const MainGrid = ({ curriculum }) => {
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
-          const updatedCourses = subject.courses.filter((course) => course.id !== id);
+          const updatedCourses = subject.courses.filter((course) => course.itemID !== id);
           return { ...subject, courses: updatedCourses };
         }
         return subject;
@@ -252,8 +253,6 @@ const MainGrid = ({ curriculum }) => {
   
       return updatedSubjects;
     });
-  
-    setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
   };
   
   const moveItem = (fromKey, toKey, id) => {
@@ -305,14 +304,6 @@ const MainGrid = ({ curriculum }) => {
             : course
         ),
       }))
-    );
-  
-    setCurrentCourses((prevCourses) =>
-      (prevCourses || []).map((course) =>
-        course.courseType?.name === removedTypeName
-          ? { ...course, courseType: { name: "N/A", color: "#FFFFFF" } }
-          : course
-      )
     );
   
     setItems((prevItems) => {
@@ -397,6 +388,8 @@ const MainGrid = ({ curriculum }) => {
                 updateCoursesForRemovedType={updateCoursesForRemovedType}
                 addItem={addItem}
                 subjects={availableSubjects}
+                modifiedCourses={modifiedCourses}
+                setModifiedCourses={setModifiedCourses}
                 isSaving={isSaving}
                 setSaving={setSaving}
               />
@@ -441,7 +434,6 @@ const MainGrid = ({ curriculum }) => {
                 if (nextSubjectIndex < availableSubjects.length) {
                   const nextSubject = availableSubjects[nextSubjectIndex];
                   setSelectedSubject(nextSubject);
-                  setCurrentCourses(nextSubject.courses || []);
                 }
               }}
               disabled={

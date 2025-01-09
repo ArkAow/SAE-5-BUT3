@@ -1,42 +1,39 @@
 import React from "react";
 import routes from "../../../Routes/routes";
 
-export const SaveButton = ({ subjects, setToast, isSaving, setSaving }) => {  
+export const SaveButton = ({ modifiedCourses, setModifiedCourses, setToast, isSaving, setSaving }) => {  
   const handleSave = async () => {
     setSaving(true);
     let hasError = false;
 
     try {
-      for (const subject of subjects) {
-        if (subject.courses) {
-          for (const course of subject.courses) {
-            const payload = {
-              id: course.id || undefined, // Ajout de l'ID pour mise à jour
-              teacherId: course.teacher.id,
-              courseTypeName: course.courseType.name,
-              duration: course.duration,
-              subjectId: subject.id,
-              weekPosition: course.pos.y,
-              ...(course.groupInfo.groupType === "formation_level" && { formationLevelId: course.groupInfo.groupID }),
-              ...(course.groupInfo.groupType === "group" && { groupPosition: course.groupInfo.groupID }),
-              ...(course.groupInfo.groupType === "half_group" && { halfGroupId: course.groupInfo.groupID }),
-            };
+      for (const course of modifiedCourses) {
+        const payload = {
+          id: course.id || undefined, // Ajout de l'ID pour mise à jour
+          teacherId: course.teacher?.id,
+          courseTypeName: course.courseType?.name,
+          duration: course.duration,
+          subjectId: course.subject?.id,
+          weekPosition: course.pos?.y,
+          ...(course.groupInfo.groupType === "formation_level" && { formationLevelId: course.groupInfo.groupID }),
+          ...(course.groupInfo.groupType === "group" && { groupPosition: course.groupInfo.groupID }),
+          ...(course.groupInfo.groupType === "half_group" && { halfGroupId: course.groupInfo.groupID }),
+        };
 
-            console.log(payload);
+        const response = await fetch(routes.dev.courses.save(), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-            const response = await fetch(routes.dev.courses.save(), {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              console.error(`Erreur lors de la sauvegarde du cours :`, errorData);
-              hasError = true;
-            }
-          }
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(`Erreur lors de la sauvegarde du cours :`, errorData);
+          hasError = true;
+        } else {
+          console.log(`Cours ajouté :`,payload);
         }
+        
       }
 
       setToast({
@@ -53,6 +50,7 @@ export const SaveButton = ({ subjects, setToast, isSaving, setSaving }) => {
       });
     } finally {
       setSaving(false);
+      setModifiedCourses([]); //On vide la liste des cours à sauvegarder
     }
   };
 

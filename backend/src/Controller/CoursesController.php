@@ -114,7 +114,7 @@ class CoursesController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         // Vérification des champs obligatoires
-        if (empty($data['duration']) || empty($data['weekPosition']) || empty($data['subjectId'])) {
+        if (!isset($data['duration']) || !isset($data['weekPosition']) || !isset($data['subjectId'])) {
             return new JsonResponse(['error' => 'Les champs duration, weekPosition et subjectId sont obligatoires.'], 400);
         }
 
@@ -124,11 +124,11 @@ class CoursesController extends AbstractController
         if (!empty($data['id'])) {
             $course = $courseRepository->find($data['id']);
             if (!$course) {
-                // Sinon, création d'un nouveau cours
-                $course = new Course();
+                return new JsonResponse(['error' => "Cours ID invalide."], 404);
             }
         } else {
-            return new JsonResponse(['error' => "Cours ID obligatoires."], 404);
+            // Sinon, création d'un nouveau cours
+            $course = new Course();
         }
 
         // Mise à jour des champs
