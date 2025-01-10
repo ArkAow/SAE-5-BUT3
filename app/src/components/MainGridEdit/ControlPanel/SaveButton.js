@@ -1,8 +1,12 @@
 import React from "react";
 import routes from "../../../Routes/routes";
 
-export const SaveButton = ({ modifiedCourses, setModifiedCourses, setToast, isSaving, setSaving }) => {  
+export const SaveButton = ({ isNoGroups ,modifiedCourses, setModifiedCourses, setToast, isSaving, isModifiedCourses, setSaving }) => {  
   const handleSave = async () => {
+    if (!isModifiedCourses) {
+      console.error("aucun cours à sauvegarder");
+      return;
+    }
     setSaving(true);
     let hasError = false;
 
@@ -33,7 +37,6 @@ export const SaveButton = ({ modifiedCourses, setModifiedCourses, setToast, isSa
         } else {
           console.log(`Cours ajouté :`,payload);
         }
-        
       }
 
       setToast({
@@ -55,14 +58,27 @@ export const SaveButton = ({ modifiedCourses, setModifiedCourses, setToast, isSa
   };
 
   return (
-    <button className={`btn-control-panel ${isSaving ? 'bg-white cursor-wait' : ''}`} onClick={handleSave}>
-      <img
-        src="/images/save.svg"
-        alt="save icon"
-        className="w-10 h-10"
-        draggable="false"
-      />
-    </button>
+    <div className="relative">
+      <button 
+        className={`btn-control-panel ${isSaving ? 'bg-white cursor-wait' : ''}`} 
+        onClick={handleSave}
+        disabled={isNoGroups}>
+        <span
+          className={`absolute right-1 top-1 flex h-3 w-3 ${
+            isModifiedCourses ? "" : "hidden"
+          }`}>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+        </span>
+        <img
+          src="/images/save.svg"
+          alt="save icon"
+          className="w-10 h-10"
+          draggable="false"
+        />
+      </button>      
+    </div>
+
   );
 };
 
