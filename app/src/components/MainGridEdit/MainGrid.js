@@ -5,6 +5,8 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
+import { createCoursesFromData, createItemsFromData } from "../../services/courseService.js";
+import { getCoursePosFromGroup } from "../../services/courseGroupService.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -123,118 +125,67 @@ const MainGrid = ({ curriculum }) => {
 
   
   {/* Gestion des COURS -------------------------------------------- */}
-  useEffect(() => {
-    const fetchCourseTypes = async () => {
-      try {
-        const response = await fetch(routes.dev.courseTypes.get());
+  const fetchCoursesForSubjects = async () => {
+    if (!selectedSemester) return;
+
+    try {
+      setIsCourseLoading(true);
+      let courses = [];
+      for (const subject of availableSubjects) {
+        const response = await fetch(routes.dev.courses.getBySubject(subject.id));
         if (!response.ok) {
-          throw new Error("Erreur lors du chargement des types de cours.");
+          throw new Error("Erreur lors du chargement des cours.");
         }
         const data = await response.json();
-        setCourseTypes(data);
-      } catch (error) {
-        console.error(error);
+        data.forEach((course) => {
+          const { x, y } = getCoursePosFromGroup(course, groups, groupList);
+          course.col = x;
+          course.row = y;
+          course.isRepeat = false;
+        });
+        courses.push(data);
       }
-      finally {
-        setIsCourseTypeLoading(false);
-      }
-    };
+      console.log(courses);
+    } catch (error) {
+      console.error("Erreur inattendue :", error);
+    } finally {
+      setIsCourseLoading(false);
+    }
+  };
 
+  const fetchCourseTypes = async () => {
+    try {
+      const response = await fetch(routes.dev.courseTypes.get());
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des types de cours.");
+      }
+      const data = await response.json();
+      setCourseTypes(data);
+    } catch (error) {
+      console.error(error);
+    }
+    finally {
+      setIsCourseTypeLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCourseTypes();
   }, []);
 
   useEffect(() => {
-    const fetchCoursesForSubjects = async () => {
-      if (!selectedSemester) return;
-
-      try {
-        setIsCourseLoading(true);
-        console.log(selectedSemester);
-        for (const subject of availableSubjects) {
-          const response = await fetch(routes.dev.courses.getBySubject(subject.id));
-          if (!response.ok) {
-            throw new Error("Erreur lors du chargement des cours.");
-          }
-          const data = await response.json();
-          console.log(data);
-        }
-      } catch (error) {
-        console.error("Erreur inattendue :", error);
-      } finally {
-        setIsCourseLoading(false);
-      }
-    };
-
     fetchCoursesForSubjects();
   }, [selectedSemester]);
 
   const addItem = (payload) => {
-    const selectedTeacher = payload.teacher;
-    const selectedCourseType = payload.courseType;
-    const selectedDuration = payload.duration
-    const selectedRow = payload.row;
-    const selectedCol = payload.col;
-    const selectedGroup = payload.group;
+    const newItems = createItemsFromData(payload);
+    const newCourses = createCoursesFromData(payload, selectedSubject);;
+  
+    setModifiedCourses((prevModifiedCourses) => [
+      ...prevModifiedCourses,
+      ...newCourses,
+    ]);
 
-    if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
-      console.error("Les informations de base sont manquantes.");
-      return;
-    }
-  
-    const newItems = [];
-    const newCourses = [];
-  
-    if (payload.isRepeat) {
-      const exceptionsArray = payload.exceptions ? payload.exceptions.map((val) => parseInt(val.trim(), 10) - 1) : [];
-
-      for (let week = payload.repeatFrom; week <= payload.repeatTo; week++) {
-        if (exceptionsArray.includes(week)) continue;
-        
-        const positionKey = `${week}-${selectedCol}`;
-        const newItem = {
-          color: selectedCourseType.color,
-          courseType: selectedCourseType.name,
-          teacher: selectedTeacher.code,
-          duration: selectedDuration,
-          id: Date.now() + week,
-        };
-        newItems.push({ positionKey, newItem });
-  
-        const newCourse = {
-          itemID: newItem.id,
-          teacher: selectedTeacher,
-          courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
-          duration: selectedDuration,
-          subject: selectedSubject,
-          pos: { x: selectedCol, y: week },
-          group: selectedGroup,
-        };
-        newCourses.push(newCourse);
-        setModifiedCourses((prevModifiedCourses) => [...prevModifiedCourses, newCourse]);
-      }
-    } else {
-      const positionKey = `${selectedRow}-${selectedCol}`;
-      const newItem = {
-        color: selectedCourseType.color,
-        courseType: selectedCourseType.name,
-        teacher: selectedTeacher.code,
-        duration: selectedDuration,
-        id: Date.now(),
-      };
-      newItems.push({ positionKey, newItem });
-  
-      const newCourse = {
-        itemID: newItem.id,
-        teacher: selectedTeacher,
-        courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
-        duration: selectedDuration,
-        subject: selectedSubject,
-        pos: { x: selectedCol, y: selectedRow },
-        groupInfo: selectedGroup,
-      };
-      newCourses.push(newCourse);
-      setModifiedCourses((prevModifiedCourses) => [...prevModifiedCourses, newCourse]);
-    }
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       newItems.forEach(({ positionKey, newItem }) => {
