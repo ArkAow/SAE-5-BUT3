@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotations\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class LdapLoginController extends AbstractController{
-
+class LdapLoginController extends AbstractController
+{
     #[Route('/ldap/login', name: 'ldap_login', methods: ['POST'])]
     public function login(Request $request)
     {
@@ -36,17 +36,22 @@ class LdapLoginController extends AbstractController{
             $query = $ldap->query('dc=unilim,dc=fr', sprintf('(&(objectClass=person)(uid=%s))', $username));
             $result = $query->execute();
 
-            // Extraction des données
-            $entries = [];
+            // Extraction des données nécessaires
+            $data = [];
             foreach ($result as $entry) {
-                $entries[] = $entry->getAttributes();
+                $attributes = $entry->getAttributes();
+                $data[] = [
+                    'givenName' => $attributes['givenName'][0] ?? null, // Extraction de givenName
+                    'sn' => $attributes['sn'][0] ?? null,                  // Extraction de sn
+                    'mail' => $attributes['mail'][0] ?? null,              // Extraction de mail
+                ];
             }
 
             // Retourne les données LDAP en JSON
             return $this->json([
                 'success' => true,
                 'message' => 'Authentication successful',
-                'data' => $entries,
+                'data' => $data,
             ]);
         } catch (\Exception $e) {
             // Gestion des erreurs (échec de l'authentification, etc.)
