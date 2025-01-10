@@ -44,22 +44,25 @@ const MainGrid = ({ curriculum }) => {
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
+        console.log(`Chargement des semestres...`);
         const response = await fetch(routes.dev.semesters.get(curriculum.id));
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des semestres.");
         }
         const semesters = await response.json();
         setAvailableSemesters(semesters);
-        setSelectedSemester(semesters[0] || null);
+        const firstSemester = semesters[0] || null;
 
         if (semesters[0]) {
-          fetchSubjects(semesters[0].id);
+          await fetchSubjects(firstSemester.id);
+          setSelectedSemester(firstSemester);
         }
       } catch (error) {
         console.error(error);
       }
       finally {
         setIsSemesterLoading(false);
+        console.log(`Chargement des semestres réussi`);
       }
     };
 
@@ -68,6 +71,7 @@ const MainGrid = ({ curriculum }) => {
 
   const fetchSubjects = async (semesterId) => {
     try {
+      console.log(`Chargement des matières...`);
       const response = await fetch(routes.dev.subjects.get(semesterId));
       if (!response.ok) {
         throw new Error("Erreur lors du chargement des matières.");
@@ -80,16 +84,17 @@ const MainGrid = ({ curriculum }) => {
     }
     finally {
       setIsSubjectLoading(false);
+      console.log(`Chargement des matières réussi`);
     }
   };
 
-  const handleSemesterChange = (e) => {
+  const handleSemesterChange = async (e) => {
     const semesterId = parseInt(e.target.value, 10);
     const selected = availableSemesters.find((s) => s.id === semesterId);
     setSelectedSemester(selected);
 
     if (selected) {
-      fetchSubjects(selected.id);
+      await fetchSubjects(selected.id);
     }
   };
 
@@ -130,6 +135,7 @@ const MainGrid = ({ curriculum }) => {
     if (!selectedSemester) return;
 
     try {
+      console.log(`Chargement des cours...`);
       setIsCourseLoading(true);
       let allSubjects = [];
       let allItems = [];
@@ -153,12 +159,11 @@ const MainGrid = ({ curriculum }) => {
         allSubjects.push(newSubject);
       }
       setAvailableSubjects(allSubjects);
-      console.log(allSubjects);
-      console.log(allItems);
     } catch (error) {
       console.error("Erreur inattendue :", error);
     } finally {
       setIsCourseLoading(false);
+      console.log(`Chargement des cours réussi`);
     }
   };
 
