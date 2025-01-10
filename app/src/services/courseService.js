@@ -48,6 +48,7 @@ export const createCoursesFromData = (payload, subject) => {
     const selectedCol = payload.col;
     const selectedGroup = payload.group;
     const selectedSubject = subject;
+    const courseId = payload.id || undefined;
     let newCourses = [];
 
     if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
@@ -61,6 +62,7 @@ export const createCoursesFromData = (payload, subject) => {
         if (exceptionsArray.includes(week)) continue;
   
         const newCourse = {
+          id: courseId,
           itemID: Date.now(),
           teacher: selectedTeacher,
           courseType: { name: selectedCourseType.name, color: selectedCourseType.color },

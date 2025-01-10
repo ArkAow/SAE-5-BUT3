@@ -96,6 +96,7 @@ const MainGrid = ({ curriculum }) => {
   const handleSubjectChange = (e) => {
     const subjectId = parseInt(e.target.value, 10);
     const selected = availableSubjects.find((s) => s.id === subjectId);
+    console.log(selected);
     setSelectedSubject(selected);
   };
 
@@ -130,22 +131,30 @@ const MainGrid = ({ curriculum }) => {
 
     try {
       setIsCourseLoading(true);
-      let courses = [];
+      let allSubjects = [];
+      let allItems = [];
       for (const subject of availableSubjects) {
         const response = await fetch(routes.dev.courses.getBySubject(subject.id));
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des cours.");
         }
         const data = await response.json();
+        let allCourses = [];
         data.forEach((course) => {
           const { x, y } = getCoursePosFromGroup(course, groups, groupList);
           course.col = x;
           course.row = y;
           course.isRepeat = false;
+          allCourses.push(...createCoursesFromData(course, subject));
+          allItems.push(...createItemsFromData(course));
         });
-        courses.push(data);
+        const newSubject = subject;
+        newSubject.courses = allCourses;
+        allSubjects.push(newSubject);
       }
-      console.log(courses);
+      setAvailableSubjects(allSubjects);
+      console.log(allSubjects);
+      console.log(allItems);
     } catch (error) {
       console.error("Erreur inattendue :", error);
     } finally {
