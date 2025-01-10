@@ -92,9 +92,14 @@ const MainGrid = ({ curriculum }) => {
     const semesterId = parseInt(e.target.value, 10);
     const selected = availableSemesters.find((s) => s.id === semesterId);
     setSelectedSemester(selected);
-
     if (selected) {
       await fetchSubjects(selected.id);
+      const currentIndex = availableSubjects.findIndex(
+        (subject) => subject.id === selectedSubject?.id
+      );
+      setCurrentSubjectIndex(currentIndex >= 0 ? currentIndex : 0); // Défaut à 0
+    } else {
+      setCurrentSubjectIndex(0);
     }
   };
 
