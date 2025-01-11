@@ -81,7 +81,7 @@ export const createCoursesFromData = (payload, subject) => {
         duration: selectedDuration,
         subject: selectedSubject,
         pos: { x: selectedCol, y: selectedRow },
-        groupInfo: selectedGroup,
+        group: selectedGroup,
       };
       newCourses.push(newCourse);
     }
