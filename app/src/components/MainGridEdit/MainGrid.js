@@ -14,7 +14,7 @@ const MainGrid = ({ curriculum }) => {
 
   const [items, setItems] = useState({});
   const [modifiedCourses, setModifiedCourses] = useState([])
-  const [selectedSemester, setSelectedSemester] = useState({});
+  const [selectedSemester, setSelectedSemester] = useState();
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState({});
   const [availableSubjects, setAvailableSubjects] = useState([]);
@@ -106,7 +106,6 @@ const MainGrid = ({ curriculum }) => {
   const handleSubjectChange = (e) => {
     const subjectId = parseInt(e.target.value, 10);
     const selected = availableSubjects.find((s) => s.id === subjectId);
-    console.log(selected);
     setSelectedSubject(selected);
   };
 
@@ -167,10 +166,17 @@ const MainGrid = ({ curriculum }) => {
     } catch (error) {
       console.error("Erreur inattendue :", error);
     } finally {
+      if (availableSubjects[0]) {
+        setSelectedSubject(availableSubjects[0]);
+      }
       setIsCourseLoading(false);
       console.log(`Chargement des cours réussi`);
     }
   };
+
+  useEffect(() => {
+    fetchCoursesForSubjects();
+  }, [selectedSemester]);
 
   const fetchCourseTypes = async () => {
     try {
@@ -192,13 +198,9 @@ const MainGrid = ({ curriculum }) => {
     fetchCourseTypes();
   }, []);
 
-  useEffect(() => {
-    fetchCoursesForSubjects();
-  }, [selectedSemester]);
-
   const addItem = (payload) => {
     const newItems = createItemsFromData(payload);
-    const newCourses = createCoursesFromData(payload, selectedSubject);;
+    const newCourses = createCoursesFromData(payload, selectedSubject);
   
     setModifiedCourses((prevModifiedCourses) => [
       ...prevModifiedCourses,
