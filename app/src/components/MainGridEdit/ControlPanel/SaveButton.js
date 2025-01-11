@@ -35,6 +35,7 @@ export const SaveButton = ({ isNoGroups ,modifiedCourses, setModifiedCourses, se
           console.error(`Erreur lors de la sauvegarde du cours :`, errorData);
           hasError = true;
         } else {
+          console.log(course);
           console.log(`Cours ajouté :`,payload);
         }
       }

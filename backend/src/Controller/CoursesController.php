@@ -151,10 +151,19 @@ class CoursesController extends AbstractController
         $course->setDuration((float) $data['duration']);
         $course->setWeekPosition((int) $data['weekPosition']);
 
-        // Association des relations (Formation Level, Group, HalfGroup, Teacher, CourseType, Subject)
+        // Association des relations (Formation Level, Group, HalfGroup)
         if (!empty($data['formationLevelId'])) {
             $formationLevel = $formationLevelRepository->find($data['formationLevelId']);
             if ($formationLevel) {
+                // Supprimer les associations existantes avec Group et HalfGroup
+                foreach ($course->getGroups() as $existingGroup) {
+                    $course->removeGroup($existingGroup);
+                }
+                foreach ($course->getHalfGroups() as $existingHalfGroup) {
+                    $course->removeHalfGroup($existingHalfGroup);
+                }
+
+                // Ajouter la nouvelle association FormationLevel
                 foreach ($course->getFormationLevel() as $existingFormationLevel) {
                     $course->removeFormationLevel($existingFormationLevel);
                 }
@@ -165,6 +174,15 @@ class CoursesController extends AbstractController
         if (!empty($data['groupId'])) {
             $group = $groupsRepository->find($data['groupId']);
             if ($group) {
+                // Supprimer les associations existantes avec FormationLevel et HalfGroup
+                foreach ($course->getFormationLevel() as $existingFormationLevel) {
+                    $course->removeFormationLevel($existingFormationLevel);
+                }
+                foreach ($course->getHalfGroups() as $existingHalfGroup) {
+                    $course->removeHalfGroup($existingHalfGroup);
+                }
+
+                // Ajouter la nouvelle association Group
                 foreach ($course->getGroups() as $existingGroup) {
                     $course->removeGroup($existingGroup);
                 }
@@ -175,6 +193,15 @@ class CoursesController extends AbstractController
         if (!empty($data['halfGroupId'])) {
             $halfGroup = $halfGroupRepository->find($data['halfGroupId']);
             if ($halfGroup) {
+                // Supprimer les associations existantes avec FormationLevel et Group
+                foreach ($course->getFormationLevel() as $existingFormationLevel) {
+                    $course->removeFormationLevel($existingFormationLevel);
+                }
+                foreach ($course->getGroups() as $existingGroup) {
+                    $course->removeGroup($existingGroup);
+                }
+
+                // Ajouter la nouvelle association HalfGroup
                 foreach ($course->getHalfGroups() as $existingHalfGroup) {
                     $course->removeHalfGroup($existingHalfGroup);
                 }

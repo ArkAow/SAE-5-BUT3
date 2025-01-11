@@ -7,6 +7,7 @@ import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
 import { createCoursesFromData, createItemsFromData } from "../../services/courseService.js";
 import { getCoursePosFromGroup } from "../../services/courseGroupService.js";
+import { determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -126,7 +127,7 @@ const MainGrid = ({ curriculum }) => {
         courseType: course.courseType.name,
         teacher: course.teacher.code || "N/A",
         duration: course.duration || 1.0,
-        id: course.id || Date.now() + index,
+        id: course.itemID || Date.now(),
       });
     });
 
@@ -142,7 +143,6 @@ const MainGrid = ({ curriculum }) => {
       console.log(`Chargement des cours...`);
       setIsCourseLoading(true);
       let allSubjects = [];
-      let allItems = [];
       for (const subject of availableSubjects) {
         const response = await fetch(routes.dev.courses.getBySubject(subject.id));
         if (!response.ok) {
@@ -152,11 +152,11 @@ const MainGrid = ({ curriculum }) => {
         let allCourses = [];
         data.forEach((course) => {
           const { x, y } = getCoursePosFromGroup(course, groups, groupList);
+          const newItemID = Date.now()+course.id;
           course.col = x;
           course.row = y;
           course.isRepeat = false;
-          allCourses.push(...createCoursesFromData(course, subject));
-          allItems.push(...createItemsFromData(course));
+          allCourses.push(...createCoursesFromData(course, subject, newItemID));
         });
         const newSubject = subject;
         newSubject.courses = allCourses;
@@ -199,8 +199,9 @@ const MainGrid = ({ curriculum }) => {
   }, []);
 
   const addItem = (payload) => {
-    const newItems = createItemsFromData(payload);
-    const newCourses = createCoursesFromData(payload, selectedSubject);
+    const newItemID = Date.now();
+    const newItems = createItemsFromData(payload, newItemID);
+    const newCourses = createCoursesFromData(payload, selectedSubject, newItemID);
   
     setModifiedCourses((prevModifiedCourses) => [
       ...prevModifiedCourses,
@@ -257,29 +258,38 @@ const MainGrid = ({ curriculum }) => {
       const fromItems = [...(prevItems[fromKey] || [])];
       const toItems = [...(prevItems[toKey] || [])];
       const itemIndex = fromItems.findIndex((item) => item.id === id);
-      if (itemIndex === -1) return prevItems;
+      if (itemIndex === -1) return prevItems; // Si l'élément n'existe pas, ne rien faire
       const [draggedItem] = fromItems.splice(itemIndex, 1);
-
+  
       setAvailableSubjects((prevSubjects) => {
-        const updatedSubjects = [...prevSubjects];
-        const currentSubject = updatedSubjects[currentSubjectIndex];
-        currentSubject.courses = currentSubject.courses.map((course) => {
-          if (
-            course.teacher.name === draggedItem.teacher &&
-            course.courseType.name === draggedItem.courseType &&
-            course.duration === draggedItem.duration &&
-            course.pos.x === parseInt(fromKey.split("-")[1], 10) &&
-            course.pos.y === parseInt(fromKey.split("-")[0], 10)
-          ) {
-            return {
-              ...course,
-              pos: { x: parseInt(toKey.split("-")[1], 10), y: parseInt(toKey.split("-")[0], 10) },
-            };
+        return prevSubjects.map((subject, index) => {
+          if (index === currentSubjectIndex) {
+            const updatedCourses = subject.courses.map((course) => {
+              if (course.itemID === draggedItem.id) {
+                const xPos = parseInt(toKey.split("-")[1], 10);
+                const yPos = parseInt(toKey.split("-")[0], 10);
+                const updatedCourse = {
+                  ...course,
+                  pos: { x: xPos, y: yPos },
+                  group: {
+                    groupType: determineCourseGroup(xPos, groups, groupList),
+                    groupID: getGroupID(xPos, groups, groupList),
+                  },
+                }; 
+                setModifiedCourses((prevModifiedCourses) => [
+                  ...prevModifiedCourses,
+                  updatedCourse,
+                ]);
+  
+                return updatedCourse;
+              }
+              return course;
+            });
+            return { ...subject, courses: updatedCourses };
           }
-          return course;
+          return subject;
         });
-        return updatedSubjects;
-      });
+      });  
       return {
         ...prevItems,
         [fromKey]: fromItems,

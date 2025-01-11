@@ -1,4 +1,4 @@
-export const createItemsFromData = (payload) => {
+export const createItemsFromData = (payload, itemID) => {
     const selectedTeacher = payload.teacher;
     const selectedCourseType = payload.courseType;
     const selectedDuration = payload.duration
@@ -18,29 +18,29 @@ export const createItemsFromData = (payload) => {
   
         const positionKey = `${week}-${selectedCol}`;
         const newItem = {
+          id: itemID + week,
           color: selectedCourseType.color,
           courseType: selectedCourseType.name,
           teacher: selectedTeacher.code,
           duration: selectedDuration,
-          id: Date.now() + week,
         };
         newItems.push({ positionKey, newItem });
       }
     } else {  
         const positionKey = `${selectedRow}-${selectedCol}`;
         const newItem = {
+          id: itemID,
           color: selectedCourseType.color,
           courseType: selectedCourseType.name,
           teacher: selectedTeacher.code,
           duration: selectedDuration,
-          id: Date.now(),
         };
         newItems.push({ positionKey, newItem });
     }
     return newItems;
 }
 
-export const createCoursesFromData = (payload, subject) => {
+export const createCoursesFromData = (payload, subject, itemID) => {
     const selectedTeacher = payload.teacher;
     const selectedCourseType = payload.courseType;
     const selectedDuration = payload.duration
@@ -63,7 +63,7 @@ export const createCoursesFromData = (payload, subject) => {
   
         const newCourse = {
           id: courseId,
-          itemID: Date.now(),
+          itemID: itemID + week,
           teacher: selectedTeacher,
           courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
           duration: selectedDuration,
@@ -75,7 +75,8 @@ export const createCoursesFromData = (payload, subject) => {
       }
     } else {  
       const newCourse = {
-        itemID: Date.now(),
+        id: courseId,
+        itemID: itemID,
         teacher: selectedTeacher,
         courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
         duration: selectedDuration,
