@@ -10,6 +10,7 @@ export const CourseButton = ({
     selectedSemester,
     courseTypes,
     addItem,
+    teachers
 }) => {
     const [isFocused, setIsFocused] = useState(false);
     const [isRepeat, setIsRepeat] = useState(false);
@@ -17,7 +18,6 @@ export const CourseButton = ({
     const [repeatTo, setRepeatTo] = useState(7);
     const [exceptions, setExceptions] = useState("");
     const [error, setError] = useState("");
-    const [teachers, setTeachers] = useState([]);
     const containerRef = useRef(null);
     const tooltipRef = useRef(null);
 
@@ -44,17 +44,6 @@ export const CourseButton = ({
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
-    const fetchTeachers = async () => {
-        try {
-            const response = await fetch(routes.dev.teachers.get());
-            if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
-            const data = await response.json();
-            setTeachers(data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     const NodePortal = ({ children }) => {
         return createPortal(children, document.getElementById("portal-root"));
@@ -117,10 +106,6 @@ export const CourseButton = ({
         console.log("Données du cours :", payload);
         addItem(payload);
     };
-
-    useEffect(() => {
-        fetchTeachers();
-    }, []);
 
     return (
         <div className="relative" ref={containerRef}>
@@ -259,7 +244,7 @@ export const CourseButton = ({
                                 step="0.5"
                                 value={selectedDuration}
                                 onChange={(e) => setSelectedDuration(Number(e.target.value))}
-                                className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-2"
+                                className="tooltip-number-input"
                             />
                         </div>
 

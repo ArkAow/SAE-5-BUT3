@@ -20,6 +20,7 @@ const MainGrid = ({ curriculum }) => {
   const [selectedSubject, setSelectedSubject] = useState({});
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [teachers, setTeachers] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
@@ -41,7 +42,7 @@ const MainGrid = ({ curriculum }) => {
     }
   }, [isGroupLoading, isSemesterLoading, isSubjectLoading, isCourseTypeLoading]);
 
-  {/* Gestion des SEMESTRES et MATIERES -------------------------------------------- */}
+  /* Gestion des SEMESTRES et MATIERES -------------------------------------------- */
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
@@ -134,8 +135,42 @@ const MainGrid = ({ curriculum }) => {
     setItems(initialItems);
   }, [selectedSubject]);
 
+
+  /* Gestion des ENSEIGNANTS -------------------------------------------- */
+    useEffect(() => {
+      const fetchTeachers = async () => {
+        try {
+            const response = await fetch(routes.dev.teachers.get());
+            if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
+            const data = await response.json();
+            setTeachers(data);
+        } catch (error) {
+            console.error(error);
+        }
+      };
   
-  {/* Gestion des COURS -------------------------------------------- */}
+      fetchTeachers();
+    }, []);
+
+
+  /* Gestion des ENSEIGNANTS */
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+          const response = await fetch(routes.dev.teachers.get());
+          if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
+          const data = await response.json();
+          setTeachers(data);
+      } catch (error) {
+          console.error(error);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
+  
+  /* Gestion des COURS -------------------------------------------- */
   const fetchCoursesForSubjects = async () => {
     if (!selectedSemester) return;
 
@@ -252,6 +287,39 @@ const MainGrid = ({ curriculum }) => {
       return updatedSubjects;
     });
   };
+
+  const modifItem = (updatedData) => {
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      const { positionKey, id, teacher, courseType, duration } = updatedData;
+      if (updatedItems[positionKey]) {
+        updatedItems[positionKey] = updatedItems[positionKey].map((item) =>
+          item.id === id ? { ...item, teacher, courseType, duration } : item
+        );
+      }
+      return updatedItems;
+    });
+    setAvailableSubjects((prevSubjects) => {
+      return prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = subject.courses.map((course) =>
+            course.id === updatedData.id
+              ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
+              : course
+          );
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+    });
+    setCurrentCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course.id === updatedData.id
+          ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
+          : course
+      )
+    );
+  };
   
   const moveItem = (fromKey, toKey, id) => {
     setItems((prevItems) => {
@@ -326,7 +394,7 @@ const MainGrid = ({ curriculum }) => {
     });
   };  
 
-  {/* Gestion des GROUPES -------------------------------------------- */}
+  /* Gestion des GROUPES -------------------------------------------- */
   const fetchGroups = async () => {
     try {
       const classID = curriculum.formationLevels[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
@@ -387,6 +455,7 @@ const MainGrid = ({ curriculum }) => {
                 selectedSemester={selectedSemester}
                 setToast={setToast}
                 groups={groups}
+                teachers={teachers}
                 groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
@@ -512,11 +581,11 @@ const MainGrid = ({ curriculum }) => {
                             const cellItems = items[positionKey] || [];
                             return (
                               <Node
-                                key={positionKey}
-                                positionKey={positionKey}
-                                items={cellItems}
+                                courseTypes={courseTypes}
+                                teachers={teachers}
                                 moveItem={moveItem}
                                 deleteItem={deleteItem}
+                                modifItem={modifItem}
                               />
                             );
                           })}
