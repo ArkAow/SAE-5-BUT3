@@ -257,13 +257,6 @@ const MainGrid = ({ curriculum }) => {
   
     setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
   };
-  const handleEditClick = (positionKey, id) => {
-    const itemToEdit = items[positionKey]?.find((item) => item.id === id);
-    if (itemToEdit) {
-      setCurrentEditItem({ positionKey, ...itemToEdit });
-      setIsEditing(true);
-    }
-  };
   const modifItem = (updatedData) => {
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
