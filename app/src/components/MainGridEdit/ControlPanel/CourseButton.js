@@ -253,7 +253,7 @@ export const CourseButton = ({
                                 step="0.5"
                                 value={selectedDuration}
                                 onChange={(e) => setSelectedDuration(Number(e.target.value))}
-                                className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-2"
+                                className="tooltip-number-input"
                             />
                         </div>
 

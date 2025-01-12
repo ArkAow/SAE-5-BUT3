@@ -257,20 +257,18 @@ const MainGrid = ({ curriculum }) => {
   
     setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
   };
+
   const modifItem = (updatedData) => {
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       const { positionKey, id, teacher, courseType, duration } = updatedData;
-  
       if (updatedItems[positionKey]) {
         updatedItems[positionKey] = updatedItems[positionKey].map((item) =>
           item.id === id ? { ...item, teacher, courseType, duration } : item
         );
       }
-  
       return updatedItems;
     });
-  
     setAvailableSubjects((prevSubjects) => {
       return prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
@@ -284,7 +282,6 @@ const MainGrid = ({ curriculum }) => {
         return subject;
       });
     });
-  
     setCurrentCourses((prevCourses) =>
       prevCourses.map((course) =>
         course.id === updatedData.id
@@ -292,7 +289,6 @@ const MainGrid = ({ curriculum }) => {
           : course
       )
     );
-  
     setIsEditing(false); // Ferme la modale
   };
   

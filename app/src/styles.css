@@ -30,6 +30,9 @@
     .tooltip-select {
       @apply w-full p-1 border rounded-full bg-primary text-white
     }
+    .tooltip-number-input {
+      @apply w-full text-primary bg-white rounded-full ring-1 ring-primary pl-2
+    }
   }
 
 /* Classe pour personnaliser la scrollbar dans l’infobulle */
