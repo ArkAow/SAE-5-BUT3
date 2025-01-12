@@ -17,6 +17,7 @@ const MainGrid = ({ curriculum }) => {
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [currentCourses, setCurrentCourses] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [teachers, setTeachers] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
@@ -121,6 +122,23 @@ const MainGrid = ({ curriculum }) => {
 
     setItems(initialItems);
   }, [currentCourses]);
+
+
+  /* Gestion des ENSEIGNANTS */
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+          const response = await fetch(routes.dev.teachers.get());
+          if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
+          const data = await response.json();
+          setTeachers(data);
+      } catch (error) {
+          console.error(error);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
 
   
   /* Gestion des COURS -------------------------------------------- */
@@ -425,6 +443,7 @@ const MainGrid = ({ curriculum }) => {
                 selectedSemester={selectedSemester}
                 setToast={setToast}
                 groups={groups}
+                teachers={teachers}
                 groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
@@ -538,6 +557,8 @@ const MainGrid = ({ curriculum }) => {
                             key={positionKey}
                             positionKey={positionKey}
                             items={cellItems}
+                            courseTypes={courseTypes}
+                            teachers={teachers}
                             moveItem={moveItem}
                             deleteItem={deleteItem}
                             modifItem={modifItem}

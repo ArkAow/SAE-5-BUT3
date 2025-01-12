@@ -14,6 +14,7 @@ const CourseObject = ({
   modifItem,
   deleteItem,
   courseTypes,
+  teachers,
 }) => {
   const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
@@ -27,8 +28,6 @@ const CourseObject = ({
   const tooltipRef = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [editedData, setEditedData] = useState({ teacher, courseType, duration });
-  const [selectedTeacher, setSelectedTeacher] = useState("");
-  const [teachers, setTeachers] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -57,6 +56,7 @@ const CourseObject = ({
   };
 
   const handleSaveEdit = () => {
+    console.log(editedData, positionKey, id);
     modifItem({ ...editedData, positionKey, id });
     setShowModal(false);
   };
@@ -121,23 +121,6 @@ const CourseObject = ({
                 handleSaveEdit();
               }}>
               <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
-                <label className="block mb-1 font-bold w-32">Enseignant :</label>
-                <select
-                    value={selectedTeacher}
-                    onChange={(e) => setSelectedTeacher(e.target.value)}
-                    className="tooltip-select">
-                    <option value="" disabled>
-                        Choisir un enseignant:
-                    </option>
-                    {teachers?.map((teacher) => (
-                        <option key={teacher.code} value={teacher.code}>
-                            {teacher.code}
-                        </option>
-                    ))}
-                </select>                
-              </div>
-
-              <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
                 <label className="block mb-1 font-bold w-32">Type de cours :</label>
                 <select
                   value={editedData.courseType}
@@ -156,6 +139,23 @@ const CourseObject = ({
                     </option>
                   )}
                 </select>
+              </div>
+
+              <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
+                <label className="block mb-1 font-bold w-32">Enseignant :</label>
+                <select
+                    value={editedData.teacher}
+                    onChange={(e) => setEditedData({ ...editedData, teacher: e.target.value })}
+                    className="tooltip-select">
+                    <option value="" disabled>
+                        Choisir un enseignant:
+                    </option>
+                    {teachers?.map((teacher) => (
+                        <option key={teacher.code} value={teacher.code}>
+                            {teacher.code}
+                        </option>
+                    ))}
+                </select>                
               </div>
 
               <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-b-xl">

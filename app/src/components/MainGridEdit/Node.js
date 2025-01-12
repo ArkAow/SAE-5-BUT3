@@ -6,7 +6,9 @@ const ITEM_TYPE = "rectangle";
 
 const Node = ({ 
   positionKey, 
-  items, 
+  items,
+  courseTypes,
+  teachers,
   deleteItem, 
   modifItem, 
   moveItem  
@@ -66,6 +68,8 @@ const Node = ({
           onDragEnd={() => setIsDragging(false)}
           deleteItem={deleteItem}
           modifItem={modifItem}
+          courseTypes={courseTypes}
+          teachers={teachers}
           />
       )}
 
@@ -112,6 +116,8 @@ const Node = ({
                 onDragStart={() => setIsDragging(true)}
                 onDragEnd={() => setIsDragging(false)}
                 deleteItem={deleteItem}
+                courseTypes={courseTypes}
+                teachers={teachers}
                 />
               <strong>--------------</strong>
             </div>

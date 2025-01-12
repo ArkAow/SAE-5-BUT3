@@ -12,6 +12,7 @@ const ControlPanel = ({
   selectedSemester,
   setToast,
   groups,
+  teachers,
   groupList,
   setGroups,
   fetchGroups,
@@ -72,7 +73,8 @@ const ControlPanel = ({
           groupList={groupList}
           selectedSemester={selectedSemester}
           courseTypes={courseTypes}
-          addItem={addItem}/>
+          addItem={addItem}
+          teachers={teachers}/>
 
         <CourseTypeButton 
           isNoGroups={isNoGroups}
