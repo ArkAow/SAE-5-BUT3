@@ -78,8 +78,8 @@ final class Version20241120093708 extends AbstractMigration
         $semester = $schema->createTable('semester');
         $semester->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $semester->addColumn('name', 'string', ['length' => 100]);
-        $semester->addColumn('week_start', 'integer', ['nullable' => true]);
-        $semester->addColumn('week_duration', 'integer', ['nullable' => true]);
+        $semester->addColumn('week_start', 'integer',['notnull' => false]);
+        $semester->addColumn('week_duration', 'integer', ['notnull' => false]);
         $semester->setPrimaryKey(['id']);
         
         // Table Semester - Curriculum
