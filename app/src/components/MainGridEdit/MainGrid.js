@@ -92,7 +92,6 @@ const MainGrid = ({ curriculum }) => {
   const handleSemesterChange = async (e) => {
     const semesterId = parseInt(e.target.value, 10);
     const selected = availableSemesters.find((s) => s.id === semesterId);
-    setSelectedSemester(selected);
     if (selected) {
       await fetchSubjects(selected.id);
       const currentIndex = availableSubjects.findIndex(
@@ -102,6 +101,7 @@ const MainGrid = ({ curriculum }) => {
     } else {
       setCurrentSubjectIndex(0);
     }
+    setSelectedSemester(selected);
   };
 
   const handleSubjectChange = (e) => {
