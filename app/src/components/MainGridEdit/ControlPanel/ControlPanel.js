@@ -20,15 +20,17 @@ const ControlPanel = ({
   setCourseTypes,
   updateCoursesForRemovedType,
   addItem,
-  subjects,
   modifiedCourses,
   setModifiedCourses,
+  deletedCourses,
+  setDeletedCourses,
   isSaving,
   setSaving }) => {
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
   const [isModifiedCourses, setIsModifiedCourses] = useState(false);
+  const [isDeletedCourses, setIsDeletedCourses] = useState(false);
 
   useEffect(() => {
     setIsNoGroups(groups.length === 0);
@@ -36,6 +38,9 @@ const ControlPanel = ({
   useEffect(() => {
     setIsModifiedCourses(modifiedCourses.length > 0);
   }, [modifiedCourses]);
+  useEffect(() => {
+    setIsDeletedCourses(deletedCourses.length > 0);
+  }, [deletedCourses]);
 
   const handleToggleExpand = () => {
     if (isButtonDisabled) return;
@@ -63,7 +68,7 @@ const ControlPanel = ({
             : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
 
-        <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isNoGroups || isModifiedCourses) || isExpanded ? "hidden" : ""}`}>
+        <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isNoGroups || isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
@@ -107,7 +112,9 @@ const ControlPanel = ({
           modifiedCourses={modifiedCourses}
           setModifiedCourses={setModifiedCourses}
           isModifiedCourses={isModifiedCourses}
-          setIsModifiedCourses={setIsModifiedCourses}
+          deletedCourses={deletedCourses}
+          setDeletedCourses={setDeletedCourses}
+          isDeletedCourses={isDeletedCourses}
           setToast={setToast}
           isSaving={isSaving}
           setSaving={setSaving}/>

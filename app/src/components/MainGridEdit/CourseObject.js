@@ -27,8 +27,11 @@ const CourseObject = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipRef = useRef(null);
   const [showModal, setShowModal] = useState(false);
-  const [editedData, setEditedData] = useState({ teacher, courseType, duration });
+  const [selectedTeacher, setSelectedTeacher] = useState(teacher);
+  const [selectedCourseType, setSelectedCourseType] = useState(courseType);
+  const [selectedDuration, setSelectedDuration] = useState(duration);
 
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
@@ -56,8 +59,15 @@ const CourseObject = ({
   };
 
   const handleSaveEdit = () => {
-    console.log(editedData, positionKey, id);
-    modifItem({ ...editedData, positionKey, id });
+
+    const payload = {
+      courseType: selectedCourseType,
+      teacher: selectedTeacher,
+      duration: selectedDuration,
+      positionKey,
+      id
+    };
+    modifItem(payload);
     setShowModal(false);
   };
 
@@ -69,12 +79,11 @@ const CourseObject = ({
         backgroundColor: color,
         opacity: isDragging ? 0.5 : 1,
         borderColor: getShade(color),
-      }}
-    >
-      <div className="w-full bg-white h-4 text-xs text-black rounded px-2 mb-0.5">
+      }}>
+      <div className="w-full bg-white h-4 text-xs text-black rounded px-2 mb-0.5 truncate ">
         {courseType}
       </div>
-      <div className="w-full bg-white h-4 text-xs text-black rounded px-2 mb-0.5">
+      <div className="w-full bg-white h-4 text-xs text-black rounded px-2 mb-0.5 truncate ">
         {teacher}
       </div>
       <div className="w-full bg-white h-4 text-xs text-black rounded px-2">
@@ -104,8 +113,8 @@ const CourseObject = ({
           </button>
           <button
             onClick={() => deleteItem(positionKey, id)}
-            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs"
-          >Supprimer
+            className="w-full py-1 px-2 bg-red-500 text-white rounded hover:bg-red-700 text-xs">
+            Supprimer
           </button>
         </div>
       )}
@@ -123,8 +132,8 @@ const CourseObject = ({
               <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
                 <label className="block mb-1 font-bold w-32">Type de cours :</label>
                 <select
-                  value={editedData.courseType}
-                  onChange={(e) => setEditedData({ ...editedData, courseType: e.target.value })}
+                  value={selectedCourseType}
+                  onChange={(e) => setSelectedCourseType(e.target.value)}
                   className="tooltip-select">
                   <option value="" disabled>
                     Choisir un type de cours
@@ -144,15 +153,15 @@ const CourseObject = ({
               <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
                 <label className="block mb-1 font-bold w-32">Enseignant :</label>
                 <select
-                    value={editedData.teacher}
-                    onChange={(e) => setEditedData({ ...editedData, teacher: e.target.value })}
+                    value={selectedTeacher}
+                    onChange={(e) => setSelectedTeacher(e.target.value)}
                     className="tooltip-select">
                     <option value="" disabled>
                         Choisir un enseignant:
                     </option>
                     {teachers?.map((teacher) => (
                         <option key={teacher.code} value={teacher.code}>
-                            {teacher.code}
+                          {teacher.code}
                         </option>
                     ))}
                 </select>                
@@ -162,13 +171,11 @@ const CourseObject = ({
                 <label className="block mb-1 font-bold w-52">Durée (en heures):</label>
                 <input
                   type="number"
-                  value={editedData.duration}
-                  onChange={(e) =>
-                    setEditedData({
-                      ...editedData,
-                      duration: parseInt(e.target.value, 10),
-                    })
-                  }
+                  min={0}
+                  max={50}
+                  step="0.5"
+                  value={selectedDuration}
+                  onChange={(e) =>setSelectedDuration(Number(e.target.value))}
                   className="tooltip-number-input"/>
               </div>
 

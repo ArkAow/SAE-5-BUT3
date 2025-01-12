@@ -5,9 +5,8 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
-import { createCoursesFromData, createItemsFromData } from "../../services/courseService.js";
-import { getCoursePosFromGroup } from "../../services/courseGroupService.js";
-import { determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
+import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../../services/courseService.js";
+import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -15,6 +14,7 @@ const MainGrid = ({ curriculum }) => {
 
   const [items, setItems] = useState({});
   const [modifiedCourses, setModifiedCourses] = useState([])
+  const [deletedCourses, setDeletedCourses] = useState([])
   const [selectedSemester, setSelectedSemester] = useState();
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState({});
@@ -114,7 +114,7 @@ const MainGrid = ({ curriculum }) => {
   useEffect(() => {
     const initialItems = {};
     const courses = selectedSubject.courses || [];
-    courses.forEach((course, index) => {
+    courses.forEach((course) => {
       const row = course.pos.y;
       const col = course.pos.x;
       const positionKey = `${row}-${col}`;
@@ -136,33 +136,21 @@ const MainGrid = ({ curriculum }) => {
   }, [selectedSubject]);
 
 
-  /* Gestion des ENSEIGNANTS -------------------------------------------- */
-    useEffect(() => {
-      const fetchTeachers = async () => {
-        try {
-            const response = await fetch(routes.dev.teachers.get());
-            if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
-            const data = await response.json();
-            setTeachers(data);
-        } catch (error) {
-            console.error(error);
-        }
-      };
-  
-      fetchTeachers();
-    }, []);
-
-
   /* Gestion des ENSEIGNANTS */
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
+        console.log(`Chargement des enseigants...`);
           const response = await fetch(routes.dev.teachers.get());
-          if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
+          if (!response.ok) {
+            throw new Error("Erreur lors du chargement des enseignants.");
+          }
           const data = await response.json();
           setTeachers(data);
       } catch (error) {
           console.error(error);
+      } finally {
+        console.log(`Chargement des enseigants réussi`);
       }
     };
 
@@ -237,12 +225,10 @@ const MainGrid = ({ curriculum }) => {
     const newItemID = Date.now();
     const newItems = createItemsFromData(payload, newItemID);
     const newCourses = createCoursesFromData(payload, selectedSubject, newItemID);
-  
     setModifiedCourses((prevModifiedCourses) => [
       ...prevModifiedCourses,
       ...newCourses,
     ]);
-
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       newItems.forEach(({ positionKey, newItem }) => {
@@ -250,7 +236,6 @@ const MainGrid = ({ curriculum }) => {
       });
       return updatedItems;
     });
-  
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
@@ -274,7 +259,15 @@ const MainGrid = ({ curriculum }) => {
       }
       return updatedItems;
     });
-  
+    setDeletedCourses((prevDeletedCourses) => [
+      ...prevDeletedCourses,
+      ...availableSubjects[currentSubjectIndex].courses.filter(
+        (course) => course.itemID === id && course.id
+      ),
+    ]);
+    setModifiedCourses((prevModifiedCourses) =>
+      prevModifiedCourses.filter((course) => course.itemID !== id)
+    );
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
@@ -283,18 +276,19 @@ const MainGrid = ({ curriculum }) => {
         }
         return subject;
       });
-  
       return updatedSubjects;
     });
   };
 
-  const modifItem = (updatedData) => {
+  const modifItem = (payload) => {
+    const { positionKey, id, teacher, courseType, duration } = payload;
+    const selectedTeacher = findTeacherByCode(teacher, teachers);
+    const selectedCourseType = findCourseTypeByName(courseType, courseTypes);
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
-      const { positionKey, id, teacher, courseType, duration } = updatedData;
       if (updatedItems[positionKey]) {
         updatedItems[positionKey] = updatedItems[positionKey].map((item) =>
-          item.id === id ? { ...item, teacher, courseType, duration } : item
+          item.id === id ? { ...item, teacher, courseType, duration, color: selectedCourseType.color } : item
         );
       }
       return updatedItems;
@@ -303,8 +297,11 @@ const MainGrid = ({ curriculum }) => {
       return prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
           const updatedCourses = subject.courses.map((course) =>
-            course.id === updatedData.id
-              ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
+            course.itemID === payload.id ? { 
+              ...course, 
+              teacher: selectedTeacher || course.teacher,
+              courseType: selectedCourseType || course.courseType,
+              duration: duration || course.duration}
               : course
           );
           return { ...subject, courses: updatedCourses };
@@ -312,14 +309,18 @@ const MainGrid = ({ curriculum }) => {
         return subject;
       });
     });
-    setCurrentCourses((prevCourses) =>
-      prevCourses.map((course) =>
-        course.id === updatedData.id
-          ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
-          : course
-      )
-    );
-  };
+    setModifiedCourses((prevModifiedCourses) => [
+      ...prevModifiedCourses.filter((course) => course.itemID !== payload.id),
+      ...availableSubjects[currentSubjectIndex].courses.filter(
+        (course) => course.itemID === payload.id
+      ).map((course) => ({
+        ...course,
+        teacher: selectedTeacher || course.teacher,
+        courseType: selectedCourseType || course.courseType,
+        duration: duration ? duration : course.duration,
+      })),
+    ]);
+  }
   
   const moveItem = (fromKey, toKey, id) => {
     setItems((prevItems) => {
@@ -328,7 +329,6 @@ const MainGrid = ({ curriculum }) => {
       const itemIndex = fromItems.findIndex((item) => item.id === id);
       if (itemIndex === -1) return prevItems; // Si l'élément n'existe pas, ne rien faire
       const [draggedItem] = fromItems.splice(itemIndex, 1);
-  
       setAvailableSubjects((prevSubjects) => {
         return prevSubjects.map((subject, index) => {
           if (index === currentSubjectIndex) {
@@ -348,7 +348,6 @@ const MainGrid = ({ curriculum }) => {
                   ...prevModifiedCourses,
                   updatedCourse,
                 ]);
-  
                 return updatedCourse;
               }
               return course;
@@ -371,16 +370,8 @@ const MainGrid = ({ curriculum }) => {
       (prevSubjects || []).map((subject) => ({
         ...subject,
         courses: (subject.courses || []).map((course) =>
-          course.courseType?.name === removedTypeName
-            ? {
-                ...course,
-                courseType: { name: "N/A", color: "#FFFFFF" },
-              }
-            : course
-        ),
-      }))
+          course.courseType?.name === removedTypeName ? {...course, courseType: { name: "N/A", color: "#FFFFFF" }}: course)}))
     );
-  
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       for (const key in updatedItems) {
@@ -463,9 +454,10 @@ const MainGrid = ({ curriculum }) => {
                 setCourseTypes={setCourseTypes}
                 updateCoursesForRemovedType={updateCoursesForRemovedType}
                 addItem={addItem}
-                subjects={availableSubjects}
                 modifiedCourses={modifiedCourses}
                 setModifiedCourses={setModifiedCourses}
+                deletedCourses={deletedCourses}
+                setDeletedCourses={setDeletedCourses}
                 isSaving={isSaving}
                 setSaving={setSaving}
               />
@@ -581,6 +573,9 @@ const MainGrid = ({ curriculum }) => {
                             const cellItems = items[positionKey] || [];
                             return (
                               <Node
+                                key={positionKey}
+                                positionKey={positionKey}
+                                items={cellItems}
                                 courseTypes={courseTypes}
                                 teachers={teachers}
                                 moveItem={moveItem}

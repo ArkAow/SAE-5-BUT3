@@ -88,3 +88,13 @@ export const createCoursesFromData = (payload, subject, itemID) => {
     }
     return newCourses;
 }
+
+export const findCourseTypeByName = (name, courseTypes) => {
+  const courseType = courseTypes.find((type) => type.name === name) || null;
+  return courseType ? { ...courseType } : null;
+};
+
+export const findTeacherByCode = (code, teachers) => {
+  const teacher = teachers.find((teacher) => teacher.code === code) || null;
+  return teacher ? { ...teacher } : null;
+};

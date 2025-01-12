@@ -1,10 +1,21 @@
 import React from "react";
 import routes from "../../../Routes/routes";
 
-export const SaveButton = ({ isNoGroups ,modifiedCourses, setModifiedCourses, setToast, isSaving, isModifiedCourses, setSaving }) => {  
+export const SaveButton = ({ 
+  isNoGroups,
+   modifiedCourses,
+   setModifiedCourses,
+   deletedCourses,
+   setDeletedCourses,
+   setToast,
+   isSaving,
+   isModifiedCourses,
+   isDeletedCourses,
+   setSaving
+  }) => {  
   const handleSave = async () => {
-    if (!isModifiedCourses) {
-      console.error("aucun cours à sauvegarder");
+    if (!isModifiedCourses && !isDeletedCourses) {
+      console.error("Rien à sauvegarder");
       return;
     }
     setSaving(true);
@@ -23,39 +34,52 @@ export const SaveButton = ({ isNoGroups ,modifiedCourses, setModifiedCourses, se
           ...(course.group.groupType === "group" && { groupId: course.group.groupID }),
           ...(course.group.groupType === "half_group" && { halfGroupId: course.group.groupID }),
         };
-
         const response = await fetch(routes.dev.courses.save(), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-
         if (!response.ok) {
           const errorData = await response.json();
           console.error(`Erreur lors de la sauvegarde du cours :`, errorData);
           hasError = true;
         } else {
-          console.log(course);
           console.log(`Cours ajouté :`,payload);
         }
       }
-
-      setToast({
-        message: hasError ? "Certaines erreurs se sont produites lors de la sauvegarde." : "Prévisionnel sauvegardé avec succès.",
-        type: hasError ? "error" : "success",
-        visible: true,
-      });
     } catch (error) {
       console.error("Erreur inattendue :", error);
-      setToast({
-        message: "Erreur inattendue lors de la sauvegarde.",
-        type: "error",
-        visible: true,
-      });
     } finally {
       setSaving(false);
       setModifiedCourses([]); //On vide la liste des cours à sauvegarder
     }
+
+    try {
+      for (const course of deletedCourses) {
+        const courseToDelete = course.id;
+        const response = await fetch(routes.dev.courses.delete(courseToDelete), {
+          method: "DELETE"
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(`Erreur lors de la suppression du cours :`, errorData);
+          hasError = true;
+        } else {
+          console.log(`Cours supprimé :`,course);
+        }
+      }
+    } catch (error) {
+      console.error("Erreur inattendue :", error);
+    } finally {
+      setSaving(false);
+      setDeletedCourses([]); //On vide la liste des cours à supprimer
+    }
+
+    setToast({
+      message: hasError ? "Certaines erreurs se sont produites lors de la sauvegarde." : "Prévisionnel sauvegardé avec succès.",
+      type: hasError ? "error" : "success",
+      visible: true,
+    });
   };
 
   return (
@@ -66,7 +90,7 @@ export const SaveButton = ({ isNoGroups ,modifiedCourses, setModifiedCourses, se
         disabled={isNoGroups}>
         <span
           className={`absolute right-1 top-1 flex h-3 w-3 ${
-            isModifiedCourses ? "" : "hidden"
+            (isModifiedCourses || isDeletedCourses) ? "" : "hidden"
           }`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
