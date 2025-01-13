@@ -103,6 +103,8 @@ const MainGrid = ({ curriculum }) => {
       setCurrentSubjectIndex(0);
     }
     setSelectedSemester(selected);
+    setModifiedCourses([]);
+    setDeletedCourses([]);
   };
 
   const handleSubjectChange = (e) => {

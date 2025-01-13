@@ -289,6 +289,22 @@ class CoursesController extends AbstractController
         foreach ($course->getCourseTypes() as $courseType) {
             $course->removeCourseType($courseType);
         }
+
+        foreach ($course->getExpectedDuration() as $expectedDuration) {
+            $course->removeGroup($expectedDuration);
+        }
+
+        foreach ($course->getComments() as $comments) {
+            $course->removeGroup($comments);
+        }
+
+        foreach ($course->getWeekPosition() as $weekPosition) {
+            $course->removeGroup($weekPosition);
+        }
+
+        foreach ($course->getDuration() as $duration) {
+            $course->removeGroup($duration);
+        }
     
         $entityManager->remove($course);
         $entityManager->flush();
