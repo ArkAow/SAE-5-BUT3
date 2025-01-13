@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
@@ -25,6 +26,9 @@ const MainGrid = ({ curriculum }) => {
   const [courseTypes, setCourseTypes] = useState([]);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
+  const [isTryingToChangeSemester, setIsTryingToChangeSemester] = useState(false);
+  const [pendingSemesterId, setPendingSemesterId] = useState(null);
+
   const [isSaving, setSaving] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [isGroupLoading, setIsGroupLoading] = useState(true);
@@ -33,7 +37,10 @@ const MainGrid = ({ curriculum }) => {
   const [isCourseTypeLoading, setIsCourseTypeLoading] = useState(true);
   const [isCourseLoading, setIsCourseLoading] = useState(true);
   
-  
+  const NodePortal = ({ children }) => {
+      return createPortal(children, document.getElementById("portal-root"));
+  };
+
   useEffect(() => {
     if (!isGroupLoading && !isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
       setLoading(false);
@@ -90,15 +97,37 @@ const MainGrid = ({ curriculum }) => {
     }
   };
 
-  const handleSemesterChange = async (e) => {
+  const handleTryingToChangeSemester = (e) => {
     const semesterId = parseInt(e.target.value, 10);
+    if (modifiedCourses.length > 0 || deletedCourses.length > 0) {
+      setPendingSemesterId(semesterId);
+      setIsTryingToChangeSemester(true);      
+    } else {
+      handleSemesterChange(semesterId);
+    }
+  };
+  
+  const confirmSemesterChange = async () => {
+    if (pendingSemesterId !== null) {
+      await handleSemesterChange(pendingSemesterId);
+      setPendingSemesterId(null);
+    }
+    setIsTryingToChangeSemester(false);
+  };
+  
+  const cancelSemesterChange = () => {
+    setPendingSemesterId(null);
+    setIsTryingToChangeSemester(false);
+  };
+
+  const handleSemesterChange = async (semesterId) => {
     const selected = availableSemesters.find((s) => s.id === semesterId);
     if (selected) {
       await fetchSubjects(selected.id);
       const currentIndex = availableSubjects.findIndex(
         (subject) => subject.id === selectedSubject?.id
       );
-      setCurrentSubjectIndex(currentIndex >= 0 ? currentIndex : 0); // Défaut à 0
+      setCurrentSubjectIndex(currentIndex >= 0 ? currentIndex : 0);
     } else {
       setCurrentSubjectIndex(0);
     }
@@ -422,16 +451,44 @@ const MainGrid = ({ curriculum }) => {
   return (
     <div className={`min-h-screen py-10 ${isSaving ? 'cursor-wait' : 'cursor-default'}`}>
       {isLoading ? (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] space-y-10">
-        <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
-          <div className="spinner"></div>
-          <div className="text-white text-3xl font-bold mt-4">
-            Chargement des données...
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] space-y-10">
+          <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
+            <div className="spinner"></div>
+            <div className="text-white text-3xl font-bold mt-4">
+              Chargement des données...
+            </div>
           </div>
         </div>
-      </div>
       ) : (
         <>
+          {isTryingToChangeSemester && (
+            <>
+              <NodePortal>
+                <div className="fixed inset-0 flex items-center justify-center z-20 text-xs bg-black bg-opacity-50">
+                  <div className="bg-white p-5 rounded shadow-xl w-80 border-2 border-gray-300">
+                    <h3 className="text-lg font-bold mb-2 text-center">Avertissement !</h3>
+                    <p className="mb-4 text-center">
+                      Vous êtes sur le point de changer de semestre.<br/>Toute modification non enregistrée sera perdue.<br/><br/>Voulez-vous continuer ?
+                    </p>
+                    <div className="flex justify-center space-x-2 mt-4">
+                      <button
+                        type="button"
+                        onClick={cancelSemesterChange}
+                        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                        Annuler
+                      </button>
+                      <button
+                        type="button"
+                        onClick={confirmSemesterChange}
+                        className="px-4 py-2 btn-default w-full">
+                        Continuer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </NodePortal>
+            </>
+          )}
           {toast.visible && (
             <Toast
               message={toast.message}
@@ -469,7 +526,7 @@ const MainGrid = ({ curriculum }) => {
             <select
               className="w-fit min-w-28 max-w-60 h-10 mt-2 ml-24 px-2 before:px-4 py-2 default-select rounded-full font-normal"
               value={selectedSemester?.id || ""}
-              onChange={handleSemesterChange}>
+              onChange={handleTryingToChangeSemester}>
               <option value="" disabled>
                 Choisir un semestre
               </option>
