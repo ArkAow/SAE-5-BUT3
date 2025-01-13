@@ -28,11 +28,11 @@ class LdapLoginController extends AbstractController
                 ],
             ]);
 
-            // Bind (authentification avec les credentials de l'utilisateur)
-            $bindDn = sprintf('uid=%s,ou=people,dc=unilim,dc=fr', $username); // DN formaté
+
+            $bindDn = sprintf('uid=%s,ou=people,dc=unilim,dc=fr', $username); 
             $ldap->bind($bindDn, $password);
 
-            // Exécution de la requête LDAP
+
             $query = $ldap->query('dc=unilim,dc=fr', sprintf('(&(objectClass=person)(uid=%s))', $username));
             $result = $query->execute();
 
