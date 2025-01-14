@@ -2,29 +2,24 @@ import React, { useState, useEffect } from "react";
 import { CourseButton } from "./CourseButton";
 import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
-import { CourseTypeButton } from "./CourseTypeButton"
+import { CourseTypeButton } from "./CourseTypeButton";
+import { SaveButton } from "./SaveButton";
 
 const ControlPanel = ({
+  isExpanded,
+  setIsExpanded,
   curriculum,
+  selectedSemester,
   setToast,
   groups,
+  teachers,
+  groupList,
   setGroups,
   fetchGroups,
-  selectedRow,
-  setSelectedRow,
-  selectedCol,
-  setSelectedCol,
   courseTypes,
   setCourseTypes,
   updateCoursesForRemovedType,
-  selectedCourseType,
-  setSelectedCourseType,
-  selectedTeacher,
-  setSelectedTeacher,
-  selectedDuration,
-  setSelectedDuration,
   addItem }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
@@ -50,7 +45,7 @@ const ControlPanel = ({
 
   return (
     <div
-      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[83.5vh] w-20" : "h-20 w-20"}`}>
+      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[84.5vh] w-20" : "h-20 w-20"}`}>
       <button
         onClick={handleToggleExpand}
         className={`${
@@ -75,18 +70,11 @@ const ControlPanel = ({
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton
           isNoGroups={isNoGroups}
-          selectedRow={selectedRow}
-          setSelectedRow={setSelectedRow}
-          selectedCol={selectedCol}
-          setSelectedCol={setSelectedCol}
+          groupList={groupList}
+          selectedSemester={selectedSemester}
           courseTypes={courseTypes}
-          selectedCourseType={selectedCourseType}
-          setSelectedCourseType={setSelectedCourseType}
-          selectedTeacher={selectedTeacher}
-          setSelectedTeacher={setSelectedTeacher}
-          selectedDuration={selectedDuration}
-          setSelectedDuration={setSelectedDuration}
-          addItem={addItem}/>
+          addItem={addItem}
+          teachers={teachers}/>
 
         <CourseTypeButton 
           isNoGroups={isNoGroups}
@@ -103,6 +91,8 @@ const ControlPanel = ({
           isNoGroups={isNoGroups}/>
 
         <PrintButton />
+
+        <SaveButton />
       </div>
     </div>
   );

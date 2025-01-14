@@ -2,10 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useDrop } from "react-dnd";
 import CourseObject from "./CourseObject";
 import { getShade } from "../../services/colorService";
-
 const ITEM_TYPE = "rectangle";
 
-const Node = ({ positionKey, items, moveItem }) => {
+const Node = ({ 
+  positionKey, 
+  items,
+  courseTypes,
+  teachers,
+  deleteItem, 
+  modifItem, 
+  moveItem  
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipDirection, setTooltipDirection] = useState("right");
@@ -58,7 +65,12 @@ const Node = ({ positionKey, items, moveItem }) => {
           positionKey={positionKey}
           id={items[0].id}
           onDragStart={() => setIsDragging(true)}
-          onDragEnd={() => setIsDragging(false)}/>
+          onDragEnd={() => setIsDragging(false)}
+          deleteItem={deleteItem}
+          modifItem={modifItem}
+          courseTypes={courseTypes}
+          teachers={teachers}
+          />
       )}
 
       {items?.length > 1 && (
@@ -102,7 +114,11 @@ const Node = ({ positionKey, items, moveItem }) => {
                 small
                 positionKey={positionKey}
                 onDragStart={() => setIsDragging(true)}
-                onDragEnd={() => setIsDragging(false)}/>
+                onDragEnd={() => setIsDragging(false)}
+                deleteItem={deleteItem}
+                courseTypes={courseTypes}
+                teachers={teachers}
+                />
               <strong>--------------</strong>
             </div>
           ))}

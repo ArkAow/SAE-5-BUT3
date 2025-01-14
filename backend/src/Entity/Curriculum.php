@@ -18,9 +18,13 @@ class Curriculum
     #[ORM\Column(type: 'string', length: 100)]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: FormationLevel::class, mappedBy: "curriculums")]
+    #[ORM\ManyToMany(targetEntity: FormationLevel::class, inversedBy: "curriculums")]
+    #[ORM\JoinTable(name: 'curriculum_formation_Level')]
+    #[ORM\JoinColumn(name: 'curriculum_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'formationLevel_id', referencedColumnName: 'id')]
     private Collection $formationLevels;
 
+    
     #[ORM\ManyToMany(targetEntity: Semester::class, inversedBy: 'curriculums')]
     #[ORM\JoinTable(name: 'curriculum_semester')]
     private Collection $semesters;

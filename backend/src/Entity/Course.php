@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use PhpOffice\PhpSpreadsheet\Calculation\TextData\Format;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'course')]
@@ -19,10 +20,7 @@ class Course
     private float $duration;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $positionX = null;
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $positionY = null;
+    private ?int $weekPosition = null;
 
     #[ORM\ManyToMany(targetEntity: CourseType::class, inversedBy: 'courses')]
     #[ORM\JoinTable(
@@ -32,14 +30,57 @@ class Course
     )]
     private Collection $courseTypes;
 
-    #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'courses')]
+    #[ORM\ManyToMany(targetEntity: Groups::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_group',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $groups;
+
+    #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_expected_duration',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'expected_duration_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $expectedDuration;
+
+    #[ORM\ManyToMany(targetEntity: HalfGroup::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_half_group',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'half_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $halfGroups;
+
+    #[ORM\ManyToMany(targetEntity: FormationLevel::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'course_formation_level',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'formationLevel_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private ?Collection $formationLevels;
+
+    #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'courses')]
     private Collection $teachers;
+    
+    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'courses')]
+    private Collection $subjects;
+
+    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: 'courses')]
+    private Collection $comments;
 
     public function __construct()
     {
+        $this->teachers = new ArrayCollection();
+        $this->subjects = new ArrayCollection();
         $this->courseTypes = new ArrayCollection();
+        $this->groups = new ArrayCollection();
+        $this->halfGroups = new ArrayCollection();
+        $this->formationLevels = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
-
     public function getId(): int
     {
         return $this->id;
@@ -56,25 +97,14 @@ class Course
         return $this;
     }
 
-    public function getPositionX(): ?int
+    public function getWeekPosition(): ?int
     {
-        return $this->positionX;
+        return $this->weekPosition;
     }
 
-    public function setPositionX(?int $positionX): self
+    public function setWeekPosition(?int $weekPosition): self
     {
-        $this->positionX = $positionX;
-        return $this;
-    }
-
-    public function getPositionY(): ?int
-    {
-        return $this->positionY;
-    }
-
-    public function setPositionY(?int $positionY): self
-    {
-        $this->positionY = $positionY;
+        $this->weekPosition = $weekPosition;
         return $this;
     }
 
@@ -111,18 +141,145 @@ class Course
     {
         if (!$this->teachers->contains($teacher)) {
             $this->teachers->add($teacher);
-            $teacher->addCourse($this);
         }
-
         return $this;
     }
 
     public function removeTeacher(Teacher $teacher): self
     {
-        if ($this->teachers->removeElement($teacher)) {
-            $teacher->removeCourse($this);
-        }
+        $this->teachers->removeElement($teacher);
+        return $this;
+    }
 
+    public function getSubjects():Collection
+    {
+        return $this->subjects;
+    }
+
+    public function addSubject(Subject $subject): self
+    {
+        if (!$this->subjects->contains($subject)){
+            $this->subjects->add($subject);
+            $subject->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeSubject(Subject $subject): self
+    {
+        if ($this->subjects->removeElement($subject)){
+            $subject->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getGroups():Collection
+    {
+        return $this->groups;
+    }
+
+    public function addGroup(Groups $group): self
+    {
+        if (!$this->groups->contains($group)){
+            $this->groups->add($group);
+            $group->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeGroup(Groups $group): self
+    {
+        if ($this->groups->removeElement($group)){
+            $group->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getHalfGroups():Collection
+    {
+        return $this->halfGroups;
+    }
+
+    public function addHalfGroup(HalfGroup $halfGroup): self
+    {
+        if (!$this->halfGroups->contains($halfGroup)){
+            $this->halfGroups->add($halfGroup);
+            $halfGroup->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeHalfGroup(HalfGroup $halfGroup): self
+    {
+        if ($this->halfGroups->removeElement($halfGroup)){
+            $halfGroup->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getFormationLevel():Collection
+    {
+        return $this->formationLevels;
+    }
+
+    public function addFormationLevel(FormationLevel $formationLevel): self
+    {
+        if (!$this->formationLevels->contains($formationLevel)){
+            $this->formationLevels->add($formationLevel);
+            $formationLevel->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeFormationLevel(FormationLevel $formationLevel): self
+    {
+        if ($this->formationLevels->removeElement($formationLevel)){
+            $formationLevel->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getExpectedDuration():Collection
+    {
+        return $this->expectedDuration;
+    }
+
+    public function addExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if (!$this->expectedDuration->contains($expectedDuration)){
+            $this->expectedDuration->add($expectedDuration);
+            $expectedDuration->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeExpectedDuration(expectedDuration $expectedDuration): self
+    {
+        if ($this->expectedDuration->removeElement($expectedDuration)){
+            $expectedDuration->removeCourse($this);
+        }
+        return $this;
+    }
+
+    public function getComments():Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)){
+            $this->comments->add($comment);
+            $comment->addCourse($this);
+        }
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)){
+            $comment->removeCourse($this);
+        }
         return $this;
     }
 }

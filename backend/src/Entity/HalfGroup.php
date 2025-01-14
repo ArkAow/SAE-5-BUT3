@@ -21,6 +21,9 @@ class HalfGroup
     #[ORM\ManyToMany(targetEntity: Groups::class, mappedBy: "halfGroups")]
     private Collection $groups;
 
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "groups")]
+    private Collection $courses;
+
     public function __construct()
     {
         $this->groups = new ArrayCollection();
@@ -63,6 +66,25 @@ class HalfGroup
             $group->removeHalfGroup($this);
         }
 
+        return $this;
+    }
+
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Course $course): self
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses[] = $course;
+        }
+        return $this;
+    }
+
+    public function removeCourse(Course $course): self
+    {
+        $this->courses->removeElement($course);
         return $this;
     }
 }

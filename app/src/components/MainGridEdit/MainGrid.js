@@ -8,30 +8,29 @@ import routes from "../../Routes/routes.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
+  const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
   const [items, setItems] = useState({});
-  const [selectedRow, setSelectedRow] = useState(0);
-  const [selectedCol, setSelectedCol] = useState(0);
   const [selectedSemester, setSelectedSemester] = useState(null);
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [availableSubjects, setAvailableSubjects] = useState([]);
   const [currentCourses, setCurrentCourses] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [teachers, setTeachers] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
-  const [selectedCourseType, setSelectedCourseType] = useState(null);
-  const [selectedTeacher, setSelectedTeacher] = useState("");
-  const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentEditItem, setCurrentEditItem] = useState(null);
 
   const [isLoading, setLoading] = useState(true);
   const [isGroupLoading, setIsGroupLoading] = useState(true);
   const [isSemesterLoading, setIsSemesterLoading] = useState(true);
   const [isSubjectLoading, setIsSubjectLoading] = useState(true);
   const [isCourseTypeLoading, setIsCourseTypeLoading] = useState(true);
-
-
+  
+  
   useEffect(() => {
     if (!isGroupLoading && !isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
       setLoading(false);
@@ -40,7 +39,7 @@ const MainGrid = ({ curriculum }) => {
     }
   }, [isGroupLoading, isSemesterLoading, isSubjectLoading, isCourseTypeLoading]);
 
-  {/* Gestion des SEMESTRES et MATIERES -------------------------------------------- */}
+  /* Gestion des SEMESTRES et MATIERES -------------------------------------------- */
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
@@ -124,8 +123,25 @@ const MainGrid = ({ curriculum }) => {
     setItems(initialItems);
   }, [currentCourses]);
 
+
+  /* Gestion des ENSEIGNANTS */
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+          const response = await fetch(routes.dev.teachers.get());
+          if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
+          const data = await response.json();
+          setTeachers(data);
+      } catch (error) {
+          console.error(error);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
   
-  {/* Gestion des COURS -------------------------------------------- */}
+  /* Gestion des COURS -------------------------------------------- */
   useEffect(() => {
     const fetchCourseTypes = async () => {
       try {
@@ -135,7 +151,6 @@ const MainGrid = ({ curriculum }) => {
         }
         const data = await response.json();
         setCourseTypes(data);
-        setSelectedCourseType(data[0] || null);
       } catch (error) {
         console.error(error);
       }
@@ -147,33 +162,109 @@ const MainGrid = ({ curriculum }) => {
     fetchCourseTypes();
   }, []);
 
-  const addItem = () => {
-    const positionKey = `${selectedRow}-${selectedCol}`;
-    const newItem = {
-      color: selectedCourseType.color,
-      courseType: selectedCourseType.name,
-      teacher: selectedTeacher,
-      duration: selectedDuration,
-      id: Date.now(),
-    };
+  const addItem = (payload) => {
+    const selectedTeacher = payload.teacher;
+    const selectedCourseType = payload.courseType;
+    const selectedDuration = payload.duration
+    const selectedRow = payload.row;
+    const selectedCol = payload.col
+
+    if (!selectedTeacher || !selectedCourseType || !selectedDuration) {
+      console.error("Les informations de base sont manquantes.");
+      return;
+    }
   
-    setItems((prevItems) => ({
-      ...prevItems,
-      [positionKey]: [...(prevItems[positionKey] || []), newItem],
-    }));
+    const newItems = [];
+    const newCourses = [];
   
-    const newCourse = {
-      teacher: { name: selectedTeacher },
-      courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
-      duration: selectedDuration,
-      pos: { x: selectedCol, y: selectedRow },
-      id: Date.now(),
-    };
+    if (payload.isRepeat) {
+      const exceptionsArray = payload.exceptions ? payload.exceptions.map((val) => parseInt(val.trim(), 10) - 1) : [];
+
+      for (let week = payload.repeatFrom; week <= payload.repeatTo; week++) {
+        if (exceptionsArray.includes(week)) continue;
+        
+        const positionKey = `${week}-${selectedCol}`;
+        const newItem = {
+          color: selectedCourseType.color,
+          courseType: selectedCourseType.name,
+          teacher: selectedTeacher,
+          duration: selectedDuration,
+          id: Date.now() + week,
+        };
+  
+        newItems.push({ positionKey, newItem });
+  
+        const newCourse = {
+          teacher: { name: selectedTeacher },
+          courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
+          duration: selectedDuration,
+          pos: { x: selectedCol, y: week },
+          id: newItem.id,
+        };
+  
+        newCourses.push(newCourse);
+      }
+    } else {
+      const positionKey = `${selectedRow}-${selectedCol}`;
+      const newItem = {
+        color: selectedCourseType.color,
+        courseType: selectedCourseType.name,
+        teacher: selectedTeacher,
+        duration: selectedDuration,
+        id: Date.now(),
+      };
+  
+      newItems.push({ positionKey, newItem });
+  
+      const newCourse = {
+        teacher: { name: selectedTeacher },
+        courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
+        duration: selectedDuration,
+        pos: { x: selectedCol, y: selectedRow },
+        id: newItem.id,
+      };
+  
+      newCourses.push(newCourse);
+    }
+  
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      newItems.forEach(({ positionKey, newItem }) => {
+        updatedItems[positionKey] = [...(updatedItems[positionKey] || []), newItem];
+      });
+      return updatedItems;
+    });
   
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
-          const updatedCourses = [...(subject.courses || []), newCourse];
+          const updatedCourses = [...(subject.courses || []), ...newCourses];
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+      return updatedSubjects;
+    });
+  
+    setCurrentCourses((prevCourses) => [...prevCourses, ...newCourses]);
+  };
+
+  const deleteItem = (positionKey, id) => {
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      if (updatedItems[positionKey]) {
+        updatedItems[positionKey] = updatedItems[positionKey].filter((item) => item.id !== id);
+        if (updatedItems[positionKey].length === 0) {
+          delete updatedItems[positionKey];
+        }
+      }
+      return updatedItems;
+    });
+  
+    setAvailableSubjects((prevSubjects) => {
+      const updatedSubjects = prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = subject.courses.filter((course) => course.id !== id);
           return { ...subject, courses: updatedCourses };
         }
         return subject;
@@ -182,7 +273,41 @@ const MainGrid = ({ curriculum }) => {
       return updatedSubjects;
     });
   
-    setCurrentCourses((prevCourses) => [...prevCourses, newCourse]);
+    setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
+  };
+
+  const modifItem = (updatedData) => {
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      const { positionKey, id, teacher, courseType, duration } = updatedData;
+      if (updatedItems[positionKey]) {
+        updatedItems[positionKey] = updatedItems[positionKey].map((item) =>
+          item.id === id ? { ...item, teacher, courseType, duration } : item
+        );
+      }
+      return updatedItems;
+    });
+    setAvailableSubjects((prevSubjects) => {
+      return prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = subject.courses.map((course) =>
+            course.id === updatedData.id
+              ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
+              : course
+          );
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+    });
+    setCurrentCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course.id === updatedData.id
+          ? { ...course, teacher: updatedData.teacher, courseType: updatedData.courseType, duration: updatedData.duration }
+          : course
+      )
+    );
+    setIsEditing(false); // Ferme la modale
   };
   
   const moveItem = (fromKey, toKey, id) => {
@@ -257,10 +382,10 @@ const MainGrid = ({ curriculum }) => {
     });
   };  
 
-  {/* Gestion des GROUPES -------------------------------------------- */}
+  /* Gestion des GROUPES -------------------------------------------- */
   const fetchGroups = async () => {
     try {
-      const classID = curriculum.classes[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
+      const classID = curriculum.formationLevels[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
       const response = await fetch(routes.dev.groups.getGroups(classID));
       if (!response.ok) {
         throw new Error("Erreur lors du chargement des groups");
@@ -287,7 +412,6 @@ const MainGrid = ({ curriculum }) => {
     return ["Tous", ...mainGroups, ...subGroups];
   };
 
-  const GRID_ROW_LENGTH = 25;
   const groupList = getGroupList();
 
   return (
@@ -313,24 +437,19 @@ const MainGrid = ({ curriculum }) => {
           <div className="flex items-center justify-start gap-5 h-20 px-10">
             <div className="absolute top-6">
               <ControlPanel
+                isExpanded={isControlPanelExpanded}
+                setIsExpanded={setIsControlPanelIsExpanded}
                 curriculum={curriculum}
+                selectedSemester={selectedSemester}
                 setToast={setToast}
                 groups={groups}
+                teachers={teachers}
+                groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
-                selectedRow={selectedRow}
-                setSelectedRow={setSelectedRow}
-                selectedCol={selectedCol}
-                setSelectedCol={setSelectedCol}
                 courseTypes={courseTypes}
                 setCourseTypes={setCourseTypes}
                 updateCoursesForRemovedType={updateCoursesForRemovedType}
-                selectedCourseType={selectedCourseType}
-                setSelectedCourseType={setSelectedCourseType}
-                selectedTeacher={selectedTeacher}
-                setSelectedTeacher={setSelectedTeacher}
-                selectedDuration={selectedDuration}
-                setSelectedDuration={setSelectedDuration}
                 addItem={addItem}
               />
             </div>
@@ -401,13 +520,14 @@ const MainGrid = ({ curriculum }) => {
 
           {groups.length === 0 ? (
             <div className="flex items-center justify-center w-full">
-              <div className="w-1/2 text-center text-primary mt-10 text-lg font-bold p-2 bg-white rounded-full">
+              <div className="w-1/2 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
                 Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
               </div>
             </div>
           ) : (
             <DndProvider backend={HTML5Backend}>
-              <div className="ml-36 rounded-lg overflow-auto max-h-[75vh] min-h-[25rem] max-w-[85vw] -z-10">
+              <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
+               mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
                 <div
                   className="grid"
                   style={{
@@ -421,10 +541,13 @@ const MainGrid = ({ curriculum }) => {
                       {groupName}
                     </div>
                   ))}
-                  {Array.from({ length: GRID_ROW_LENGTH }).map((_, rowIndex) => (
+                  {Array.from(
+                    { length: selectedSemester.week_duration || 20 }, // La durée par défaut est 20 si week_duration est indéfini
+                    (_, i) => (selectedSemester.week_start || 1) + i // La semaine de départ par défaut est 1 si week_start est indéfini
+                  ).map((week, rowIndex) => (
                     <React.Fragment key={`row-${rowIndex}`}>
                       <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
-                        S{rowIndex + 1}
+                        S{week}
                       </div>
                       {groupList.map((_, colIndex) => {
                         const positionKey = `${rowIndex}-${colIndex}`;
@@ -434,7 +557,11 @@ const MainGrid = ({ curriculum }) => {
                             key={positionKey}
                             positionKey={positionKey}
                             items={cellItems}
+                            courseTypes={courseTypes}
+                            teachers={teachers}
                             moveItem={moveItem}
+                            deleteItem={deleteItem}
+                            modifItem={modifItem}
                           />
                         );
                       })}

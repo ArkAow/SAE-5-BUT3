@@ -25,12 +25,17 @@ class Groups
     private Collection $halfGroups;
 
     #[ORM\ManyToMany(targetEntity: FormationLevel::class, mappedBy: "groups")]
+    #[ORM\JoinTable(name: "formation_Level_group")]
     private Collection $formationLevels;
+
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "groups")]
+    private Collection $courses;
 
     public function __construct()
     {
         $this->formationLevels = new ArrayCollection();
         $this->halfGroups = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int
@@ -84,6 +89,25 @@ class Groups
     public function removeHalfGroup(HalfGroup $halfGroup): self
     {
         $this->halfGroups->removeElement($halfGroup);
+        return $this;
+    }
+
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Course $course): self
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses[] = $course;
+        }
+        return $this;
+    }
+
+    public function removeCourse(Course $course): self
+    {
+        $this->courses->removeElement($course);
         return $this;
     }
 }
