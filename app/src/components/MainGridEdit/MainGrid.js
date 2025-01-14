@@ -128,12 +128,12 @@ const MainGrid = ({ curriculum }) => {
         (subject) => subject.id === selectedSubject?.id
       );
       setCurrentSubjectIndex(currentIndex >= 0 ? currentIndex : 0);
+      setSelectedSemester(selected);
+      setModifiedCourses([]);
+      setDeletedCourses([]);
     } else {
       setCurrentSubjectIndex(0);
     }
-    setSelectedSemester(selected);
-    setModifiedCourses([]);
-    setDeletedCourses([]);
   };
 
   const handleSubjectChange = (e) => {
