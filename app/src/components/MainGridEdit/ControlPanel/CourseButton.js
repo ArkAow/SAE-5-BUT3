@@ -4,24 +4,26 @@ import routes from "../../../Routes/routes";
 
 export const CourseButton = ({
     isNoGroups,
-    selectedRow,
-    setSelectedRow,
-    selectedCol,
-    setSelectedCol,
+    groupList,
+    selectedSemester,
     courseTypes,
-    selectedCourseType,
-    setSelectedCourseType,
-    selectedTeacher,
-    setSelectedTeacher,
-    selectedDuration,
-    setSelectedDuration,
     addItem,
-}) => {  
+    teachers
+}) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [isRepeat, setIsRepeat] = useState(false);
+    const [repeatFrom, setRepeatFrom] = useState(0);
+    const [repeatTo, setRepeatTo] = useState(7);
+    const [exceptions, setExceptions] = useState("");
     const [error, setError] = useState("");
-    const [teachers, setTeachers] = useState([]);
     const containerRef = useRef(null);
     const tooltipRef = useRef(null);
+
+    const [selectedRow, setSelectedRow] = useState(0);
+    const [selectedCol, setSelectedCol] = useState(0);
+    const [selectedCourseType, setSelectedCourseType] = useState(courseTypes ? courseTypes[0] : {});
+    const [selectedTeacher, setSelectedTeacher] = useState("");
+    const [selectedDuration, setSelectedDuration] = useState(1.0);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -41,37 +43,63 @@ export const CourseButton = ({
         };
     }, []);
 
-    const fetchTeachers = async () => {
-        try {
-          const response = await fetch(routes.dev.teachers.get());
-          if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
-          const data = await response.json();
-          setTeachers(data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
     const NodePortal = ({ children }) => {
-        return createPortal(
-            children,
-            document.getElementById("portal-root")
-        );
+        return createPortal(children, document.getElementById("portal-root"));
     };
 
+    const checkPayloadExceptions = (from, to, exceptions) => {
+        if (from >= to) {
+            setError("La valeur 'De' doit être inférieure à la valeur 'À'.");
+            return false;
+        }
+        if (exceptions.some((val) => isNaN(val))) {
+            setError("Les exceptions ne doivent contenir que des chiffres.");
+            return false;
+        }
+        if (exceptions.includes('0')) {
+            setError("'0' n'est pas une valeur valide.");
+            return false;
+        }
+        if (exceptions.some((val) => val < from+1 || val > to+1)) {
+            setError(`Les exceptions doivent être entre ${from+1} et ${to+1}.`);
+            return false;
+        }
+        return true;
+    };
+    
     const handleSubmit = (e) => {
         e.preventDefault();
+    
         if (!selectedTeacher) {
-          setError("Veuillez sélectionner un professeur.");
-          return;
+            setError("Veuillez sélectionner un professeur.");
+            return;
         }
         setError("");
-        addItem();
-    };
 
-    useEffect(() => {
-        fetchTeachers();
-      }, []);
+        const payload = {
+            teacher: selectedTeacher,
+            courseType: selectedCourseType,
+            duration: selectedDuration,
+            group: groupList[selectedCol],
+            row: selectedRow,
+            col: selectedCol,
+        };
+    
+        if (isRepeat) {
+            payload.isRepeat = isRepeat;
+            payload.repeatFrom = repeatFrom;
+            payload.repeatTo = repeatTo;
+            payload.exceptions = exceptions.split(";").map((val) => val.trim()).filter(Boolean);
+    
+            if (!checkPayloadExceptions(payload.repeatFrom, payload.repeatTo, payload.exceptions)) {
+                return;
+            }
+        } else {
+            payload.week = selectedRow;
+        }
+        console.log("Données du cours :", payload);
+        addItem(payload);
+    };
 
     return (
         <div className="relative" ref={containerRef}>
@@ -85,44 +113,96 @@ export const CourseButton = ({
             {/* Tooltip rendu dans le portail global */}
             {isFocused && (
                 <NodePortal>
-                    <div
-                        className="tooltip"
-                        ref={tooltipRef}>
+                    <div className="tooltip" ref={tooltipRef}>
                         <h3 className="mb-5 font-bold text-base">Ajouter un cours</h3>
-                        <div className="flex flex-row gap-4">
-                            <div className="flex flex-row mb-5">
-                                <label className="mr-2 text-clip text-nowrap">Ligne :</label>
+
+                        <div className="mb-1 bg-gray-200 p-2 rounded-t-xl">
+                            <label className="block mb-1 font-bold">
                                 <input
-                                    type="number"
-                                    min="0"
-                                    max="3"
-                                    value={selectedRow}
-                                    onChange={(e) => setSelectedRow(Number(e.target.value))}
-                                    className="w-14 bg-gray-300 rounded-full pl-6"/>
-                            </div>
-                            <div className="flex flex-row mb-5">
-                                <label className="mr-2 text-clip text-nowrap">Colonne :</label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="7"
-                                    value={selectedCol}
-                                    onChange={(e) => setSelectedCol(Number(e.target.value))}
-                                    className="w-14 bg-gray-300 rounded-full pl-6"/>
-                            </div>                            
+                                    type="checkbox"
+                                    checked={isRepeat}
+                                    onChange={(e) => setIsRepeat(e.target.checked)}
+                                    className="mr-2"
+                                />
+                                Répéter
+                            </label>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block mb-1 font-bold">Type de cours :</label>
+                        {isRepeat ? (
+                            <div>
+                                <div className="flex items-center gap-4 mb-1 bg-gray-200 p-2">
+                                    <div className="flex items-center gap-2">
+                                        <label className="block mb-1 font-bold">De</label>
+                                        <select
+                                        value={repeatFrom}
+                                        onChange={(e) => setRepeatFrom(Number(e.target.value))}
+                                        className="tooltip-select">
+                                        {Array.from(
+                                            { length: selectedSemester?.week_duration || 20 },
+                                            (_, i) => (
+                                            <option key={i} value={i}>
+                                            Semaine {i+(selectedSemester?.week_start || 1)}
+                                            </option>
+                                        ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <label className="block mb-1 font-bold">À</label>
+                                        <select
+                                        value={repeatTo}
+                                        onChange={(e) => setRepeatTo(Number(e.target.value))}
+                                        className="tooltip-select">
+                                        {Array.from(
+                                            { length: selectedSemester?.week_duration || 20 },
+                                            (_, i) => (
+                                            <option key={i} value={i}>
+                                            Semaine {i+(selectedSemester?.week_start || 1)}
+                                            </option>
+                                        ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="mb-3 bg-gray-200 p-2 rounded-b-xl">
+                                    <label className="block mb-1 font-bold">Exceptions (séparées par ";") :</label>
+                                    <input
+                                        type="text"
+                                        value={exceptions}
+                                        onChange={(e) => setExceptions(e.target.value)}
+                                        placeholder="Ex: 2; 4; 6"
+                                        className="w-full text-primary bg-white rounded-full ring-1 ring-primary pl-2"
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 mb-3 bg-gray-200 p-2 rounded-b-xl">
+                                <label className="w-20 block mb-1 font-bold">Semaine :</label>
+                                <select
+                                    value={selectedRow}
+                                    onChange={(e) => setSelectedRow(Number(e.target.value))}
+                                    className="tooltip-select">
+                                    {Array.from(
+                                        { length: selectedSemester?.week_duration || 20 },
+                                        (_, i) => (
+                                        <option key={i} value={i}>
+                                        Semaine {i+(selectedSemester?.week_start || 1)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
+                            <label className="w-32 block mb-1 font-bold">Type de cours :</label>
                             <select
                                 value={selectedCourseType.name}
                                 onChange={(e) => {
                                     const selectedType = courseTypes.find((type) => type.name === e.target.value);
                                     setSelectedCourseType(selectedType);
                                 }}
-                                className="w-full p-2 border rounded">
+                                className="tooltip-select">
                                 <option value="" disabled>
-                                Choisir un type de cours
+                                    Choisir un type de cours
                                 </option>
                                 {courseTypes.map((type) => (
                                     <option key={type.name} value={type.name}>
@@ -132,36 +212,58 @@ export const CourseButton = ({
                             </select>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block mb-1 font-bold">Professeur :</label>
+                        <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
+                            <label className="block mb-1 font-bold w-24">Professeur :</label>
                             <select
                                 value={selectedTeacher}
                                 onChange={(e) => setSelectedTeacher(e.target.value)}
-                                className="w-full p-2 border rounded">
+                                className="tooltip-select">
                                 <option value="" disabled>
-                                Choisir un professeur
+                                    Choisir un professeur
                                 </option>
                                 {teachers.map((teacher) => (
-                                <option key={teacher.code} value={teacher.code}>
-                                    {teacher.code}
-                                </option>
+                                    <option key={teacher.code} value={teacher.code}>
+                                        {teacher.code}
+                                    </option>
                                 ))}
                             </select>
                         </div>
 
-                        <div className="mb-4">
+                        <div className="mb-3 bg-gray-200 p-2 rounded-b-xl">
                             <label className="block mb-1 font-bold">Durée (en heure):</label>
                             <input
                                 type="number"
+                                min={0}
+                                max={50}
                                 step="0.5"
                                 value={selectedDuration}
                                 onChange={(e) => setSelectedDuration(Number(e.target.value))}
-                                className="w-full bg-gray-300 rounded-full pl-6"/>
+                                className="tooltip-number-input"
+                            />
                         </div>
-                        {error && <p className="text-red-700 text-sm text-center w-full">{error}</p>}
-                        <button
-                            onClick={handleSubmit}
-                            className="px-3 py-2 w-full btn-default">
+
+                        <div className="flex items-center gap-2 mb-3 bg-gray-200 p-2 rounded-xl">
+                            <label className="w-16 block mb-1 font-bold">Groupe :</label>
+                            <select
+                                value={groupList[selectedCol] || ""}
+                                onChange={(e) => {
+                                    const selectedIndex = groupList.indexOf(e.target.value);
+                                    setSelectedCol(selectedIndex !== -1 ? selectedIndex : 0);
+                                }}
+                                className="tooltip-select">
+                                <option value="" disabled>
+                                    Choisir un groupe
+                                </option>
+                                {groupList.map((group, index) => (
+                                    <option key={index} value={group}>
+                                        {group}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {error && <p className="text-red-700 text-sm text-center w-full pb-2">{error}</p>}
+                        <button onClick={handleSubmit} className="px-3 py-2 w-full btn-default">
                             Ajouter
                         </button>
                     </div>
