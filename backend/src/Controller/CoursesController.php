@@ -310,7 +310,8 @@ class CoursesController extends AbstractController
             $entityManager->flush();
 
             return $this->json(['message' => 'Cours supprimé avec succès.'], 200);
-        } catch (\Exception $e) {return $this->json(['error' => 'Erreur lors de la suppression.',], 500);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Erreur lors de la suppression.',], 500);
         }
     }
 }
