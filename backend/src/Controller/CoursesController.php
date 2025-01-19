@@ -254,45 +254,63 @@ class CoursesController extends AbstractController
     }
 
 
-    #[Route('/courses/delete/{id}', name: 'delete_course', methods: ['DELETE'])]
-    public function deleteCourse(
-        int $id,
-        CourseRepository $courseRepository,
-        EntityManagerInterface $entityManager
-    ): JsonResponse {
-        $course = $courseRepository->find($id);
-    
+    #[Route('/course/delete/{id}', name: 'delete_course', methods: ['DELETE'])]
+    public function deleteCourse(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Rechercher le cours
+        $course = $entityManager->getRepository(Course::class)->find($id);
+
         if (!$course) {
             return $this->json(['error' => 'Cours non trouvé.'], 404);
         }
-    
-        foreach ($course->getGroups() as $group) {
-            $course->removeGroup($group);
+
+        try {
+            // Supprimer toutes les relations avec les groupes
+            foreach ($course->getGroups() as $group) {
+                $course->removeGroup($group);
+            }
+
+            // Supprimer toutes les relations avec les demi-groupes
+            foreach ($course->getHalfGroups() as $halfGroup) {
+                $course->removeHalfGroup($halfGroup);
+            }
+
+            // Supprimer toutes les relations avec les niveaux de formation
+            foreach ($course->getFormationLevel() as $formationLevel) {
+                $course->removeFormationLevel($formationLevel);
+            }
+
+            // Supprimer toutes les relations avec les enseignants
+            foreach ($course->getTeachers() as $teacher) {
+                $course->removeTeacher($teacher);
+            }
+
+            // Supprimer toutes les relations avec les matières
+            foreach ($course->getSubjects() as $subject) {
+                $course->removeSubject($subject);
+            }
+
+            // Supprimer toutes les relations avec les types de cours
+            foreach ($course->getCourseTypes() as $courseType) {
+                $course->removeCourseType($courseType);
+            }
+
+            // Supprimer toutes les relations avec les durées prévues
+            foreach ($course->getExpectedDuration() as $expectedDuration) {
+                $course->removeExpectedDuration($expectedDuration);
+            }
+
+            // Supprimer toutes les relations avec les commentaires
+            foreach ($course->getComments() as $comment) {
+                $course->removeComment($comment);
+            }
+
+            // Supprimer le cours
+            $entityManager->remove($course);
+            $entityManager->flush();
+
+            return $this->json(['message' => 'Cours supprimé avec succès.'], 200);
+        } catch (\Exception $e) {return $this->json(['error' => 'Erreur lors de la suppression.',], 500);
         }
-    
-        foreach ($course->getHalfGroups() as $halfGroup) {
-            $course->removeHalfGroup($halfGroup);
-        }
-    
-        foreach ($course->getFormationLevel() as $formationLevel) {
-            $course->removeFormationLevel($formationLevel);
-        }
-    
-        foreach ($course->getTeachers() as $teacher) {
-            $course->removeTeacher($teacher);
-        }
-    
-        foreach ($course->getSubjects() as $subject) {
-            $course->removeSubject($subject);
-        }
-    
-        foreach ($course->getCourseTypes() as $courseType) {
-            $course->removeCourseType($courseType);
-        }
-    
-        $entityManager->remove($course);
-        $entityManager->flush();
-    
-        return $this->json(['message' => 'Cours supprimé avec succès.'], 200);
     }
 }
