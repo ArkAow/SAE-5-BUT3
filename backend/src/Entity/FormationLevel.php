@@ -34,6 +34,7 @@ class FormationLevel
     {
         $this->groups = new ArrayCollection();
         $this->curriculums = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int
@@ -99,13 +100,16 @@ class FormationLevel
     {
         if (!$this->courses->contains($course)) {
             $this->courses[] = $course;
+            $course->addFormationLevel($this);
         }
         return $this;
     }
-
+    
     public function removeCourse(Course $course): self
     {
-        $this->courses->removeElement($course);
+        if ($this->courses->removeElement($course)) {
+            $course->removeFormationLevel($this);
+        }
         return $this;
     }
 }

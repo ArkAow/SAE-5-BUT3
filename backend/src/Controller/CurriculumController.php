@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class CurriculumController extends AbstractController
 {
     //Route et fonction permttant de récupérer les semestres d'un curriculum
-    #[Route('/api/curriculum/{id}/semesters', name: 'api_get_semesters', methods: ['GET'])]
+    #[Route('/curriculum/{id}/semesters', name: 'api_get_semesters', methods: ['GET'])]
     public function getSemesters(int $id, EntityManagerInterface $em): JsonResponse
     {
         //Connexion à la BDD afin de récupérer les données

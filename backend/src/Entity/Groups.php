@@ -25,7 +25,6 @@ class Groups
     private Collection $halfGroups;
 
     #[ORM\ManyToMany(targetEntity: FormationLevel::class, mappedBy: "groups")]
-    #[ORM\JoinTable(name: "formation_Level_group")]
     private Collection $formationLevels;
 
     #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "groups")]
@@ -106,8 +105,10 @@ class Groups
     }
 
     public function removeCourse(Course $course): self
-    {
-        $this->courses->removeElement($course);
-        return $this;
+{
+    if ($this->courses->removeElement($course)) {
+        $course->removeGroup($this);
     }
+    return $this;
+}
 }

@@ -21,12 +21,13 @@ class HalfGroup
     #[ORM\ManyToMany(targetEntity: Groups::class, mappedBy: "halfGroups")]
     private Collection $groups;
 
-    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "groups")]
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: "halfGroups")]
     private Collection $courses;
 
     public function __construct()
     {
         $this->groups = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int
@@ -84,7 +85,9 @@ class HalfGroup
 
     public function removeCourse(Course $course): self
     {
-        $this->courses->removeElement($course);
+        if ($this->courses->removeElement($course)) {
+            $course->removeHalfGroup($this);
+        }
         return $this;
     }
 }

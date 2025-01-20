@@ -40,13 +40,14 @@ class ExpectedDuration
         joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'expected_duration_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
-    private ?Collection $teacher;
+    private Collection $teacher;
 
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
         $this->courseTypes = new ArrayCollection();
         $this->courses = new ArrayCollection();
+        $this->teacher = new ArrayCollection();
     }
 
     public function getId(): int

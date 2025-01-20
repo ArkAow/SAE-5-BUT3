@@ -192,11 +192,11 @@ class DatasInsertController extends AbstractController
     }
 
     // Fonction pour ajouter ou mettre à jour la durée attendue
-    private function addOrUpdateExpectedDuration(Subject $subject, CourseType $courseType, int $duration): void
+    private function addOrUpdateExpectedDuration(Subject $subject, CourseType $courseType, int $expected_duration): void
     {
         // Recherche si la durée attendue voulant être ajoutée existe déjà ou non dans la BDD
         $existingExpectedDuration = $this->entityManager->getRepository(ExpectedDuration::class)
-            ->findOneBy(['duration' => $duration]);
+            ->findOneBy(['duration' => $expected_duration]);
 
         // Si la durée attendue n'existe pas alors on la crée
         if ($existingExpectedDuration) {
@@ -211,7 +211,7 @@ class DatasInsertController extends AbstractController
         } else {
             // Création de la durée attendue et de ses datas et ajout dans la BDD (persist)
             $expectedDuration = new ExpectedDuration();
-            $expectedDuration->setDuration($duration);
+            $expectedDuration->setDuration($expected_duration);
             $expectedDuration->addSubject($subject);
             $expectedDuration->addCourseType($courseType);
             $this->entityManager->persist($expectedDuration);
