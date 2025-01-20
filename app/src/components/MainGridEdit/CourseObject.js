@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useDrag } from "react-dnd";
 import { getShade, isBlack } from "../../services/colorService";
 import { formatDuration } from "../../services/durationService";
@@ -71,6 +72,10 @@ const CourseObject = ({
     setShowModal(false);
   };
 
+  const NodePortal = ({ children }) => {
+      return createPortal(children, document.getElementById("portal-root"));
+  };
+
   return (
     <div
       ref={drag}
@@ -121,80 +126,82 @@ const CourseObject = ({
 
       {/* Editing Modal */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-20 text-xs">
-          <div className="bg-white p-5 rounded shadow-xl w-1/3 border-2 border-gray-300">
-            <h3 className="text-lg font-bold mb-4">Modification du cours</h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSaveEdit();
-              }}>
-              <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
-                <label className="block mb-1 font-bold w-32">Type de cours :</label>
-                <select
-                  value={selectedCourseType}
-                  onChange={(e) => setSelectedCourseType(e.target.value)}
-                  className="tooltip-select">
-                  <option value="" disabled>
-                    Choisir un type de cours
-                  </option>
-                  {courseTypes?.map((type) => (
-                    <option key={type.name} value={type.name}>
-                      {type.name}
-                    </option>
-                  )) || (
-                    <option value="" disabled>
-                      Aucun type de cours disponible
-                    </option>
-                  )}
-                </select>
-              </div>
-
-              <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
-                <label className="block mb-1 font-bold w-32">Enseignant :</label>
-                <select
-                    value={selectedTeacher}
-                    onChange={(e) => setSelectedTeacher(e.target.value)}
+        <NodePortal>
+          <div className="fixed inset-0 flex items-center justify-center z-20 text-xs bg-black bg-opacity-50">
+            <div className="bg-white p-5 rounded shadow-xl w-1/3 border-2 border-gray-300">
+              <h3 className="text-lg font-bold mb-4">Modification du cours</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSaveEdit();
+                }}>
+                <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-t-xl">
+                  <label className="block mb-1 font-bold w-32">Type de cours :</label>
+                  <select
+                    value={selectedCourseType}
+                    onChange={(e) => setSelectedCourseType(e.target.value)}
                     className="tooltip-select">
                     <option value="" disabled>
-                        Choisir un enseignant:
+                      Choisir un type de cours
                     </option>
-                    {teachers?.map((teacher) => (
-                        <option key={teacher.code} value={teacher.code}>
-                          {teacher.code}
-                        </option>
-                    ))}
-                </select>                
-              </div>
+                    {courseTypes?.map((type) => (
+                      <option key={type.name} value={type.name}>
+                        {type.name}
+                      </option>
+                    )) || (
+                      <option value="" disabled>
+                        Aucun type de cours disponible
+                      </option>
+                    )}
+                  </select>
+                </div>
 
-              <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-b-xl">
-                <label className="block mb-1 font-bold w-52">Durée (en heures):</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={50}
-                  step="0.5"
-                  value={selectedDuration}
-                  onChange={(e) =>setSelectedDuration(Number(e.target.value))}
-                  className="tooltip-number-input"/>
-              </div>
+                <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2">
+                  <label className="block mb-1 font-bold w-32">Enseignant :</label>
+                  <select
+                      value={selectedTeacher}
+                      onChange={(e) => setSelectedTeacher(e.target.value)}
+                      className="tooltip-select">
+                      <option value="" disabled>
+                          Choisir un enseignant:
+                      </option>
+                      {teachers?.map((teacher) => (
+                          <option key={teacher.code} value={teacher.code}>
+                            {teacher.code}
+                          </option>
+                      ))}
+                  </select>                
+                </div>
 
-              <div className="flex justify-center space-x-2 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 btn-default w-full">
-                  Enregistrer
-                </button>
-              </div>
-            </form>
+                <div className="flex items-center gap-2 mb-1 bg-gray-200 p-2 rounded-b-xl">
+                  <label className="block mb-1 font-bold w-52">Durée (en heures):</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={50}
+                    step="0.5"
+                    value={selectedDuration}
+                    onChange={(e) =>setSelectedDuration(Number(e.target.value))}
+                    className="tooltip-number-input"/>
+                </div>
+
+                <div className="flex justify-center space-x-2 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 btn-default w-full">
+                    Enregistrer
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </NodePortal>
       )}
     </div>
   );
