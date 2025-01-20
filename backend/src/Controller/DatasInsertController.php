@@ -126,26 +126,6 @@ class DatasInsertController extends AbstractController
             // Création du Semester et de ses datas et ajout dans la BDD (persist)
             $semester = new Semester();
             $semester->setName($name);
-
-            // Extraction du numéro du semestre à partir de son nom
-            if (preg_match('/\d+/', $name, $matches)) {
-                $semesterNumber = (int)$matches[0];
-
-                // Définir week_start et week_duration en fonction de la parité du numéro
-                // Les premiers semestres de chaque année commence à la semaine 1 et le semestre suivant commence à semestre 20
-                if ($semesterNumber % 2 === 1) {
-                    $semester->setWeekStart(1);
-                } else {
-                    $semester->setWeekStart(20);
-                }
-
-                // week_duration est toujours 19
-                $semester->setWeekDuration(19);
-            } else {
-                // Gestion de cas où le nom ne contient pas de numéro valide
-                throw new \InvalidArgumentException("Le nom du semestre doit contenir un numéro valide.");
-            }
-
             $this->entityManager->persist($semester);
         }
 
