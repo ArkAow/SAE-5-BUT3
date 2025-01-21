@@ -153,7 +153,7 @@ const ModifyTeachers = () => {
         <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, visible: false })} />
       )}
       {/* Navigation */}
-      <div className="flex flex-row items-center mt-16 ml-10 space-x-2">
+      <div className="absolute flex flex-row items-center top-16 left-10 space-x-2">
         <div 
           className="flex flex-row items-center py-4 px-4
           bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
