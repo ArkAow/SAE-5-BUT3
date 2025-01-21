@@ -49,7 +49,7 @@ const PreGridEdit = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-cover bg-center bg-landscape">
+    <div className="flex flex-col min-h-screen">
       <Header />
 
       <div className="flex flex-col items-center justify-center flex-1 space-y-10 py-10">
