@@ -53,7 +53,7 @@ const Login = ({ setIsAuthenticated }) => {
 
   return (
     <>
-      <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col items-center">
+      <div className="min-h-screen flex flex-col items-center">
         <LoginHeader />
         <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
           <form

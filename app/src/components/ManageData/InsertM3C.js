@@ -82,7 +82,7 @@ const InsertM3C = () => {
   };  
 
   return (
-    <div className="flex flex-col min-h-screen bg-cover bg-center bg-landscape">
+    <div className="flex flex-col min-h-screen">
       <Header />
       {toast.visible && (
         <Toast

@@ -18,7 +18,7 @@ const ManageData = () => {
   }; 
 
   return (
-    <div className="flex flex-col min-h-screen bg-cover bg-center bg-landscape">
+    <div className="flex flex-col min-h-screen">
         <Header />
         
         <div className="flex flex-row items-center mt-16 ml-10 py-1 px-8 

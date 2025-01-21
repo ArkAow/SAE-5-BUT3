@@ -4,7 +4,7 @@ import { UserProvider } from "./contexts/UserContext"; // Importer le UserProvid
 
 function App() {
   return (
-    <div className="App" style={{ WebkitAppRegion: "no-drag" }}>
+    <div className="App bg-cover bg-center bg-landscape" style={{ WebkitAppRegion: "no-drag" }}>
       <UserProvider>
         <AppRoutes />
       </UserProvider>

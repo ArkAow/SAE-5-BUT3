@@ -23,7 +23,7 @@ const HomePage = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-cover bg-center bg-landscape flex flex-col justify-around items-center">
+      <div className="min-h-screen flex flex-col justify-around items-center">
         <div className="flex justify-center items-center w-full h-full">
           <h1 className="text-white text-4xl font-bold text-outline bg-black bg-opacity-55 p-4 rounded-2xl mt-10">
             Bienvenue, {fullName} !
