@@ -58,8 +58,7 @@ const Login = ({ setIsAuthenticated }) => {
         <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
           <form
             onSubmit={handleSubmit}
-            className="flex flex-col items-center w-full"
-          >
+            className="flex flex-col items-center w-full">
             <div className="bg-primary rounded-full w-32 h-32 mb-12 bg-center bg-cover bg-pfp" />
             <div className="flex flex-col items-center mb-6">
               <label htmlFor="username" className="text-white mb-2">
@@ -71,8 +70,8 @@ const Login = ({ setIsAuthenticated }) => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-[130%] px-4 py-2 border border-gray-300 rounded-md"
-              />
+                autoComplete="username"
+                className="w-[130%] px-4 py-2 border border-gray-300 rounded-md"/>
             </div>
             <div className="flex flex-col items-center mb-6">
               <label htmlFor="password" className="text-white mb-2">
@@ -84,17 +83,14 @@ const Login = ({ setIsAuthenticated }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-[130%] px-4 py-2 border border-gray-300 rounded-md"
-              />
+                autoComplete="current-password"
+                className="w-[130%] px-4 py-2 border border-gray-300 rounded-md"/>
             </div>
             <button type="submit" className="btn-login transition duration-300">
               Se connecter
             </button>
             <p
-              className={`text-red-500 text-right text-sm mt-4 h-6 ${
-                error ? "visible" : "invisible"
-              }`}
-            >
+              className={`text-red-500 text-right text-sm mt-4 h-6 ${error ? "visible" : "invisible"}`}>
               {error}
             </p>
           </form>
