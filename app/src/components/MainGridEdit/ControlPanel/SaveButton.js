@@ -50,7 +50,6 @@ export const SaveButton = ({
     } catch (error) {
       console.error("Erreur inattendue :", error);
     } finally {
-      setSaving(false);
       setModifiedCourses([]); //On vide la liste des cours à sauvegarder
     }
 
@@ -71,7 +70,6 @@ export const SaveButton = ({
     } catch (error) {
       console.error("Erreur inattendue :", error);
     } finally {
-      setSaving(false);
       setDeletedCourses([]); //On vide la liste des cours à supprimer
     }
 
@@ -80,6 +78,8 @@ export const SaveButton = ({
       type: hasError ? "error" : "success",
       visible: true,
     });
+
+    setSaving(false);
   };
 
   return (
