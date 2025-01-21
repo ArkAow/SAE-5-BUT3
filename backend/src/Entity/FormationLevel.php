@@ -34,6 +34,7 @@ class FormationLevel
     {
         $this->groups = new ArrayCollection();
         $this->curriculums = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int

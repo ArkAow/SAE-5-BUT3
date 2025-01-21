@@ -27,6 +27,7 @@ class HalfGroup
     public function __construct()
     {
         $this->groups = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int

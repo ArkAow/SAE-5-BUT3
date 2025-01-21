@@ -42,6 +42,8 @@ class Subject
     {
         $this->expectedDurations = new ArrayCollection();
         $this->semesters = new ArrayCollection();
+        $this->teachers = new ArrayCollection();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): int
