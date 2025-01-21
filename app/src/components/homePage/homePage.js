@@ -56,6 +56,7 @@ const HomePage = () => {
             <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <img
                 src="/images/options.svg"
+                alt="options"
                 className="size-[70px] md:size-[100px] lg:size-[200px]"
               />
             </div>
