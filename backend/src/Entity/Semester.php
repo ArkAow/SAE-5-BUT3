@@ -30,6 +30,9 @@ class Semester
     #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'semesters')]
     private Collection $subjects;
 
+    #[ORM\ManyToMany(targetEntity: Archive::class, mappedBy: 'semesters')]
+    private Collection $archives;
+
     public function __construct()
     {
         $this->curriculums = new ArrayCollection();
@@ -112,6 +115,25 @@ class Semester
         if ($this->subjects->removeElement($subject)) {
             $subject->removeSemester($this);
         }
+        return $this;
+    }
+
+    public function getArchives(): Collection
+    {
+        return $this->archives;
+    }
+
+    public function addArchive(Archive $archive): self
+    {
+        if (!$this->archives->contains($archive)) {
+            $this->archives->add($archive);
+        }
+        return $this;
+    }
+
+    public function removeArchive(Archive $archive): self
+    {
+        $this->archives->removeElement($archive);
         return $this;
     }
 }

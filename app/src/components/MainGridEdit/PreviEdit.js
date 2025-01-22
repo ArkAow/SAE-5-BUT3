@@ -14,7 +14,7 @@ const MainPreviEdit = () => {
   return (
     <div className="MainPreviEdit">
       <Header />
-      <div className="absolute h-screen w-screen bg-cover bg-center bg-landscape -z-10" />
+      <div className="absolute h-screen w-screen -z-10" />
       {/* Transmettre le cursus sélectionné au composant MainGrid */}
       <MainGrid curriculum={selectedCurriculum} />
     </div>

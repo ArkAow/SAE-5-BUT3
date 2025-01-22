@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use PhpOffice\PhpSpreadsheet\Calculation\TextData\Format;
+use App\Entity\Teacher;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'course')]
@@ -36,7 +36,7 @@ class Course
         joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
-    private ?Collection $groups;
+    private Collection $groups;
 
     #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, inversedBy: 'courses')]
     #[ORM\JoinTable(
@@ -44,7 +44,7 @@ class Course
         joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'expected_duration_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
-    private ?Collection $expectedDuration;
+    private Collection $expectedDurations;
 
     #[ORM\ManyToMany(targetEntity: HalfGroup::class, inversedBy: 'courses')]
     #[ORM\JoinTable(
@@ -52,7 +52,7 @@ class Course
         joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'half_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
-    private ?Collection $halfGroups;
+    private Collection $halfGroups;
 
     #[ORM\ManyToMany(targetEntity: FormationLevel::class, inversedBy: 'courses')]
     #[ORM\JoinTable(
@@ -60,27 +60,36 @@ class Course
         joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
         inverseJoinColumns: [new ORM\JoinColumn(name: 'formationLevel_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
-    private ?Collection $formationLevels;
+    private Collection $formationLevels;
 
     #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(name: 'course_teacher')]
     private Collection $teachers;
     
-    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'courses')]
+    #[ORM\ManyToMany(targetEntity: Subject::class, inversedBy: 'courses')]
     private Collection $subjects;
 
-    #[ORM\ManyToMany(targetEntity: Curriculum::class, mappedBy: 'courses')]
-    private Collection $comments;
+    #[ORM\ManyToMany(targetEntity: Comment::class, inversedBy: 'courses')]
+    #[ORM\JoinTable(
+        name: 'comment_course',
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'comment_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
+    private Collection $comments;    
 
     public function __construct()
     {
         $this->teachers = new ArrayCollection();
         $this->subjects = new ArrayCollection();
+        $this->expectedDurations = new ArrayCollection();
         $this->courseTypes = new ArrayCollection();
         $this->groups = new ArrayCollection();
         $this->halfGroups = new ArrayCollection();
         $this->formationLevels = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->expectedDuration = new ArrayCollection();
     }
+
     public function getId(): int
     {
         return $this->id;
@@ -141,13 +150,17 @@ class Course
     {
         if (!$this->teachers->contains($teacher)) {
             $this->teachers->add($teacher);
+            $teacher->addCourse($this);
         }
         return $this;
     }
 
     public function removeTeacher(Teacher $teacher): self
     {
-        $this->teachers->removeElement($teacher);
+        if ($this->teachers->removeElement($teacher)) {
+            $teacher->removeCourse($this);
+        }
+
         return $this;
     }
 
@@ -241,13 +254,13 @@ class Course
 
     public function getExpectedDuration():Collection
     {
-        return $this->expectedDuration;
+        return $this->expectedDurations;
     }
 
     public function addExpectedDuration(ExpectedDuration $expectedDuration): self
     {
-        if (!$this->expectedDuration->contains($expectedDuration)){
-            $this->expectedDuration->add($expectedDuration);
+        if (!$this->expectedDurations->contains($expectedDuration)){
+            $this->expectedDurations->add($expectedDuration);
             $expectedDuration->addCourse($this);
         }
         return $this;
@@ -255,7 +268,7 @@ class Course
 
     public function removeExpectedDuration(expectedDuration $expectedDuration): self
     {
-        if ($this->expectedDuration->removeElement($expectedDuration)){
+        if ($this->expectedDurations->removeElement($expectedDuration)){
             $expectedDuration->removeCourse($this);
         }
         return $this;

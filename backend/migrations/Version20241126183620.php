@@ -20,9 +20,9 @@ final class Version20241126183620 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql("INSERT INTO course_type (name, color, scope) VALUES ('CM', '#FFFF00', 'class')");
-        $this->addSql("INSERT INTO course_type (name, color, scope) VALUES ('TD', '#FF6961', 'group')");
-        $this->addSql("INSERT INTO course_type (name, color, scope) VALUES ('TP', '#ADD8E6', 'half_group')");
-        $this->addSql("INSERT INTO course_type (name, color, scope) VALUES ('SAE', '#008000', 'class group half_group')");
+        $this->addSql("INSERT INTO course_type (name, color, scope) VALUES ('TD', '#FF3131', 'group')");
+        $this->addSql("INSERT INTO course_type (name, color, scope) VALUES ('TP', '#38B6FF', 'half_group')");
+        $this->addSql("INSERT INTO course_type (name, color, scope) VALUES ('SAE', '#57B440', 'class group half_group')");
     }
 
     public function down(Schema $schema): void

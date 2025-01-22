@@ -14,14 +14,14 @@ use Doctrine\ORM\EntityManagerInterface;
 class CurriculumController extends AbstractController
 {
     //Route et fonction permttant de récupérer les semestres d'un curriculum
-    #[Route('/api/curriculum/{id}/semesters', name: 'api_get_semesters', methods: ['GET'])]
+    #[Route('/curriculum/{id}/semesters', name: 'api_get_semesters', methods: ['GET'])]
     public function getSemesters(int $id, EntityManagerInterface $em): JsonResponse
     {
         //Connexion à la BDD afin de récupérer les données
         $connection = $em->getConnection();
         //Requête SQL 
         $sql = '
-            SELECT *
+            SELECT s.id, s.name 
             FROM semester s
             INNER JOIN curriculum_semester cursem ON cursem.semester_id = s.id
             WHERE cursem.curriculum_id = :curriculumId

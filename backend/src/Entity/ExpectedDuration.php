@@ -37,16 +37,17 @@ class ExpectedDuration
     #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'expectedDurations')]
     #[ORM\JoinTable(
         name: 'expected_duration_teacher',
-        joinColumns: [new ORM\JoinColumn(name: 'expected_duration_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
-        inverseJoinColumns: [new ORM\JoinColumn(name: 'teacher_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+        joinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'expected_duration_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     )]
-    private ?Collection $teacher;
+    private Collection $teacher;
 
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
         $this->courseTypes = new ArrayCollection();
         $this->courses = new ArrayCollection();
+        $this->teacher = new ArrayCollection();
     }
 
     public function getId(): int
@@ -127,28 +128,6 @@ class ExpectedDuration
     public function removeCourse(Course $course): self
     {
         $this->courses->removeElement($course);
-        return $this;
-    }
-
-    public function getTeacher():Collection
-    {
-        return $this->teacher;
-    }
-
-    public function addTeacher(Teacher $teacher): self
-    {
-        if (!$this->teacher->contains($teacher)){
-            $this->teacher->add($teacher);
-            $teacher->addExpectedDuration($this);
-        }
-        return $this;
-    }
-
-    public function removeTeacher(Teacher $teacher): self
-    {
-        if ($this->teacher->removeElement($teacher)){
-            $teacher->removeExpectedDuration($this);
-        }
         return $this;
     }
 }
