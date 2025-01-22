@@ -20,7 +20,7 @@ class Comment
     #[ORM\Column]
     private ?string $text = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'comments')]
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'comments')]
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'comments')]

@@ -4,7 +4,15 @@ import CourseObject from "./CourseObject";
 import { getShade } from "../../services/colorService";
 const ITEM_TYPE = "rectangle";
 
-const Node = ({ positionKey, items, deleteItem, moveItem  }) => {
+const Node = ({ 
+  positionKey, 
+  items,
+  courseTypes,
+  teachers,
+  deleteItem, 
+  modifItem, 
+  moveItem  
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [tooltipDirection, setTooltipDirection] = useState("right");
@@ -59,6 +67,9 @@ const Node = ({ positionKey, items, deleteItem, moveItem  }) => {
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => setIsDragging(false)}
           deleteItem={deleteItem}
+          modifItem={modifItem}
+          courseTypes={courseTypes}
+          teachers={teachers}
           />
       )}
 
@@ -105,6 +116,8 @@ const Node = ({ positionKey, items, deleteItem, moveItem  }) => {
                 onDragStart={() => setIsDragging(true)}
                 onDragEnd={() => setIsDragging(false)}
                 deleteItem={deleteItem}
+                courseTypes={courseTypes}
+                teachers={teachers}
                 />
               <strong>--------------</strong>
             </div>

@@ -34,7 +34,7 @@ class Subject
     #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'subjects')]
     private Collection $teachers;
     
-    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'subjects')]
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'subjects')]
     #[ORM\JoinTable(name: 'course_subject')]
     private Collection $courses;
 

@@ -5,7 +5,7 @@ const SeePrevi = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-cover bg-center bg-landscape pt-20">
+      <div className="min-h-screen pt-20">
           <h1>SeePrevi</h1>
       </div>
     </>

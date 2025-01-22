@@ -1,39 +1,46 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
-import handleDeleteNode from "./Node.js";
+import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../../services/courseService.js";
+import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
   const [items, setItems] = useState({});
-  const [selectedRow, setSelectedRow] = useState(0);
-  const [selectedCol, setSelectedCol] = useState(0);
-  const [selectedSemester, setSelectedSemester] = useState(null);
+  const [modifiedCourses, setModifiedCourses] = useState([])
+  const [deletedCourses, setDeletedCourses] = useState([])
+  const [selectedSemester, setSelectedSemester] = useState();
   const [availableSemesters, setAvailableSemesters] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState({});
   const [availableSubjects, setAvailableSubjects] = useState([]);
-  const [currentCourses, setCurrentCourses] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [teachers, setTeachers] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
-  const [selectedCourseType, setSelectedCourseType] = useState(null);
-  const [selectedTeacher, setSelectedTeacher] = useState("");
-  const [selectedDuration, setSelectedDuration] = useState(1.0);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
+  const [isTryingToChangeSemester, setIsTryingToChangeSemester] = useState(false);
+  const [pendingSemesterId, setPendingSemesterId] = useState(null);
+
+  const [isSaving, setSaving] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [isGroupLoading, setIsGroupLoading] = useState(true);
   const [isSemesterLoading, setIsSemesterLoading] = useState(true);
   const [isSubjectLoading, setIsSubjectLoading] = useState(true);
   const [isCourseTypeLoading, setIsCourseTypeLoading] = useState(true);
+  const [isCourseLoading, setIsCourseLoading] = useState(true);
   
-  
+  const NodePortal = ({ children }) => {
+      return createPortal(children, document.getElementById("portal-root"));
+  };
+
   useEffect(() => {
     if (!isGroupLoading && !isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
       setLoading(false);
@@ -42,26 +49,29 @@ const MainGrid = ({ curriculum }) => {
     }
   }, [isGroupLoading, isSemesterLoading, isSubjectLoading, isCourseTypeLoading]);
 
-  {/* Gestion des SEMESTRES et MATIERES -------------------------------------------- */}
+  /* Gestion des SEMESTRES et MATIERES -------------------------------------------- */
   useEffect(() => {
     const fetchSemesters = async () => {
       try {
+        console.log(`Chargement des semestres...`);
         const response = await fetch(routes.dev.semesters.get(curriculum.id));
         if (!response.ok) {
           throw new Error("Erreur lors du chargement des semestres.");
         }
         const semesters = await response.json();
         setAvailableSemesters(semesters);
-        setSelectedSemester(semesters[0] || null);
+        const firstSemester = semesters[0] || null;
 
         if (semesters[0]) {
-          fetchSubjects(semesters[0].id);
+          await fetchSubjects(firstSemester.id);
+          setSelectedSemester(firstSemester);
         }
       } catch (error) {
         console.error(error);
       }
       finally {
         setIsSemesterLoading(false);
+        console.log(`Chargement des semestres réussi`);
       }
     };
 
@@ -70,6 +80,7 @@ const MainGrid = ({ curriculum }) => {
 
   const fetchSubjects = async (semesterId) => {
     try {
+      console.log(`Chargement des matières...`);
       const response = await fetch(routes.dev.subjects.get(semesterId));
       if (!response.ok) {
         throw new Error("Erreur lors du chargement des matières.");
@@ -77,22 +88,51 @@ const MainGrid = ({ curriculum }) => {
       const subjects = await response.json();
       setAvailableSubjects(subjects);
       setSelectedSubject(subjects[0] || null);
-      setCurrentCourses(subjects[0]?.courses || []);
     } catch (error) {
       console.error(error);
     }
     finally {
       setIsSubjectLoading(false);
+      console.log(`Chargement des matières réussi`);
     }
   };
 
-  const handleSemesterChange = (e) => {
+  const handleTryingToChangeSemester = (e) => {
     const semesterId = parseInt(e.target.value, 10);
-    const selected = availableSemesters.find((s) => s.id === semesterId);
-    setSelectedSemester(selected);
+    if (modifiedCourses.length > 0 || deletedCourses.length > 0) {
+      setPendingSemesterId(semesterId);
+      setIsTryingToChangeSemester(true);      
+    } else {
+      handleSemesterChange(semesterId);
+    }
+  };
+  
+  const confirmSemesterChange = async () => {
+    if (pendingSemesterId !== null) {
+      await handleSemesterChange(pendingSemesterId);
+      setPendingSemesterId(null);
+    }
+    setIsTryingToChangeSemester(false);
+  };
+  
+  const cancelSemesterChange = () => {
+    setPendingSemesterId(null);
+    setIsTryingToChangeSemester(false);
+  };
 
+  const handleSemesterChange = async (semesterId) => {
+    const selected = availableSemesters.find((s) => s.id === semesterId);
     if (selected) {
-      fetchSubjects(selected.id);
+      await fetchSubjects(selected.id);
+      const currentIndex = availableSubjects.findIndex(
+        (subject) => subject.id === selectedSubject?.id
+      );
+      setCurrentSubjectIndex(currentIndex >= 0 ? currentIndex : 0);
+      setSelectedSemester(selected);
+      setModifiedCourses([]);
+      setDeletedCourses([]);
+    } else {
+      setCurrentSubjectIndex(0);
     }
   };
 
@@ -100,12 +140,12 @@ const MainGrid = ({ curriculum }) => {
     const subjectId = parseInt(e.target.value, 10);
     const selected = availableSubjects.find((s) => s.id === subjectId);
     setSelectedSubject(selected);
-    setCurrentCourses(selected?.courses || []);
   };
 
   useEffect(() => {
     const initialItems = {};
-    currentCourses.forEach((course, index) => {
+    const courses = selectedSubject.courses || [];
+    courses.forEach((course) => {
       const row = course.pos.y;
       const col = course.pos.x;
       const positionKey = `${row}-${col}`;
@@ -117,74 +157,126 @@ const MainGrid = ({ curriculum }) => {
       initialItems[positionKey].push({
         color: course.courseType?.color || "#ffffff",
         courseType: course.courseType.name,
-        teacher: course.teacher.name || "N/A",
+        teacher: course.teacher.code || "N/A",
         duration: course.duration || 1.0,
-        id: course.id || Date.now() + index,
+        id: course.itemID || Date.now(),
       });
     });
 
     setItems(initialItems);
-  }, [currentCourses]);
+  }, [selectedSubject]);
 
-  
-  {/* Gestion des COURS -------------------------------------------- */}
+
+  /* Gestion des ENSEIGNANTS */
   useEffect(() => {
-    const fetchCourseTypes = async () => {
+    const fetchTeachers = async () => {
       try {
-        const response = await fetch(routes.dev.courseTypes.get());
-        if (!response.ok) {
-          throw new Error("Erreur lors du chargement des types de cours.");
-        }
-        const data = await response.json();
-        setCourseTypes(data);
-        setSelectedCourseType(data[0] || null);
+        console.log(`Chargement des enseigants...`);
+          const response = await fetch(routes.dev.teachers.get());
+          if (!response.ok) {
+            throw new Error("Erreur lors du chargement des enseignants.");
+          }
+          const data = await response.json();
+          setTeachers(data);
       } catch (error) {
-        console.error(error);
-      }
-      finally {
-        setIsCourseTypeLoading(false);
+          console.error(error);
+      } finally {
+        console.log(`Chargement des enseigants réussi`);
       }
     };
 
+    fetchTeachers();
+  }, []);
+
+  
+  /* Gestion des COURS -------------------------------------------- */
+  const fetchCoursesForSubjects = async () => {
+    if (!selectedSemester) return;
+
+    try {
+      console.log(`Chargement des cours...`);
+      setIsCourseLoading(true);
+      let allSubjects = [];
+      for (const subject of availableSubjects) {
+        const response = await fetch(routes.dev.courses.getBySubject(subject.id));
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement des cours.");
+        }
+        const data = await response.json();
+        let allCourses = [];
+        data.forEach((course) => {
+          const { x, y } = getCoursePosFromGroup(course, groups, groupList);
+          const newItemID = Date.now()+course.id;
+          course.col = x;
+          course.row = y;
+          course.isRepeat = false;
+          allCourses.push(...createCoursesFromData(course, subject, newItemID));
+        });
+        const newSubject = subject;
+        newSubject.courses = allCourses;
+        allSubjects.push(newSubject);
+      }
+      setAvailableSubjects(allSubjects);
+    } catch (error) {
+      console.error("Erreur inattendue :", error);
+    } finally {
+      if (availableSubjects[0]) {
+        setSelectedSubject(availableSubjects[0]);
+      }
+      setIsCourseLoading(false);
+      console.log(`Chargement des cours réussi`);
+    }
+  };
+
+  useEffect(() => {
+    fetchCoursesForSubjects();
+  }, [selectedSemester]);
+
+  const fetchCourseTypes = async () => {
+    try {
+      const response = await fetch(routes.dev.courseTypes.get());
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des types de cours.");
+      }
+      const data = await response.json();
+      setCourseTypes(data);
+    } catch (error) {
+      console.error(error);
+    }
+    finally {
+      setIsCourseTypeLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCourseTypes();
   }, []);
 
-  const addItem = () => {
-    const positionKey = `${selectedRow}-${selectedCol}`;
-    const newItem = {
-      color: selectedCourseType.color,
-      courseType: selectedCourseType.name,
-      teacher: selectedTeacher,
-      duration: selectedDuration,
-      id: Date.now(),
-    };
-  
-    setItems((prevItems) => ({
-      ...prevItems,
-      [positionKey]: [...(prevItems[positionKey] || []), newItem],
-    }));
-  
-    const newCourse = {
-      teacher: { name: selectedTeacher },
-      courseType: { name: selectedCourseType.name, color: selectedCourseType.color },
-      duration: selectedDuration,
-      pos: { x: selectedCol, y: selectedRow },
-      id: Date.now(),
-    };
-  
+  const addItem = (payload) => {
+    const newItemID = Date.now();
+    const newItems = createItemsFromData(payload, newItemID);
+    const newCourses = createCoursesFromData(payload, selectedSubject, newItemID);
+    setModifiedCourses((prevModifiedCourses) => [
+      ...prevModifiedCourses,
+      ...newCourses,
+    ]);
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      newItems.forEach(({ positionKey, newItem }) => {
+        updatedItems[positionKey] = [...(updatedItems[positionKey] || []), newItem];
+      });
+      return updatedItems;
+    });
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
-          const updatedCourses = [...(subject.courses || []), newCourse];
+          const updatedCourses = [...(subject.courses || []), ...newCourses];
           return { ...subject, courses: updatedCourses };
         }
         return subject;
       });
-  
       return updatedSubjects;
     });
-  
-    setCurrentCourses((prevCourses) => [...prevCourses, newCourse]);
   };
 
   const deleteItem = (positionKey, id) => {
@@ -198,50 +290,104 @@ const MainGrid = ({ curriculum }) => {
       }
       return updatedItems;
     });
-  
+    setDeletedCourses((prevDeletedCourses) => [
+      ...prevDeletedCourses,
+      ...availableSubjects[currentSubjectIndex].courses.filter(
+        (course) => course.itemID === id && course.id
+      ),
+    ]);
+    setModifiedCourses((prevModifiedCourses) =>
+      prevModifiedCourses.filter((course) => course.itemID !== id)
+    );
     setAvailableSubjects((prevSubjects) => {
       const updatedSubjects = prevSubjects.map((subject, index) => {
         if (index === currentSubjectIndex) {
-          const updatedCourses = subject.courses.filter((course) => course.id !== id);
+          const updatedCourses = subject.courses.filter((course) => course.itemID !== id);
           return { ...subject, courses: updatedCourses };
         }
         return subject;
       });
-  
       return updatedSubjects;
     });
-  
-    setCurrentCourses((prevCourses) => prevCourses.filter((course) => course.id !== id));
   };
+
+  const modifItem = (payload) => {
+    const { positionKey, id, teacher, courseType, duration } = payload;
+    const selectedTeacher = findTeacherByCode(teacher, teachers);
+    const selectedCourseType = findCourseTypeByName(courseType, courseTypes);
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      if (updatedItems[positionKey]) {
+        updatedItems[positionKey] = updatedItems[positionKey].map((item) =>
+          item.id === id ? { ...item, teacher, courseType, duration, color: selectedCourseType.color } : item
+        );
+      }
+      return updatedItems;
+    });
+    setAvailableSubjects((prevSubjects) => {
+      return prevSubjects.map((subject, index) => {
+        if (index === currentSubjectIndex) {
+          const updatedCourses = subject.courses.map((course) =>
+            course.itemID === payload.id ? { 
+              ...course, 
+              teacher: selectedTeacher || course.teacher,
+              courseType: selectedCourseType || course.courseType,
+              duration: duration || course.duration}
+              : course
+          );
+          return { ...subject, courses: updatedCourses };
+        }
+        return subject;
+      });
+    });
+    setModifiedCourses((prevModifiedCourses) => [
+      ...prevModifiedCourses.filter((course) => course.itemID !== payload.id),
+      ...availableSubjects[currentSubjectIndex].courses.filter(
+        (course) => course.itemID === payload.id
+      ).map((course) => ({
+        ...course,
+        teacher: selectedTeacher || course.teacher,
+        courseType: selectedCourseType || course.courseType,
+        duration: duration ? duration : course.duration,
+      })),
+    ]);
+  }
   
   const moveItem = (fromKey, toKey, id) => {
     setItems((prevItems) => {
       const fromItems = [...(prevItems[fromKey] || [])];
       const toItems = [...(prevItems[toKey] || [])];
       const itemIndex = fromItems.findIndex((item) => item.id === id);
-      if (itemIndex === -1) return prevItems;
+      if (itemIndex === -1) return prevItems; // Si l'élément n'existe pas, ne rien faire
       const [draggedItem] = fromItems.splice(itemIndex, 1);
-
       setAvailableSubjects((prevSubjects) => {
-        const updatedSubjects = [...prevSubjects];
-        const currentSubject = updatedSubjects[currentSubjectIndex];  
-        currentSubject.courses = currentSubject.courses.map((course) => {
-          if (
-            course.teacher.name === draggedItem.teacher &&
-            course.courseType.name === draggedItem.courseType &&
-            course.duration === draggedItem.duration &&
-            course.pos.x === parseInt(fromKey.split("-")[1], 10) &&
-            course.pos.y === parseInt(fromKey.split("-")[0], 10)
-          ) {
-            return {
-              ...course,
-              pos: { x: parseInt(toKey.split("-")[1], 10), y: parseInt(toKey.split("-")[0], 10) },
-            };
+        return prevSubjects.map((subject, index) => {
+          if (index === currentSubjectIndex) {
+            const updatedCourses = subject.courses.map((course) => {
+              if (course.itemID === draggedItem.id) {
+                const xPos = parseInt(toKey.split("-")[1], 10);
+                const yPos = parseInt(toKey.split("-")[0], 10);
+                const updatedCourse = {
+                  ...course,
+                  pos: { x: xPos, y: yPos },
+                  group: {
+                    groupType: determineCourseGroup(xPos, groups, groupList),
+                    groupID: getGroupID(xPos, groups, groupList),
+                  },
+                }; 
+                setModifiedCourses((prevModifiedCourses) => [
+                  ...prevModifiedCourses,
+                  updatedCourse,
+                ]);
+                return updatedCourse;
+              }
+              return course;
+            });
+            return { ...subject, courses: updatedCourses };
           }
-          return course;
+          return subject;
         });
-        return updatedSubjects;
-      });
+      });  
       return {
         ...prevItems,
         [fromKey]: fromItems,
@@ -255,24 +401,8 @@ const MainGrid = ({ curriculum }) => {
       (prevSubjects || []).map((subject) => ({
         ...subject,
         courses: (subject.courses || []).map((course) =>
-          course.courseType?.name === removedTypeName
-            ? {
-                ...course,
-                courseType: { name: "N/A", color: "#FFFFFF" },
-              }
-            : course
-        ),
-      }))
+          course.courseType?.name === removedTypeName ? {...course, courseType: { name: "N/A", color: "#FFFFFF" }}: course)}))
     );
-  
-    setCurrentCourses((prevCourses) =>
-      (prevCourses || []).map((course) =>
-        course.courseType?.name === removedTypeName
-          ? { ...course, courseType: { name: "N/A", color: "#FFFFFF" } }
-          : course
-      )
-    );
-  
     setItems((prevItems) => {
       const updatedItems = { ...prevItems };
       for (const key in updatedItems) {
@@ -286,7 +416,7 @@ const MainGrid = ({ curriculum }) => {
     });
   };  
 
-  {/* Gestion des GROUPES -------------------------------------------- */}
+  /* Gestion des GROUPES -------------------------------------------- */
   const fetchGroups = async () => {
     try {
       const classID = curriculum.formationLevels[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
@@ -319,18 +449,46 @@ const MainGrid = ({ curriculum }) => {
   const groupList = getGroupList();
 
   return (
-    <div className="min-h-screen py-10">
+    <div className={`min-h-screen py-10 ${isSaving ? 'cursor-wait' : 'cursor-default'}`}>
       {isLoading ? (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] space-y-10">
-        <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
-          <div className="spinner"></div>
-          <div className="text-white text-3xl font-bold mt-4">
-            Chargement des données...
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] space-y-10">
+          <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
+            <div className="spinner"></div>
+            <div className="text-white text-3xl font-bold mt-4">
+              Chargement des données...
+            </div>
           </div>
         </div>
-      </div>
       ) : (
         <>
+          {isTryingToChangeSemester && (
+            <>
+              <NodePortal>
+                <div className="fixed inset-0 flex items-center justify-center z-20 text-xs bg-black bg-opacity-50">
+                  <div className="bg-white p-5 rounded shadow-xl w-80 border-2 border-gray-300">
+                    <h3 className="text-lg font-bold mb-2 text-center">Avertissement !</h3>
+                    <p className="mb-4 text-center">
+                      Vous êtes sur le point de changer de semestre.<br/>Toute modification non enregistrée sera perdue.<br/><br/>Voulez-vous continuer ?
+                    </p>
+                    <div className="flex justify-center space-x-2 mt-4">
+                      <button
+                        type="button"
+                        onClick={cancelSemesterChange}
+                        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                        Annuler
+                      </button>
+                      <button
+                        type="button"
+                        onClick={confirmSemesterChange}
+                        className="px-4 py-2 btn-default w-full">
+                        Continuer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </NodePortal>
+            </>
+          )}
           {toast.visible && (
             <Toast
               message={toast.message}
@@ -344,24 +502,23 @@ const MainGrid = ({ curriculum }) => {
                 isExpanded={isControlPanelExpanded}
                 setIsExpanded={setIsControlPanelIsExpanded}
                 curriculum={curriculum}
+                selectedSemester={selectedSemester}
                 setToast={setToast}
                 groups={groups}
+                teachers={teachers}
+                groupList={groupList}
                 setGroups={setGroups}
                 fetchGroups={fetchGroups}
-                selectedRow={selectedRow}
-                setSelectedRow={setSelectedRow}
-                selectedCol={selectedCol}
-                setSelectedCol={setSelectedCol}
                 courseTypes={courseTypes}
                 setCourseTypes={setCourseTypes}
                 updateCoursesForRemovedType={updateCoursesForRemovedType}
-                selectedCourseType={selectedCourseType}
-                setSelectedCourseType={setSelectedCourseType}
-                selectedTeacher={selectedTeacher}
-                setSelectedTeacher={setSelectedTeacher}
-                selectedDuration={selectedDuration}
-                setSelectedDuration={setSelectedDuration}
                 addItem={addItem}
+                modifiedCourses={modifiedCourses}
+                setModifiedCourses={setModifiedCourses}
+                deletedCourses={deletedCourses}
+                setDeletedCourses={setDeletedCourses}
+                isSaving={isSaving}
+                setSaving={setSaving}
               />
             </div>
 
@@ -369,7 +526,7 @@ const MainGrid = ({ curriculum }) => {
             <select
               className="w-fit min-w-28 max-w-60 h-10 mt-2 ml-24 px-2 before:px-4 py-2 default-select rounded-full font-normal"
               value={selectedSemester?.id || ""}
-              onChange={handleSemesterChange}>
+              onChange={handleTryingToChangeSemester}>
               <option value="" disabled>
                 Choisir un semestre
               </option>
@@ -404,7 +561,6 @@ const MainGrid = ({ curriculum }) => {
                 if (nextSubjectIndex < availableSubjects.length) {
                   const nextSubject = availableSubjects[nextSubjectIndex];
                   setSelectedSubject(nextSubject);
-                  setCurrentCourses(nextSubject.courses || []);
                 }
               }}
               disabled={
@@ -429,55 +585,71 @@ const MainGrid = ({ curriculum }) => {
             </button>
           </div>
 
-          {groups.length === 0 ? (
-            <div className="flex items-center justify-center w-full">
-              <div className="w-1/2 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
-                Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
+          {isCourseLoading ? (
+            <div className="flex items-center justify-center w-full mt-10">
+              <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
+                <div className="spinner"></div>
+                <div className="text-white text-3xl font-bold mt-4">
+                  Chargement des cours...
+                </div>
               </div>
             </div>
           ) : (
-            <DndProvider backend={HTML5Backend}>
-              <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
-               mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
-                <div
-                  className="grid"
-                  style={{
-                    gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
-                  }}>
-                  <div className="w-10 h-6"></div>
-                  {groupList.map((groupName, colIndex) => (
-                    <div
-                      key={`col-label-${colIndex}`}
-                      className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
-                      {groupName}
-                    </div>
-                  ))}
-                  {Array.from(
-                    { length: selectedSemester.week_duration || 20 }, // La durée par défaut est 20 si week_duration est indéfini
-                    (_, i) => (selectedSemester.week_start || 1) + i // La semaine de départ par défaut est 1 si week_start est indéfini
-                  ).map((week, rowIndex) => (
-                    <React.Fragment key={`row-${rowIndex}`}>
-                      <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
-                        S{week}
-                      </div>
-                      {groupList.map((_, colIndex) => {
-                        const positionKey = `${rowIndex}-${colIndex}`;
-                        const cellItems = items[positionKey] || [];
-                        return (
-                          <Node
-                            key={positionKey}
-                            positionKey={positionKey}
-                            items={cellItems}
-                            moveItem={moveItem}
-                            deleteItem={deleteItem}
-                          />
-                        );
-                      })}
-                    </React.Fragment>
-                  ))}
+            <>
+              {groups.length === 0 ? (
+                <div className="flex items-center justify-center w-full">
+                  <div className="w-1/2 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
+                    Il n'y a pas de groupes, veuillez en ajouter pour consulter le tableau.
+                  </div>
                 </div>
-              </div>
-            </DndProvider>
+              ) : (
+                <DndProvider backend={HTML5Backend}>
+                  <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
+                  mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
+                    <div
+                      className="grid"
+                      style={{
+                        gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
+                      }}>
+                      <div className="w-10 h-6"></div>
+                      {groupList.map((groupName, colIndex) => (
+                        <div
+                          key={`col-label-${colIndex}`}
+                          className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                          {groupName}
+                        </div>
+                      ))}
+                      {Array.from(
+                        { length: selectedSemester.week_duration || 20 }, // La durée par défaut est 20 si week_duration est indéfini
+                        (_, i) => (selectedSemester.week_start || 1) + i // La semaine de départ par défaut est 1 si week_start est indéfini
+                      ).map((week, rowIndex) => (
+                        <React.Fragment key={`row-${rowIndex}`}>
+                          <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                            S{week}
+                          </div>
+                          {groupList.map((_, colIndex) => {
+                            const positionKey = `${rowIndex}-${colIndex}`;
+                            const cellItems = items[positionKey] || [];
+                            return (
+                              <Node
+                                key={positionKey}
+                                positionKey={positionKey}
+                                items={cellItems}
+                                courseTypes={courseTypes}
+                                teachers={teachers}
+                                moveItem={moveItem}
+                                deleteItem={deleteItem}
+                                modifItem={modifItem}
+                              />
+                            );
+                          })}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                </DndProvider>
+              )}
+            </>
           )}
         </>
       )}

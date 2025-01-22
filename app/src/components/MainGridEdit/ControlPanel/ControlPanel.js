@@ -9,31 +9,38 @@ const ControlPanel = ({
   isExpanded,
   setIsExpanded,
   curriculum,
+  selectedSemester,
   setToast,
   groups,
+  teachers,
+  groupList,
   setGroups,
   fetchGroups,
-  selectedRow,
-  setSelectedRow,
-  selectedCol,
-  setSelectedCol,
   courseTypes,
   setCourseTypes,
   updateCoursesForRemovedType,
-  selectedCourseType,
-  setSelectedCourseType,
-  selectedTeacher,
-  setSelectedTeacher,
-  selectedDuration,
-  setSelectedDuration,
-  addItem }) => {
+  addItem,
+  modifiedCourses,
+  setModifiedCourses,
+  deletedCourses,
+  setDeletedCourses,
+  isSaving,
+  setSaving }) => {
   const [delayedExpanded, setDelayedExpanded] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isNoGroups, setIsNoGroups] = useState(true);
+  const [isModifiedCourses, setIsModifiedCourses] = useState(false);
+  const [isDeletedCourses, setIsDeletedCourses] = useState(false);
 
   useEffect(() => {
     setIsNoGroups(groups.length === 0);
   }, [groups]);
+  useEffect(() => {
+    setIsModifiedCourses(modifiedCourses.length > 0);
+  }, [modifiedCourses]);
+  useEffect(() => {
+    setIsDeletedCourses(deletedCourses.length > 0);
+  }, [deletedCourses]);
 
   const handleToggleExpand = () => {
     if (isButtonDisabled) return;
@@ -61,7 +68,7 @@ const ControlPanel = ({
             : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
 
-        <span className={`absolute right-4 top-4 flex h-3 w-3 ${(!isNoGroups || isExpanded) ? "hidden" : ""}`}>
+        <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isNoGroups || isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
@@ -77,18 +84,12 @@ const ControlPanel = ({
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton
           isNoGroups={isNoGroups}
-          selectedRow={selectedRow}
-          setSelectedRow={setSelectedRow}
-          selectedCol={selectedCol}
-          setSelectedCol={setSelectedCol}
+          groups={groups}
+          groupList={groupList}
+          selectedSemester={selectedSemester}
           courseTypes={courseTypes}
-          selectedCourseType={selectedCourseType}
-          setSelectedCourseType={setSelectedCourseType}
-          selectedTeacher={selectedTeacher}
-          setSelectedTeacher={setSelectedTeacher}
-          selectedDuration={selectedDuration}
-          setSelectedDuration={setSelectedDuration}
-          addItem={addItem}/>
+          addItem={addItem}
+          teachers={teachers}/>
 
         <CourseTypeButton 
           isNoGroups={isNoGroups}
@@ -97,16 +98,26 @@ const ControlPanel = ({
           updateCoursesForRemovedType={updateCoursesForRemovedType}/>
 
         <GroupButton 
+          isNoGroups={isNoGroups}
           curriculum={curriculum}
           setToast={setToast}
           groups={groups}
           setGroups={setGroups}
-          fetchGroups={fetchGroups}
-          isNoGroups={isNoGroups}/>
+          fetchGroups={fetchGroups}/>
 
         <PrintButton />
 
-        <SaveButton />
+        <SaveButton
+          isNoGroups={isNoGroups}
+          modifiedCourses={modifiedCourses}
+          setModifiedCourses={setModifiedCourses}
+          isModifiedCourses={isModifiedCourses}
+          deletedCourses={deletedCourses}
+          setDeletedCourses={setDeletedCourses}
+          isDeletedCourses={isDeletedCourses}
+          setToast={setToast}
+          isSaving={isSaving}
+          setSaving={setSaving}/>
       </div>
     </div>
   );

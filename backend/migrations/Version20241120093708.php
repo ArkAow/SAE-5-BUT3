@@ -78,8 +78,8 @@ final class Version20241120093708 extends AbstractMigration
         $semester = $schema->createTable('semester');
         $semester->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $semester->addColumn('name', 'string', ['length' => 100]);
-        $semester->addColumn('week_start', 'integer', ['nullable' => true]);
-        $semester->addColumn('week_duration', 'integer', ['nullable' => true]);
+        $semester->addColumn('week_start', 'integer');
+        $semester->addColumn('week_duration', 'integer');
         $semester->setPrimaryKey(['id']);
         
         // Table Semester - Curriculum
@@ -298,6 +298,9 @@ final class Version20241120093708 extends AbstractMigration
 
         $archive = $schema->createTable('archive');
         $archive->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
+        $archive->addColumn('name', 'string', ['length' => 100]);
+        $archive->addColumn('data', 'json', ['notnull' => false]);
+        $archive->addColumn('year', 'integer', ['unsigned' => true, 'notnull' => true]);
         $archive->setPrimaryKey(['id']);
 
         // Table Archive - Department
@@ -308,6 +311,14 @@ final class Version20241120093708 extends AbstractMigration
         $archive_department->setPrimaryKey(['archive_id', 'department_id']);
         $archive_department->addForeignKeyConstraint($archive, ['archive_id'], ['id'], ['onDelete' => 'CASCADE']);
         $archive_department->addForeignKeyConstraint($department, ['department_id'], ['id'], ['onDelete' => 'CASCADE']);
+
+        // Table Archive - Semester
+        $archive_semester = $schema->createTable('archive_semester');
+        $archive_semester->addColumn('archive_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $archive_semester->addColumn('semester_id','integer', ['unsigned' => true, 'notnull' => true]);
+        $archive_semester->setPrimaryKey(['archive_id', 'semester_id']);
+        $archive_semester->addForeignKeyConstraint($archive, ['archive_id'], ['id'], ['onDelete' => 'CASCADE']);
+        $archive_semester->addForeignKeyConstraint($semester, ['semester_id'], ['id'], ['onDelete' => 'CASCADE']);
 
         // Table Comment
 

@@ -30,13 +30,8 @@ class Teacher
     #[ORM\Column(name: "partTimeTutor", type: "boolean", nullable: true)]
     private ?bool $is_partimetutor = null;
 
-    #[ORM\ManyToMany(targetEntity: Course::class, inversedBy: 'teachers')]
-    #[ORM\JoinTable(
-        name: 'course_teacher',
-        joinColumns: [new ORM\JoinColumn(name: 'teacher_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
-        inverseJoinColumns: [new ORM\JoinColumn(name: 'course_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    )]
-    private Collection $courses;
+    #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'teachers')]
+    private Collection $courses;    
 
     #[ORM\ManyToMany(targetEntity:Subject::class, inversedBy: 'teachers')]
     private Collection $subjects;
@@ -45,8 +40,7 @@ class Teacher
     private Collection $departments;
 
     #[ORM\ManyToMany(targetEntity: ExpectedDuration::class, mappedBy: "teachers")]
-    private Collection $expected_duration;
-
+    private Collection $expectedDurations;
 
     public function __construct()
     {
@@ -111,9 +105,7 @@ class Teacher
     public function removeCourse(Course $course): self
     {
         if ($this->courses->removeElement($course)) {
-            if ($course->getTeachers() === $this) {
-                $course->removeTeacher($this);
-            }
+            $course->removeTeacher($this);
         }
         return $this;
     }
@@ -185,7 +177,7 @@ class Teacher
     }
 
     public function getExpectedDuration() {
-        return $this->expected_duration;
+        return $this->expectedDurations;
     }
 
     public function addExpectedDuration(ExpectedDuration $expectedDuration): self
