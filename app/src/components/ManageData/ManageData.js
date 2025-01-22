@@ -18,24 +18,20 @@ const ManageData = () => {
   }; 
 
   return (
-    <div className="flex flex-col min-h-screen bg-cover bg-center bg-landscape">
+    <>
         <Header />
-        
-        <div className="flex flex-row items-center mt-16 ml-10 py-1 px-8 
-            text-white bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg">
-            <span 
-                onClick={goToHomePage} 
-                className="cursor-pointer hover:underline">
-                Page d'accueil /
-            </span>
-            <img src="/images/options.svg" alt="Options Icon" className="w-8 h-8"/>
-            <span>
-                Gestion des données
-            </span>
-        </div>
-        
-        <div className="flex flex-col bg-cover justify-around items-center">
-            <div className="flex justify-around items-center w-full max-w-[1200px] mt-8 px-8">
+        <div className="min-h-screen flex flex-col justify-around items-center">
+            {/* Navigation */}
+            <div 
+                className="absolute flex flex-row items-center top-16 left-10 py-4 px-4
+                bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
+                onClick={goToHomePage}>
+                <img 
+                    src="/images/home.svg"
+                    className="size-8"/>
+            </div>
+            
+            <div className="flex justify-around items-center w-full max-w-[1200px] mt-40 px-8">
                 {/* Insert M3C Block */}
                 <div
                     className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
@@ -63,7 +59,7 @@ const ManageData = () => {
                 </div>
             </div>            
         </div>
-    </div>
+    </>
   );
 };
 

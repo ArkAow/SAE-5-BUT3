@@ -254,7 +254,7 @@ class CoursesController extends AbstractController
     }
 
 
-    #[Route('/course/delete/{id}', name: 'delete_course', methods: ['DELETE'])]
+    #[Route('/courses/delete/{id}', name: 'delete_course', methods: ['DELETE'])]
     public function deleteCourse(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
         // Rechercher le cours
