@@ -51,6 +51,9 @@ class Teacher
     public function __construct()
     {
         $this->courses = new ArrayCollection();
+        $this->subjects = new ArrayCollection();
+        $this->departments = new ArrayCollection();
+        $this->expected_duration = new ArrayCollection();
     }
 
     public function getId(): int
@@ -185,11 +188,20 @@ class Teacher
         return $this->expected_duration;
     }
 
-    public function addExpectedDuration(ExpectedDuration $expectedDuration) {
-        
+    public function addExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if (!$this->expected_duration->contains($expectedDuration)) {
+            $this->expected_duration->add($expectedDuration);
+            $expectedDuration->addTeacher($this);
+        }
+        return $this;
     }
 
-    public function removeExpectedDuration(ExpectedDuration $expectedDuration) {
-        
+    public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
+    {
+        if ($this->expected_duration->removeElement($expectedDuration)) {
+            $expectedDuration->removeTeacher($this);
+        }
+        return $this;
     }
 }

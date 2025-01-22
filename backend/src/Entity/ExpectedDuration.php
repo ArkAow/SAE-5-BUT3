@@ -47,6 +47,7 @@ class ExpectedDuration
         $this->subjects = new ArrayCollection();
         $this->courseTypes = new ArrayCollection();
         $this->courses = new ArrayCollection();
+        $this->teacher = new ArrayCollection();
     }
 
     public function getId(): int
