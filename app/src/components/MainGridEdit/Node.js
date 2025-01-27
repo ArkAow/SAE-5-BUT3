@@ -1,0 +1,131 @@
+import React, { useState, useEffect } from "react";
+import { useDrop } from "react-dnd";
+import CourseObject from "./CourseObject";
+import { getShade } from "../../services/colorService";
+const ITEM_TYPE = "rectangle";
+
+const Node = ({ 
+  positionKey, 
+  items,
+  courseTypes,
+  teachers,
+  deleteItem, 
+  modifItem, 
+  moveItem  
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [tooltipDirection, setTooltipDirection] = useState("right");
+
+  const [, drop] = useDrop({
+    accept: ITEM_TYPE,
+    drop: (draggedItem) => {
+      if (draggedItem.positionKey !== positionKey && draggedItem.id) {
+        moveItem(draggedItem.positionKey, positionKey, draggedItem.id);
+      }
+      else {
+        console.error("Missing item's ID");
+      }
+    },
+  });
+
+  const visibleItems = items?.slice(0, 3) || [];
+  const remainingItemsCount = items?.length > 3 ? items.length - 3 : 0;
+
+  const showTooltip = isHovered && items?.length > 1 && !isDragging;
+
+  const adjustTooltipDirection = () => {
+    const nodeElement = document.getElementById(positionKey);
+    if (nodeElement) {
+      const rect = nodeElement.getBoundingClientRect();
+      const screenWidth = window.innerWidth;
+      setTooltipDirection(rect.left > screenWidth / 2 ? "left" : "right");
+    }
+  };
+
+  useEffect(() => {
+    if (isHovered) {
+      adjustTooltipDirection();
+    }
+  }, [isHovered]);
+
+  return (
+    <div
+      id={positionKey}
+      ref={drop}
+      className="relative min-w-20 h-20 bg-white justify-items-center border border-opacity-75 border-gray-300 p-1"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}>
+      {items?.length === 1 && (
+        <CourseObject
+          courseType={items[0].courseType}
+          color={items[0].color}
+          teacher={items[0].teacher}
+          duration={items[0].duration}
+          positionKey={positionKey}
+          id={items[0].id}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setIsDragging(false)}
+          deleteItem={deleteItem}
+          modifItem={modifItem}
+          courseTypes={courseTypes}
+          teachers={teachers}
+          />
+      )}
+
+      {items?.length > 1 && (
+        <div className="relative w-full max-w-20 h-full grid grid-cols-2 grid-rows-2 gap-1 justify-items-center">
+          {visibleItems.map((item) => (
+            <div
+              key={item.id}
+              className="w-full max-w-10 h-full max-h-10 rounded-md border-2"
+              style={{
+                backgroundColor: item.color,
+                borderColor: getShade(item.color),
+              }}>
+            </div>
+          ))}
+          {remainingItemsCount > 0 && (
+            <div className="relative w-full h-full flex items-center justify-center text-black text-xs font-bold">
+              +{remainingItemsCount}
+            </div>
+          )}
+        </div>
+      )}
+
+      {showTooltip && (
+        <div
+          className={`absolute top-0 p-2 rounded-xl shadow-lg z-10 w-40 custom-scrollbar-dark ${
+            tooltipDirection === "left" ? "left-0 -translate-x-full" : "left-full"
+          }`}
+          style={{
+            maxHeight: "300px",
+            overflowY: "auto",
+            backgroundColor: "rgba(55, 65, 81, 0.90)",
+          }}>
+          {items.map((item) => (
+            <div key={item.id} className="mb-1 text-white">
+              <CourseObject
+                courseType={item.courseType}
+                color={item.color}
+                teacher={item.teacher}
+                duration={item.duration}
+                id={item.id}
+                small
+                positionKey={positionKey}
+                onDragStart={() => setIsDragging(true)}
+                onDragEnd={() => setIsDragging(false)}
+                deleteItem={deleteItem}
+                courseTypes={courseTypes}
+                teachers={teachers}
+                />
+              <strong>--------------</strong>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Node;
