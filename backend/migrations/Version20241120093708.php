@@ -247,8 +247,11 @@ final class Version20241120093708 extends AbstractMigration
 
         $user = $schema->createTable('user');
         $user->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
-        $user->addColumn('email', 'string', ['length' => 150]);
-        $user->addColumn('password', 'string', ['length' => 150]);
+        $user->addColumn('identifiant', 'string', ['length' => 150]);
+        $user->addColumn('is_superadmin','boolean', ['default' => false]);
+        $user->addColumn('is_admin','boolean', ['default' => false]);
+        $user->addColumn('is_extendedviewer','boolean', ['default' => false]);
+        $user->addColumn('is_restrictedviewer','boolean', ['default' => false]);
         $user->setPrimaryKey(['id']);
 
         // Table Department
