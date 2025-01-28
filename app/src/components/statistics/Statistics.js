@@ -1,10 +1,12 @@
 import React from "react";
+import Header from "../header/header";
 
 const Statistics = () => {
 
   return (
-    <div>
-    </div>
+    <>
+      <Header />
+    </>
   );
 };
 
