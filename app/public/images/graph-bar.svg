@@ -1,18 +1,15 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
-
-<g id="SVGRepo_bgCarrier" stroke-width="1"/>
-
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-
-<g id="SVGRepo_iconCarrier">
-
-<path d="M15 20V1h-4v19zm-1-1h-2V8h2zM12 2h2v5h-2zM5 20h4v-9H5zm3-1H6v-2h2zm-2-7h2v4H6zm11 8h4V5h-4zm3-1h-2v-7h2zM18 6h2v5h-2zM2 22h21v1H1V1h1z"/>
-
-<path fill="none" d="M0 0h24v24H0z"/>
-
-</g>
-
-</svg>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="-2.4 -2.4 28.80 28.80" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" fill="#ffffff">
+<g id="SVGRepo_bgCarrier" stroke-width="0"/>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="SVGRepo_iconCarrier">
+<defs>
+<style>.cls-1{fill:none;stroke:#ffffff;stroke-miterlimit:10;stroke-width:1.91px;}</style>
+</defs>
+<rect class="cls-1" x="2.45" y="14.86" width="3.82" height="7.64"/>
+<rect class="cls-1" x="17.73" y="9.14" width="3.82" height="13.36"/>
+<rect class="cls-1" x="10.09" y="1.5" width="3.82" height="21"/>
+<line class="cls-1" x1="0.55" y1="22.5" x2="23.45" y2="22.5"/>
+</g>
+</svg>

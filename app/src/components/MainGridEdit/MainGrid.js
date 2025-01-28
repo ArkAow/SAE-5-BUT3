@@ -572,8 +572,8 @@ const MainGrid = ({ curriculum }) => {
               disabled={
                 !selectedSubject ||
                 availableSubjects.indexOf(selectedSubject) >=
-                  availableSubjects.length - 1
-              }
+                  availableSubjects.length - 1}
+              title="Passer à la mtière suivante"
               className={`flex w-48 h-10 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full
                 shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none
                 ${
