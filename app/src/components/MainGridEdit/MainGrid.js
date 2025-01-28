@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
@@ -10,6 +11,7 @@ import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findT
 import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
 
 const MainGrid = ({ curriculum }) => {
+  const navigate = useNavigate();
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
@@ -39,6 +41,10 @@ const MainGrid = ({ curriculum }) => {
   
   const NodePortal = ({ children }) => {
       return createPortal(children, document.getElementById("portal-root"));
+  };
+
+  const goToStatistics = () => {
+    navigate("/Statistics");
   };
 
   useEffect(() => {
@@ -582,6 +588,18 @@ const MainGrid = ({ curriculum }) => {
                 src="/images/right-arrow.svg"
                 alt="Right Arrow"
                 className="ml-2 w-4 h-4"/>
+            </button>
+
+            {/* Bouton Statistiques */}
+            <button
+              onClick={goToStatistics}
+              className={`flex w-fit h-10 mt-2 items-center px-10 py-2 text-white bg-primary rounded-full
+                shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none`}
+              title="Accèder aux statistiques">
+              <img
+                src="/images/graph-bar.svg"
+                alt="Graph Bar Stacked"
+                className="size-6"/>
             </button>
           </div>
 

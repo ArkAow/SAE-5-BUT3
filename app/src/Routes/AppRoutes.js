@@ -14,6 +14,7 @@ import InsertM3C from "../components/ManageData/InsertM3C";
 import ManageData from "../components/ManageData/ManageData";
 import ModifyTeachers from "../components/ManageData/ModifyTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
+import Statistics from "../components/statistics/Statistics";
 
 const AppRoutes = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -85,6 +86,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <PreGridEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Statistics"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <Statistics />
             </ProtectedRoute>
           }
         />
