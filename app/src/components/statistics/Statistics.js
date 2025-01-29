@@ -8,7 +8,7 @@ const Statistics = () => {
       <Header />
       <div className="min-h-screen flex flex-col items-center p-6 bg-cover bg-center">
         <div className="flex flex-row justify-between w-full max-w-[90vw] mt-16">
-          <div className="h-[70vh] w-[65vw] rounded-lg bg-white shadow-lg p-4">
+          <div className="h-[70vh] w-[65vw] min-w-[40rem] rounded-lg bg-white shadow-lg p-4">
             Graph et statistiques
           </div>
 
@@ -25,7 +25,7 @@ const Statistics = () => {
               </button>
             </div>
 
-            <div className="h-[40vh] w-[20vw] rounded-lg bg-white shadow-lg p-4">
+            <div className="h-[40vh] w-[20vw] min-w-64 rounded-lg bg-white shadow-lg p-4">
               Graph répartition des heures
             </div>
           </div>
