@@ -12,12 +12,21 @@ const Statistics = () => {
             Graph et statistiques
           </div>
 
-          <div className="flex flex-col justify-between items-left ml-6">
-            <div className="h-[25vh] w-[10vw] rounded-lg bg-white shadow-lg p-4">
-              Légende du graph
+          <div className="flex flex-col justify-between items-left ml-6 relative">
+            <div className="flex flex-row">
+              <div className="h-[25vh] w-1/2 rounded-lg bg-white shadow-lg p-4">
+                Légende du graph
+              </div>
+              <button
+                onClick={() => window.history.back()}
+                className="w-28 h-10 px-2 mx-auto flex items-center justify-around btn-default">
+                Retour
+                <img src="/images/back.svg" className="size-5" alt="Retour" />
+              </button>
             </div>
+
             <div className="h-[40vh] w-[20vw] rounded-lg bg-white shadow-lg p-4">
-              graph répartition des heures
+              Graph répartition des heures
             </div>
           </div>
         </div>
