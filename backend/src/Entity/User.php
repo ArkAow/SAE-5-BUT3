@@ -7,34 +7,24 @@ use App\Entity\Comment;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity] 
 class User
 {
+    public const ROLES = ['superadmin', 'admin', 'extendedviewer', 'restrictedviewer'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 150)]
-    private string $email;
-
-    #[ORM\Column(type: "string", length: 50)]
-    private string $role;
+    #[ORM\Column(type: "string", length: 255)]
+    private string $identifiant;
 
     #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: "users")]
     private Collection $comments;
 
-    #[ORM\Column(type: "boolean")]
-    private bool $is_superadmin;
-
-    #[ORM\Column(type: "boolean")]
-    private bool $is_admin;
-
-    #[ORM\Column(type: "boolean")]
-    private bool $is_extendedviewer;
-    
-    #[ORM\Column(type: "boolean")]
-    private bool $is_restrictedviewer;
+    #[ORM\Column(type: "string", length: 20)]
+    private string $role;
 
     public function __construct()
     {
@@ -46,17 +36,6 @@ class User
         return $this->id;
     }
 
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-        return $this;
-    }
-
     public function getRole(): string
     {
         return $this->role;
@@ -64,7 +43,21 @@ class User
 
     public function setRole(string $role): self
     {
+        if (!in_array($role, self::ROLES, true)) {
+            throw new \InvalidArgumentException("Rôle invalide : " . $role);
+        }
         $this->role = $role;
+        return $this;
+    }
+
+    public function getIdentifiant(): string
+    {
+        return $this->identifiant;
+    }
+
+    public function setIdentifiant(string $identifiant): self
+    {
+        $this->identifiant = $identifiant;
         return $this;
     }
 
@@ -88,47 +81,5 @@ class User
         return $this;
     }
 
-    public function getIsSuperadmin(): bool
-    {
-        return $this->is_superadmin;
-    }
 
-    public function setIsSuperadmin(bool $is_superadmin): self
-    {
-        $this->is_superadmin = $is_superadmin;
-        return $this;
-    }
-
-    public function getIsAdmin(): bool
-    {
-        return $this->is_admin;
-    }
-
-    public function setIsAdmin(bool $is_admin): self
-    {
-        $this->is_admin = $is_admin;
-        return $this;
-    }
-
-    public function getIsExtendedviewer(): bool
-    {
-        return $this->is_extendedviewer;
-    }
-
-    public function setIsExtendedviewer(bool $is_extendedviewer): self
-    {
-        $this->is_extendedviewer = $is_extendedviewer;
-        return $this;
-    }
-
-    public function getIsRestrictedviewer(): bool
-    {
-        return $this->is_restrictedviewer;
-    }
-
-    public function setIsRestrictedviewer(bool $is_restrictedviewer): self
-    {
-        $this->is_restrictedviewer = $is_restrictedviewer;
-        return $this;
-    }
 }
