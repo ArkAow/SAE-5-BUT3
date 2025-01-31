@@ -3,6 +3,9 @@
 const routes = {
   dev: {
     default: "http://localhost:8600/",
+    curriculums : {
+      getCurriculums: () => `${routes.dev.default}curriculums`,
+    },
     groups: {
       getGroups: (classID) => `${routes.dev.default}groups/${classID}`,
       getSubGroups: (groupId) => `${routes.dev.default}groups/${groupId}/half_group`,

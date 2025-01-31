@@ -28,7 +28,6 @@ const ModifyGroups = () => {
       </div>
 
       <div className="min-h-screen flex flex-col justify-center items-center px-8">
-        
         <div className="flex justify-around w-full mx-10 mt-40">
           
           {/* Niveaux de formation */}

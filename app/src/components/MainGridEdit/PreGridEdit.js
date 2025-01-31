@@ -1,37 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Header from "../header/header";
 import { useNavigate } from "react-router-dom";
-
-// Hook pour récupérer les cursus
-const useFetchCurriculums = (url) => {
-  const [curriculums, setCurriculums] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCurriculums = async () => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Erreur lors du chargement des curriculums");
-        }
-        const data = await response.json();
-        setCurriculums(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCurriculums();
-  }, [url]);
-
-  return { curriculums, error, loading };
-};
+import useCurriculums from "../../hooks/useCurriculums";
+import routes from "../../Routes/routes";
 
 const PreGridEdit = () => {
-  const { curriculums, error, loading } = useFetchCurriculums("http://localhost:8600/curriculums");
+  const { curriculums, error, loading } = useCurriculums(routes.dev.curriculums.getCurriculums());
   const [selectedCurriculum, setSelectedCurriculum] = useState(null);
   const navigate = useNavigate();
 
