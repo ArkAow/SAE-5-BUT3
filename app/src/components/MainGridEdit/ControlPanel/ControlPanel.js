@@ -11,11 +11,15 @@ const ControlPanel = ({
   curriculum,
   selectedSemester,
   setToast,
-  groups,
   teachers,
+
+  groups,
   groupList,
-  setGroups,
-  fetchGroups,
+  addGroups,
+  addSubGroups,
+  deleteGroups,
+  deleteHalfGroups,
+
   courseTypes,
   setCourseTypes,
   updateCoursesForRemovedType,
@@ -98,12 +102,13 @@ const ControlPanel = ({
           updateCoursesForRemovedType={updateCoursesForRemovedType}/>
 
         <GroupButton 
-          isNoGroups={isNoGroups}
           curriculum={curriculum}
-          setToast={setToast}
           groups={groups}
-          setGroups={setGroups}
-          fetchGroups={fetchGroups}/>
+          isNoGroups={isNoGroups}
+          addGroups={addGroups}
+          addSubGroups={addSubGroups}
+          deleteGroups={deleteGroups}
+          deleteHalfGroups={deleteHalfGroups}/>
 
         <PrintButton />
 

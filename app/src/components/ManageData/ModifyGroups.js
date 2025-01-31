@@ -7,7 +7,7 @@ const ModifyGroups = () => {
   const navigate = useNavigate();
   const goToHomePage = () => navigate("/homePage");
   const goToManageData = () => navigate("/ManageData");
-  const { groups, isGroupLoading, getGroupList } = useGroups(curriculum);
+  const { groups, isGroupLoading, getGroupList } = useGroups();
 
   return (
     <>

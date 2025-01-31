@@ -8,10 +8,13 @@ import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
 import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../../services/courseService.js";
 import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
+import useGroups from "../../hooks/useGroups.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
+
+  const { groups, setGroups, fetchGroups, addGroups, deleteGroups, deleteHalfGroups, addSubGroups, isGroupLoading, getGroupList } = useGroups(curriculum, setToast);
 
   const [items, setItems] = useState({});
   const [modifiedCourses, setModifiedCourses] = useState([])
@@ -20,7 +23,6 @@ const MainGrid = ({ curriculum }) => {
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState({});
   const [availableSubjects, setAvailableSubjects] = useState([]);
-  const [groups, setGroups] = useState([]);
   const [teachers, setTeachers] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
@@ -31,7 +33,6 @@ const MainGrid = ({ curriculum }) => {
 
   const [isSaving, setSaving] = useState(false);
   const [isLoading, setLoading] = useState(true);
-  const [isGroupLoading, setIsGroupLoading] = useState(true);
   const [isSemesterLoading, setIsSemesterLoading] = useState(true);
   const [isSubjectLoading, setIsSubjectLoading] = useState(true);
   const [isCourseTypeLoading, setIsCourseTypeLoading] = useState(true);
@@ -416,36 +417,6 @@ const MainGrid = ({ curriculum }) => {
     });
   };  
 
-  /* Gestion des GROUPES -------------------------------------------- */
-  const fetchGroups = async () => {
-    try {
-      const classID = curriculum.formationLevels[0].id; //Pour l'instant il n'y a qu'une promo par cursus ( BUT1 -> A1 )
-      const response = await fetch(routes.dev.groups.getGroups(classID));
-      if (!response.ok) {
-        throw new Error("Erreur lors du chargement des groups");
-      }
-      const data = await response.json();
-      setGroups(data);
-    } catch (error) {
-      console.error(error);
-    }
-    finally {
-      setIsGroupLoading(false);
-    }
-  };
-  
-  useEffect(() => {
-    fetchGroups();
-  }, []);
-
-  const getGroupList = () => {
-    const mainGroups = groups.map((group) => group.name);
-    const subGroups = groups.flatMap((group) => 
-      (group.subGroups || []).map((subGroup) => subGroup.name)
-    );
-    return ["Tous", ...mainGroups, ...subGroups];
-  };
-
   const groupList = getGroupList();
 
   return (
@@ -504,10 +475,15 @@ const MainGrid = ({ curriculum }) => {
                 curriculum={curriculum}
                 selectedSemester={selectedSemester}
                 setToast={setToast}
-                groups={groups}
                 teachers={teachers}
+
+                groups={groups}
                 groupList={groupList}
-                setGroups={setGroups}
+                addGroups={addGroups}
+                addSubGroups={addSubGroups}
+                deleteGroups={deleteGroups}
+                deleteHalfGroups={deleteHalfGroups}
+
                 fetchGroups={fetchGroups}
                 courseTypes={courseTypes}
                 setCourseTypes={setCourseTypes}
