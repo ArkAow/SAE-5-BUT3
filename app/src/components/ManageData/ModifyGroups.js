@@ -2,12 +2,14 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
 import useGroups from "../../hooks/useGroups.js";
+import useCurriculums from "../../hooks/useCurriculums";
 
 const ModifyGroups = () => {
   const navigate = useNavigate();
   const goToHomePage = () => navigate("/homePage");
   const goToManageData = () => navigate("/ManageData");
   const { groups, isGroupLoading, getGroupList } = useGroups();
+  const { curriculums, error, loading } = useCurriculums();
 
   return (
     <>

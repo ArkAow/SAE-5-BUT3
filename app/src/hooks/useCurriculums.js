@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import routes from "../Routes/routes";
 
-const useCurriculums = (url) => {
+const useCurriculums = () => {
     const [curriculums, setCurriculums] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -8,7 +9,7 @@ const useCurriculums = (url) => {
     useEffect(() => {
       const fetchCurriculums = async () => {
         try {
-          const response = await fetch(url);
+          const response = await fetch(routes.dev.curriculums.getCurriculums());
           if (!response.ok) {
             throw new Error("Erreur lors du chargement des curriculums");
           }
@@ -22,7 +23,7 @@ const useCurriculums = (url) => {
       };
   
       fetchCurriculums();
-    }, [url]);
+    }, []);
   
     return { curriculums, error, loading };
   };

@@ -2,10 +2,9 @@ import React, { useState } from "react";
 import Header from "../header/header";
 import { useNavigate } from "react-router-dom";
 import useCurriculums from "../../hooks/useCurriculums";
-import routes from "../../Routes/routes";
 
 const PreGridEdit = () => {
-  const { curriculums, error, loading } = useCurriculums(routes.dev.curriculums.getCurriculums());
+  const { curriculums, error, loading } = useCurriculums();
   const [selectedCurriculum, setSelectedCurriculum] = useState(null);
   const navigate = useNavigate();
 
