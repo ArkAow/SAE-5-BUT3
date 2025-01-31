@@ -72,7 +72,7 @@ const ManageData = () => {
                         </div>
                     </div>
                     <p className="text-white text-xl text-center pb-6">
-                        Modifier les enseignants
+                        Modifier les groupes d’étudiants
                     </p>
                 </div>
             </div>            
