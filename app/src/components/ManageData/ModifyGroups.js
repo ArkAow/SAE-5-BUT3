@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
 import useGroups from "../../hooks/useGroups.js";
@@ -8,8 +8,9 @@ const ModifyGroups = () => {
   const navigate = useNavigate();
   const goToHomePage = () => navigate("/homePage");
   const goToManageData = () => navigate("/ManageData");
-  const { groups, isGroupLoading, getGroupList } = useGroups();
   const { curriculums, error, loading } = useCurriculums();
+  const [selectedCurriculum, setSelectedCurriculum] = useState(null);
+  const { groups, isGroupLoading, getGroupList } = useGroups(selectedCurriculum);
 
   return (
     <>
@@ -38,7 +39,25 @@ const ModifyGroups = () => {
               Niveaux de formation
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
-              {/*éléments ici*/}
+              {loading ? (
+                <p className="text-white text-center">Chargement...</p>
+              ) : error ? (
+                <p className="text-red-500 text-center">Erreur : {error}</p>
+              ) : (
+                curriculums.map((curriculum) => (
+                  <div
+                    key={curriculum.id}
+                    onClick={() => setSelectedCurriculum(curriculum)}
+                    className={`p-2 cursor-pointer rounded-lg ${
+                      selectedCurriculum?.id === curriculum.id
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {curriculum.name}
+                  </div>
+                ))
+              )}
             </div>
             <button className="mt-4 w-full p-2 btn-default justify-between">
               Ajouter

@@ -14,7 +14,7 @@ const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
-  const { groups, setGroups, fetchGroups, addGroups, deleteGroups, deleteHalfGroups, addSubGroups, isGroupLoading, getGroupList } = useGroups(curriculum, setToast);
+  const { groups, fetchGroups, addGroups, deleteGroups, deleteHalfGroups, addSubGroups, isGroupLoading, getGroupList } = useGroups(curriculum, setToast);
 
   const [items, setItems] = useState({});
   const [modifiedCourses, setModifiedCourses] = useState([])

@@ -7,18 +7,20 @@ const useGroups = (curriculum, setToast) => {
 
   const fetchGroups = async () => {
     try {
-      const classID = curriculum?.formationLevels?.[0]?.id;
-      if (!classID) throw new Error("Aucun classID trouvé");
+        console.log(`Chargement des groupes...`);
+        const formation_levelID = curriculum?.formationLevels?.[0]?.id;
+        if (!formation_levelID) throw new Error("Aucun formation_levelID trouvé");
 
-      const response = await fetch(routes.dev.groups.getGroups(classID));
-      if (!response.ok) throw new Error("Erreur lors du chargement des groupes");
+        const response = await fetch(routes.dev.groups.getGroups(formation_levelID));
+        if (!response.ok) throw new Error("Erreur lors du chargement des groupes");
 
-      const data = await response.json();
-      setGroups(data);
+        const data = await response.json();
+        setGroups(data);
     } catch (error) {
-      console.error(error);
+        console.error(error);
     } finally {
-      setIsGroupLoading(false);
+        setIsGroupLoading(false);
+        console.log(`Chargement des groupes réussi`);
     }
   };
 
