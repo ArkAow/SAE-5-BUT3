@@ -16,7 +16,7 @@ class Department
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", name: "expected_duration", nullable: true)]
+    #[ORM\Column(type: "string", name: "name", nullable: true)]
     private string $name;
     
     #[ORM\ManyToMany(targetEntity: FormationLevel::class)]

@@ -95,14 +95,15 @@ class User
     {
         if (!$this->departments->contains($department)) {
             $this->departments[] = $department;
-            $department->addUser($this);
         }
+
         return $this;
     }
 
     public function removeDepartment(Department $department): self
     {
         $this->departments->removeElement($department);
+
         return $this;
     }
 }
