@@ -26,9 +26,14 @@ class User
     #[ORM\Column(type: "string", length: 20)]
     private string $role;
 
+    #[ORM\ManyToMany(targetEntity: Department::class, inversedBy: "users")]
+    #[ORM\JoinTable(name: "user_department")]
+    private Collection $departments;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
 
     public function getId(): int
@@ -81,5 +86,23 @@ class User
         return $this;
     }
 
+    public function getDepartments(): Collection
+    {
+        return $this->departments;
+    }
 
+    public function addDepartment(Department $department): self
+    {
+        if (!$this->departments->contains($department)) {
+            $this->departments[] = $department;
+            $department->addUser($this);
+        }
+        return $this;
+    }
+
+    public function removeDepartment(Department $department): self
+    {
+        $this->departments->removeElement($department);
+        return $this;
+    }
 }
