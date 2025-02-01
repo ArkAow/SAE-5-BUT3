@@ -94,7 +94,7 @@ class UserController extends AbstractController
 
         if (!$user)
         {
-            return new JsonResponse(['error' => "L\'utilisateur n\'existe pas ou n\' pas été trouvé"], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => "L'utilisateur n'existe pas ou n'a pas été trouvé"], Response::HTTP_NOT_FOUND);
         }
 
         $departmentRepository = $entityManager->getRepository(Department::class);
@@ -102,18 +102,18 @@ class UserController extends AbstractController
 
         if (!$department)
         {
-            return new JsonResponse(['error' => "Le département n\'existe pas ou n\' pas été trouvé"], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => "Le département n'existe pas ou n'a pas été trouvé"], Response::HTTP_NOT_FOUND);
         }
 
         if ($user->getDepartments()->contains($department))
         {
-            return new JsonResponse(['error' => "Le département est déjà associé à l\'utilisateur"], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => "Le département est déjà associé à l'utilisateur"], Response::HTTP_BAD_REQUEST);
         }
 
         $user->addDepartment($department);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => "Département ajouté à l\'utilisateur avec succès"], Response::HTTP_OK);
+        return new JsonResponse(['message' => "Département ajouté à l'utilisateur avec succès"], Response::HTTP_OK);
     }
 
     #[Route("user/{id}/department/{departmentId}", name:"modify_department_from_user", methods:['PUT'])]
