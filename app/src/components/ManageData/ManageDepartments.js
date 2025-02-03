@@ -39,9 +39,14 @@ const ManageDepartments = () => {
       </div>
 
       <div className="flex flex-col min-h-screen">
-
+        <div className="flex justify-center w-full mt-40">
+          <div className="w-full mx-10 h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg flex flex-col">
+              <h2 className="text-white text-center text-lg font-bold mb-4">
+                Départements
+              </h2>
+          </div>
+        </div>
       </div>
-
     </>
   );
 };
