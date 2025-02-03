@@ -1,0 +1,8 @@
+0f0fce,127.0.0.1,GET,http://127.0.0.1:8000/?vscodeBrowserReqId=1732028544282,1732028544,,404,request
+b27440,127.0.0.1,GET,http://localhost:8000/api/authenticate?name=pignol8,1732028606,8461df,404,request
+8461df,127.0.0.1,POST,http://localhost:8000/api/authenticate?name=pignol8,1732028606,,404,request
+c3b571,127.0.0.1,GET,http://localhost:8000/,1732028621,,404,request
+8d101d,127.0.0.1,GET,http://localhost:8000/api,1732028626,c31d17,404,request
+c31d17,127.0.0.1,GET,http://localhost:8000/api,1732028626,,404,request
+da51cd,127.0.0.1,GET,http://localhost:8000/api/authenticate,1732028635,8bb1ac,404,request
+8bb1ac,127.0.0.1,GET,http://localhost:8000/api/authenticate,1732028635,,404,request

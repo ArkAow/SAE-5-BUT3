@@ -87,7 +87,7 @@ class Course
         $this->halfGroups = new ArrayCollection();
         $this->formationLevels = new ArrayCollection();
         $this->comments = new ArrayCollection();
-        $this->expectedDuration = new ArrayCollection();
+        $this->expectedDurations = new ArrayCollection();
     }
 
     public function getId(): int
