@@ -12,12 +12,17 @@ use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection\StaticServerVersionProvider;
 use Doctrine\DBAL\Driver\API\ExceptionConverter;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
+use Doctrine\DBAL\Driver\Exception as TheDriverException;
 use Doctrine\DBAL\Driver\Statement as DriverStatement;
 use Doctrine\DBAL\Exception\CommitFailedRollbackOnly;
 use Doctrine\DBAL\Exception\ConnectionLost;
+use Doctrine\DBAL\Exception\DeadlockException;
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\NoActiveTransaction;
 use Doctrine\DBAL\Exception\SavepointsNotSupported;
+use Doctrine\DBAL\Exception\TransactionRolledBack;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -47,10 +52,13 @@ use function sprintf;
  * A database abstraction-level connection that implements features like transaction isolation levels,
  * configuration, emulated transaction nesting, lazy connecting and more.
  *
- * @psalm-import-type Params from DriverManager
- * @psalm-type WrapperParameterType = string|Type|ParameterType|ArrayParameterType
- * @psalm-type WrapperParameterTypeArray = array<int<0, max>, WrapperParameterType>|array<string, WrapperParameterType>
- * @psalm-consistent-constructor
+ * @phpstan-import-type Params from DriverManager
+ * @phpstan-type WrapperParameterType = string|Type|ParameterType|ArrayParameterType
+ * @phpstan-type WrapperParameterTypeArray = array<
+ *    int<0, max>,
+ *    WrapperParameterType>|array<string, WrapperParameterType
+ *  >
+ * @phpstan-consistent-constructor
  */
 class Connection implements ServerVersionProvider
 {
@@ -80,7 +88,7 @@ class Connection implements ServerVersionProvider
      * The parameters used during creation of the Connection instance.
      *
      * @var array<string,mixed>
-     * @psalm-var Params
+     * @phpstan-var Params
      */
     private array $params;
 
@@ -107,7 +115,7 @@ class Connection implements ServerVersionProvider
      * @param array<string, mixed> $params The connection parameters.
      * @param Driver               $driver The driver to use.
      * @param Configuration|null   $config The configuration, optional.
-     * @psalm-param Params $params
+     * @phpstan-param Params $params
      */
     public function __construct(
         #[SensitiveParameter]
@@ -129,7 +137,7 @@ class Connection implements ServerVersionProvider
      * @internal
      *
      * @return array<string,mixed>
-     * @psalm-return Params
+     * @phpstan-return Params
      */
     public function getParams(): array
     {
@@ -285,7 +293,7 @@ class Connection implements ServerVersionProvider
      * as an associative array.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return array<string, mixed>|false False is returned if no rows are found.
      *
@@ -301,7 +309,7 @@ class Connection implements ServerVersionProvider
      * as a numerically indexed array.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return list<mixed>|false False is returned if no rows are found.
      *
@@ -317,7 +325,7 @@ class Connection implements ServerVersionProvider
      * of the first row of the result.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return mixed|false False is returned if no rows are found.
      *
@@ -331,7 +339,7 @@ class Connection implements ServerVersionProvider
     /**
      * Whether an actual connection to the database is established.
      *
-     * @psalm-assert-if-true !null $this->_conn
+     * @phpstan-assert-if-true !null $this->_conn
      */
     public function isConnected(): bool
     {
@@ -566,7 +574,7 @@ class Connection implements ServerVersionProvider
      * Prepares and executes an SQL query and returns the result as an array of numeric arrays.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return list<list<mixed>>
      *
@@ -581,7 +589,7 @@ class Connection implements ServerVersionProvider
      * Prepares and executes an SQL query and returns the result as an array of associative arrays.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return list<array<string,mixed>>
      *
@@ -597,7 +605,7 @@ class Connection implements ServerVersionProvider
      * mapped to the first column and the values mapped to the second column.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return array<mixed,mixed>
      *
@@ -614,7 +622,7 @@ class Connection implements ServerVersionProvider
      * and their values.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return array<mixed,array<string,mixed>>
      *
@@ -629,7 +637,7 @@ class Connection implements ServerVersionProvider
      * Prepares and executes an SQL query and returns the result as an array of the first column values.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return list<mixed>
      *
@@ -644,7 +652,7 @@ class Connection implements ServerVersionProvider
      * Prepares and executes an SQL query and returns the result as an iterator over rows represented as numeric arrays.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return Traversable<int,list<mixed>>
      *
@@ -660,7 +668,7 @@ class Connection implements ServerVersionProvider
      * as associative arrays.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return Traversable<int,array<string,mixed>>
      *
@@ -676,7 +684,7 @@ class Connection implements ServerVersionProvider
      * mapped to the first column and the values mapped to the second column.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return Traversable<mixed,mixed>
      *
@@ -693,7 +701,7 @@ class Connection implements ServerVersionProvider
      * and their values.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return Traversable<mixed,array<string,mixed>>
      *
@@ -708,7 +716,7 @@ class Connection implements ServerVersionProvider
      * Prepares and executes an SQL query and returns the result as an iterator over the first column values.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return Traversable<int,mixed>
      *
@@ -745,7 +753,7 @@ class Connection implements ServerVersionProvider
      * If the query is parametrized, a prepared statement is used.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @throws Exception
      */
@@ -784,7 +792,7 @@ class Connection implements ServerVersionProvider
      * Executes a caching query.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @throws CacheException
      * @throws Exception
@@ -811,7 +819,7 @@ class Connection implements ServerVersionProvider
             }
 
             if (isset($value[$realKey]) && $value[$realKey] instanceof ArrayResult) {
-                return new Result($value[$realKey], $this);
+                return new Result(clone $value[$realKey], $this);
             }
         } else {
             $value = [];
@@ -837,7 +845,7 @@ class Connection implements ServerVersionProvider
 
         $resultCache->save($item);
 
-        return new Result($value[$realKey], $this);
+        return new Result(clone $value[$realKey], $this);
     }
 
     /**
@@ -853,7 +861,7 @@ class Connection implements ServerVersionProvider
      * This method supports PDO binding types as well as DBAL mapping types.
      *
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return int|numeric-string
      *
@@ -926,16 +934,40 @@ class Connection implements ServerVersionProvider
     public function transactional(Closure $func): mixed
     {
         $this->beginTransaction();
+
+        $successful = false;
+
         try {
             $res = $func($this);
+
+            $successful = true;
+        } finally {
+            if (! $successful) {
+                $this->rollBack();
+            }
+        }
+
+        $shouldRollback = true;
+        try {
             $this->commit();
 
-            return $res;
-        } catch (Throwable $e) {
-            $this->rollBack();
+            $shouldRollback = false;
+        } catch (TheDriverException $t) {
+            $shouldRollback = ! (
+                $t instanceof TransactionRolledBack
+                || $t instanceof UniqueConstraintViolationException
+                || $t instanceof ForeignKeyConstraintViolationException
+                || $t instanceof DeadlockException
+            );
 
-            throw $e;
+            throw $t;
+        } finally {
+            if ($shouldRollback) {
+                $this->rollBack();
+            }
         }
+
+        return $res;
     }
 
     /**
@@ -1014,17 +1046,26 @@ class Connection implements ServerVersionProvider
 
         $connection = $this->connect();
 
-        if ($this->transactionNestingLevel === 1) {
-            try {
-                $connection->commit();
-            } catch (Driver\Exception $e) {
-                throw $this->convertException($e);
+        try {
+            if ($this->transactionNestingLevel === 1) {
+                try {
+                    $connection->commit();
+                } catch (Driver\Exception $e) {
+                    throw $this->convertException($e);
+                }
+            } else {
+                $this->releaseSavepoint($this->_getNestedTransactionSavePointName());
             }
-        } else {
-            $this->releaseSavepoint($this->_getNestedTransactionSavePointName());
+        } finally {
+            $this->updateTransactionStateAfterCommit();
         }
+    }
 
-        --$this->transactionNestingLevel;
+    private function updateTransactionStateAfterCommit(): void
+    {
+        if ($this->transactionNestingLevel !== 0) {
+            --$this->transactionNestingLevel;
+        }
 
         if ($this->autoCommit !== false || $this->transactionNestingLevel !== 0) {
             return;
@@ -1304,7 +1345,7 @@ class Connection implements ServerVersionProvider
      * @internal
      *
      * @param list<mixed>|array<string,mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      */
     final public function convertExceptionDuringQuery(
         Driver\Exception $e,
@@ -1323,7 +1364,7 @@ class Connection implements ServerVersionProvider
 
     /**
      * @param list<mixed>|array<string, mixed> $params
-     * @psalm-param WrapperParameterTypeArray $types
+     * @phpstan-param WrapperParameterTypeArray $types
      *
      * @return array{
      *     string,

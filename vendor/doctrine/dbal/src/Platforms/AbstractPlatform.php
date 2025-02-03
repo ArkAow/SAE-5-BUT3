@@ -52,6 +52,7 @@ use function is_bool;
 use function is_float;
 use function is_int;
 use function is_string;
+use function key;
 use function max;
 use function mb_strlen;
 use function preg_quote;
@@ -209,7 +210,11 @@ abstract class AbstractPlatform
             throw ColumnValuesRequired::new($this, 'ENUM');
         }
 
-        return $this->getStringTypeDeclarationSQL(['length' => max(...array_map(mb_strlen(...), $column['values']))]);
+        $length = count($column['values']) > 1
+            ? max(...array_map(mb_strlen(...), $column['values']))
+            : mb_strlen($column['values'][key($column['values'])]);
+
+        return $this->getStringTypeDeclarationSQL(['length' => $length]);
     }
 
     /**
@@ -824,7 +829,7 @@ abstract class AbstractPlatform
 
         foreach ($table->getIndexes() as $index) {
             if (! $index->isPrimary()) {
-                $options['indexes'][$index->getQuotedName($this)] = $index;
+                $options['indexes'][] = $index;
 
                 continue;
             }
@@ -834,7 +839,7 @@ abstract class AbstractPlatform
         }
 
         foreach ($table->getUniqueConstraints() as $uniqueConstraint) {
-            $options['uniqueConstraints'][$uniqueConstraint->getQuotedName($this)] = $uniqueConstraint;
+            $options['uniqueConstraints'][] = $uniqueConstraint;
         }
 
         if ($createForeignKeys) {
@@ -1165,8 +1170,13 @@ abstract class AbstractPlatform
      */
     public function getCreateUniqueConstraintSQL(UniqueConstraint $constraint, string $tableName): string
     {
-        return 'ALTER TABLE ' . $tableName . ' ADD CONSTRAINT ' . $constraint->getQuotedName($this) . ' UNIQUE'
-            . ' (' . implode(', ', $constraint->getQuotedColumns($this)) . ')';
+        $sql = 'ALTER TABLE ' . $tableName . ' ADD';
+
+        if ($constraint->getName() !== '') {
+            $sql .= ' CONSTRAINT ' . $constraint->getQuotedName($this);
+        }
+
+        return $sql . ' UNIQUE (' . implode(', ', $constraint->getQuotedColumns($this)) . ')';
     }
 
     /**
@@ -1541,9 +1551,10 @@ abstract class AbstractPlatform
             throw new InvalidArgumentException('Incomplete definition. "columns" required.');
         }
 
-        $chunks = ['CONSTRAINT'];
+        $chunks = [];
 
         if ($constraint->getName() !== '') {
+            $chunks[] = 'CONSTRAINT';
             $chunks[] = $constraint->getQuotedName($this);
         }
 
