@@ -16,7 +16,7 @@ class Department
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: "string", name: "expected_duration", nullable: true)]
+    #[ORM\Column(type: "string", name: "name", nullable: true)]
     private string $name;
     
     #[ORM\ManyToMany(targetEntity: FormationLevel::class)]
@@ -31,11 +31,16 @@ class Department
     #[ORM\JoinTable(name: "department_curriculum")]
     private Collection $curriculums;
 
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: "user_department")]
+    private Collection $users;
+
     public function __construct()
     {
         $this->formationLevels = new ArrayCollection();
         $this->teachers = new ArrayCollection();
         $this->curriculums = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -115,6 +120,26 @@ class Department
     {
         $this->curriculums->removeElement($curriculum);
 
+        return $this;
+    }
+
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user))
+        {
+            $this->users[] = $user;
+        }
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        $this->users->removeElement($user);
         return $this;
     }
 }

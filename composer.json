@@ -1,5 +1,6 @@
 {
     "require": {
-        "doctrine/orm": "^3.3"
+        "doctrine/orm": "^3.3",
+        "nelmio/cors-bundle": "^2.5"
     }
 }
