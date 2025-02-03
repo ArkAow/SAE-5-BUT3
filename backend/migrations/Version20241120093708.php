@@ -247,7 +247,7 @@ final class Version20241120093708 extends AbstractMigration
 
         $user = $schema->createTable('user');
         $user->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
-        $user->addColumn('identifiant', 'string', ['length' => 150]);
+        $user->addColumn('email', 'string', ['length' => 150]);
         $user->addColumn('role', 'string', ['length' => 20]);
         $user->addOption('CHECK', "role IN ('superadmin', 'admin', 'extendedviewer', 'restrictedviewer')");        
         $user->setPrimaryKey(['id']);
