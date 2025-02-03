@@ -45,16 +45,30 @@ const ManageDepartments = () => {
                 Départements
               </h2>
               <ul className="space-y-4">
-                <li className="flex justify-around items-center bg-white rounded-lg p-2">
-                  {/* Texte centré avec le reste de l'espace */}
-                  <div className="text-base text-black w-full flex flex-row justify-between ml-2 mr-12">
-                    <span className="font-semibold"> Département Informatique de Limoges </span>
-                    <span> x cursus associés </span>
-                    <span> x membres </span>
+                <li className="flex items-center bg-white rounded-lg p-2">
+                  <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
+                    <span className="w-1/3 text-left font-semibold"> Département Informatique de Limoges </span>
+                    <span className="w-1/3 text-left"> x cursus associés </span>
+                    <span className="w-1/3 text-left"> x membres </span>
                   </div>
-                  {/* Boutons alignés à droite */}
                   <div className="flex space-x-2">
-                    <button className="size-6 lex justify-center items-center">
+                    <button className="size-6 flex justify-center items-center">
+                      <img src="images/pen.svg" alt="Modifier" className="size-6" />
+                    </button>
+                    <button className="size-6 flex justify-center items-center">
+                      <img src="images/trash.svg" alt="Fermer" className="size-6" />
+                    </button>
+                  </div>
+                </li>
+
+                <li className="flex items-center bg-white rounded-lg p-2">
+                  <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
+                    <span className="w-1/3 text-left font-semibold"> Département GEA de Limoges </span>
+                    <span className="w-1/3 text-left"> x cursus associés </span>
+                    <span className="w-1/3 text-left"> x membres </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button className="size-6 flex justify-center items-center">
                       <img src="images/pen.svg" alt="Modifier" className="size-6" />
                     </button>
                     <button className="size-6 flex justify-center items-center">
@@ -63,6 +77,10 @@ const ManageDepartments = () => {
                   </div>
                 </li>
               </ul>
+
+              <button className="w-[35%] h-7 btn-default py-3 rounded-full flex justify-center items-center space-x-4 px-10 mt-4 mx-auto">
+                <span>Ajouter</span>
+              </button>
           </div>
         </div>
       </div>

@@ -31,6 +31,11 @@ const routes = {
       delete: () => `${routes.dev.default}teacher/delete`,
       update: () => `${routes.dev.default}teacher/update`,
     },
+    departments: {
+      add: () => `${routes.dev.default}department/add`,
+      get: () => `${routes.dev.default}department`,
+      update: () => `${routes.dev.default}department/update`,
+    },
     courses: {
       getAll: () => `${routes.dev.default}courses`,
       getBySubject: (id) => `${routes.dev.default}subject/${id}/courses`,
@@ -41,7 +46,6 @@ const routes = {
   },
   insertM3C: "http://localhost:8600/insertM3C",
   insertData: "http://localhost:8600/insert-data",
-
 };
 
 export default routes;
