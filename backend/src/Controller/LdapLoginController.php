@@ -6,6 +6,9 @@ use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+USE Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\User;
 
 class LdapLoginController extends AbstractController
 {

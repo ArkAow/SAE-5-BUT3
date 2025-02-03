@@ -7,26 +7,33 @@ use App\Entity\Comment;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity] 
 class User
 {
+    public const ROLES = ['superadmin', 'admin', 'extendedviewer', 'restrictedviewer'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 150)]
-    private string $email;
-
-    #[ORM\Column(type: "string", length: 150)]
-    private string $password;
+    #[ORM\Column(type: "string", length: 255)]
+    private string $identifiant;
 
     #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: "users")]
     private Collection $comments;
 
+    #[ORM\Column(type: "string", length: 20)]
+    private string $role;
+
+    #[ORM\ManyToMany(targetEntity: Department::class, inversedBy: "users")]
+    #[ORM\JoinTable(name: "user_department")]
+    private Collection $departments;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
 
     public function getId(): int
@@ -34,25 +41,28 @@ class User
         return $this->id;
     }
 
-    public function getEmail(): string
+    public function getRole(): string
     {
-        return $this->email;
+        return $this->role;
     }
 
-    public function setEmail(string $email): self
+    public function setRole(string $role): self
     {
-        $this->email = $email;
+        if (!in_array($role, self::ROLES, true)) {
+            throw new \InvalidArgumentException("Rôle invalide : " . $role);
+        }
+        $this->role = $role;
         return $this;
     }
 
-    public function getPassword(): string
+    public function getIdentifiant(): string
     {
-        return $this->password;
+        return $this->identifiant;
     }
 
-    public function setPassword(string $password): self
+    public function setIdentifiant(string $identifiant): self
     {
-        $this->password = $password;
+        $this->identifiant = $identifiant;
         return $this;
     }
 
@@ -73,6 +83,27 @@ class User
     public function removeComment(Comment $comment): self
     {
         $this->comments->removeElement($comment);
+        return $this;
+    }
+
+    public function getDepartments(): Collection
+    {
+        return $this->departments;
+    }
+
+    public function addDepartment(Department $department): self
+    {
+        if (!$this->departments->contains($department)) {
+            $this->departments[] = $department;
+        }
+
+        return $this;
+    }
+
+    public function removeDepartment(Department $department): self
+    {
+        $this->departments->removeElement($department);
+
         return $this;
     }
 }
