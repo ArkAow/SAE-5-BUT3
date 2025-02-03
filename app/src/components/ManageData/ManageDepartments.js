@@ -44,6 +44,25 @@ const ManageDepartments = () => {
               <h2 className="text-white text-center text-lg font-bold mb-4">
                 Départements
               </h2>
+              <ul className="space-y-4">
+                <li className="flex justify-around items-center bg-white rounded-lg p-2">
+                  {/* Texte centré avec le reste de l'espace */}
+                  <div className="text-base text-black w-full flex flex-row justify-between ml-2 mr-12">
+                    <span className="font-semibold"> Département Informatique de Limoges </span>
+                    <span> x cursus associés </span>
+                    <span> x membres </span>
+                  </div>
+                  {/* Boutons alignés à droite */}
+                  <div className="flex space-x-2">
+                    <button className="size-6 lex justify-center items-center">
+                      <img src="images/pen.svg" alt="Modifier" className="size-6" />
+                    </button>
+                    <button className="size-6 flex justify-center items-center">
+                      <img src="images/trash.svg" alt="Fermer" className="size-6" />
+                    </button>
+                  </div>
+                </li>
+              </ul>
           </div>
         </div>
       </div>
