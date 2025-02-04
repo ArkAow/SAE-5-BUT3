@@ -5,10 +5,14 @@ import useDepartments from "../../hooks/useDepartments.js";
 import useCurriculums from "../../hooks/useCurriculums.js";
 import DepartmentAddingForm from "../forms/DepartmentAddingForm.js";
 import DepartmentUpdatingForm from "../forms/DepartmentUpdatingingForm.js";
+import Toast from "../Toast/Toast.js";
 
 const ManageDepartments = () => {
+  const [toast, setToast] = useState({ message: "", type: "", visible: false });
+
   const {curriculums, loading: isCurriculumLoading} = useCurriculums();
-  const {departments, loading: isDepartmentLoading, addDepartment, updateDepartment, deleteDepartment} = useDepartments();
+  const {departments, loading: isDepartmentLoading, addDepartment, updateDepartment, deleteDepartment} = useDepartments(setToast);
+
   const [addingDepartment, setAddingDepartment] = useState(false);
   const [updatingDepartment, setUpdatingDepartment] = useState(false);
   const [updatedDepartment, setUpdatedDepartment] = useState(null);
@@ -130,6 +134,13 @@ const ManageDepartments = () => {
           )}
         </div>
       </div>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, visible: false })}
+        />
+      )}
     </>
   );
 };

@@ -95,7 +95,7 @@ const DepartmentAddingForm = ({addDepartment, curriculums, setAddingDepartment, 
             {error && <p className="text-red-500">{error}</p>}
             <div className="flex justify-center space-x-2 w-full">
               <button type="button" onClick={handleCancelAddingDepartment} className="btn-default p-2">
-                  Annuler
+                  Retour
               </button>
               <button type="submit" className="btn-default p-2">
                   Valider

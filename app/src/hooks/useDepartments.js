@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import routes from "../Routes/routes";
 
-const useDepartments = () => {
+const useDepartments = (setToast) => {
   const [departments, setDepartments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchDepartments = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
+      console.log(`Chargement des départements...`);
       const response = await fetch(routes.dev.departments.get());
       if (!response.ok) throw new Error("Erreur lors du chargement des départements");
 
@@ -17,7 +18,8 @@ const useDepartments = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
+      console.log(`Chargement des départements réussi`);
     }
   };
 
@@ -30,8 +32,8 @@ const useDepartments = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Erreur lors de l'ajout du département");
+        const error = await response.json();
+        throw new Error(error.message || "Erreur lors de l'ajout du département");
       }
 
       const newDepartment = await response.json();
@@ -39,15 +41,36 @@ const useDepartments = () => {
 
     } catch (err) {
       setError(err.message);
+      setToast({
+        message: error.message || "Erreur lors de l'ajout du département",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setToast({ message: "Département ajouté avec succès", type: "success", visible: true });
+      fetchDepartments();
     }
   };
 
   const updateDepartment = async (payload) => {
-    await fetch(routes.dev.departments.update(), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      await fetch(routes.dev.departments.update(), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+    } catch (err) {
+      setError(err.message);
+      setToast({
+        message: error.message || "Erreur lors de la modification du département",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setToast({ message: "Département modifié avec succès", type: "success", visible: true });
+      fetchDepartments();
+    }
   };
   
   const deleteDepartment = async (departmentId) => {
@@ -60,7 +83,7 @@ const useDepartments = () => {
     fetchDepartments();
   }, []);
 
-  return { departments, loading, error, fetchDepartments, addDepartment, updateDepartment, deleteDepartment};
+  return { departments, loading: isLoading, error, fetchDepartments, addDepartment, updateDepartment, deleteDepartment};
 };
 
 export default useDepartments;
