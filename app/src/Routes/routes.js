@@ -35,6 +35,7 @@ const routes = {
       add: () => `${routes.dev.default}department/add`,
       get: () => `${routes.dev.default}department`,
       update: () => `${routes.dev.default}department/update`,
+      delete: (id) => `${routes.dev.default}department/delete/${id}`,
     },
     courses: {
       getAll: () => `${routes.dev.default}courses`,

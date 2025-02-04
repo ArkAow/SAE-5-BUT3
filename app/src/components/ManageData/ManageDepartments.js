@@ -3,14 +3,17 @@ import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
 import useDepartments from "../../hooks/useDepartments.js";
 import useCurriculums from "../../hooks/useCurriculums.js";
+import DepartmentAddingForm from "../forms/DepartmentAddingForm.js";
+import DepartmentUpdatingForm from "../forms/DepartmentUpdatingingForm.js";
 
 const ManageDepartments = () => {
-  const {curriculums, error: curriculumError, loading: isCurriculumLoading} = useCurriculums();
-  const {departments, loading: isDepartmentLoading, addDepartment} = useDepartments();
+  const {curriculums, loading: isCurriculumLoading} = useCurriculums();
+  const {departments, loading: isDepartmentLoading, addDepartment, updateDepartment, deleteDepartment} = useDepartments();
   const [addingDepartment, setAddingDepartment] = useState(false);
-  const [departmentCurriculums, setDepartmentCurriculums] = useState([]);
-  const [departmentName, setDepartmentName] = useState("");
-  const [error, setError] = useState("");
+  const [updatingDepartment, setUpdatingDepartment] = useState(false);
+  const [updatedDepartment, setUpdatedDepartment] = useState(null);
+  const [deletingDepartment, setDeletingDepartment] = useState(false);
+  const [deletedDepartment, setDeletedDepartment] = useState(null);
   const navigate = useNavigate();
 
   const goToHomePage = () => {
@@ -25,25 +28,14 @@ const ManageDepartments = () => {
     setAddingDepartment(true);
   }
 
-  const handleCancelAddingDepartment = () => {
-    setDepartmentCurriculums([]);
-    setDepartmentName("");
-    setAddingDepartment(false);
+  const handleClickingUpdateButton = (department) => {
+    setUpdatedDepartment(department);
+    setUpdatingDepartment(true);
   }
 
-  const handleAddCurriculum = (curriculum) => {
-    if (!departmentCurriculums.some((c) => c.id === curriculum.id)) {
-      setDepartmentCurriculums([...departmentCurriculums, curriculum.id]);
-    }
-  };
-
-  const handleAddingDepartment = () => {
-    if (!departmentName.trim()) {
-      setError("Le nom du département est obligatoire.");
-      return;
-    }
-    setError("");
-    addDepartment(departmentName, departmentCurriculums);
+  const handleClickingDeleteButton = (department) => {
+    setDeletedDepartment(department);
+    setDeletingDepartment(true);
   }
 
   return (
@@ -92,15 +84,19 @@ const ManageDepartments = () => {
                         <li className="flex items-center bg-white rounded-lg p-2">
                           <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
                             <span className="w-1/3 text-left font-semibold"> {department.name} </span>
-                            <span className="w-1/3 text-left"> {department.curriculums.length} cursus associés </span>
-                            <span className="w-1/3 text-left"> {department.users.length} membres </span>
+                            <span className="w-1/3 text-left"> {department.curriculums?.length} cursus associés </span>
+                            <span className="w-1/3 text-left"> {department.users?.length} membres </span>
                           </div>
                           <div className="flex space-x-2">
-                            <button className="size-6 flex justify-center items-center">
+                            <button 
+                            className="size-6 flex justify-center items-center"
+                            onClick={() => handleClickingUpdateButton(department)}>
                               <img src="images/pen.svg" alt="Modifier" className="size-6" />
                             </button>
-                            <button className="size-6 flex justify-center items-center">
-                              <img src="images/trash.svg" alt="Fermer" className="size-6" />
+                            <button 
+                            className="size-6 flex justify-center items-center"
+                            onClick={() => handleClickingDeleteButton(department)}>
+                              <img src="images/trash.svg" alt="Supprmer" className="size-6" />
                             </button>
                           </div>
                         </li>
@@ -117,82 +113,20 @@ const ManageDepartments = () => {
           </div>
 
           {addingDepartment && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="tooltip-centered-bigger min-w-[345px] w-1/3">
-                <h2 className="text-2xl font-bold mb-4">Ajouter un département</h2>
-                <form onSubmit={handleAddingDepartment} className="space-y-2">
-                <div>
-                  <label className="block mb-1">Nom du département :</label>
-                  <input
-                    type="text"
-                    value={departmentName}
-                    onChange={(e) => setDepartmentName(e.target.value)}
-                    className="flex w-full items-center bg-gray-200 p-2 rounded-xl"
-                    required/>
-                </div>
-                  {isCurriculumLoading ? (
-                    <div className="flex flex-col items-center justify-center p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
-                      <div className="spinner"></div>
-                      <div className="text-white text-xl font-bold text-center mt-4 max-h-[100px] h-max">
-                        Chargement des cursus...
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      {curriculums.length === 0 ? (
-                        <span className="w-full text-center">Il n'y a pas de cursus</span>
-                      ) : (
-                        <div className="space-y-2">
-                          <label className="block mb-1">Selectionnez les cursus :</label>
-                          <div className="flex flex-wrap gap-2 w-full justify-start">
-                            {curriculums.map((curriculum) => (
-                              <button
-                              key={curriculum.id}
-                              type="button"
-                              className={`px-4 py-2 rounded-md ${
-                                departmentCurriculums.some((c) => c.id === curriculum.id)
-                                  ? "bg-primarytint text-white cursor-not-allowed"
-                                  : "bg-primary text-white hover:bg-primaryshade"
-                              }`}
-                              onClick={() => handleAddCurriculum(curriculum)}
-                              disabled={departmentCurriculums.some((c) => c.id === curriculum.id)}>
-                                {curriculum.name}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
+            <DepartmentAddingForm 
+              addDepartment={addDepartment}
+              setAddingDepartment={setAddingDepartment}
+              curriculums={curriculums}
+              isCurriculumLoading={isCurriculumLoading}/>
+          )}
 
-                  <div className="mt-4">
-                    <p className="font-bold">Cursus sélectionnés :</p>
-                    <ul className="list-disc list-inside">
-                      {departmentCurriculums.length == 0 ? (
-                        <li> Auncun cursus selectionné</li>
-                      ) : (
-                        <>
-                          {departmentCurriculums.map((c) => (
-                            <li key={c.id}>{c.name}</li>
-                          ))}
-                        </>
-                      )}
-                    </ul>
-                  </div>
-
-                  {error && <p className="text-red-500">{error}</p>}
-
-                  <div className="flex justify-center space-x-2 w-full">
-                    <button type="button" onClick={handleCancelAddingDepartment} className="btn-default p-2">
-                      Annuler
-                    </button>
-                    <button type="submit" className="btn-default p-2">
-                      Valider
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
+          {updatingDepartment && (
+            <DepartmentUpdatingForm
+              department={updatedDepartment}
+              updateDepartment={updateDepartment}
+              curriculums={curriculums}
+              setUpdatingDepartment={setUpdatingDepartment}
+              isCurriculumLoading={isCurriculumLoading}/>
           )}
         </div>
       </div>

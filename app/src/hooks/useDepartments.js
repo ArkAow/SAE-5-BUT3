@@ -42,11 +42,25 @@ const useDepartments = () => {
     }
   };
 
+  const updateDepartment = async (payload) => {
+    await fetch(routes.dev.departments.update(), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  };
+  
+  const deleteDepartment = async (departmentId) => {
+    await fetch(routes.dev.departments.delete(departmentId), { 
+      method: "DELETE"
+    });
+  };
+
   useEffect(() => {
     fetchDepartments();
   }, []);
 
-  return { departments, loading, error, fetchDepartments, addDepartment };
+  return { departments, loading, error, fetchDepartments, addDepartment, updateDepartment, deleteDepartment};
 };
 
 export default useDepartments;

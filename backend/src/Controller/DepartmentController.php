@@ -10,34 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Department;
 use App\Entity\Curriculum;
+use App\Repository\DepartmentRepository;
+use App\Repository\CurriculumRepository;
 
 class DepartmentController extends AbstractController
 {
-    #[Route('/department/update', name: 'app_department')]
-    public function createDepartment(EntityManagerInterface $entityManager, Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        $departmentRepository = $entityManager->getRepository(Department::class);
-        $department = $departmentRepository->findOneBy(['name' => $data['name']]);
-
-        if (!$department)
-        {
-            return new JsonResponse(['error' => 'Department not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        $department->setName($data['name']);
-        $entityManager->flush();
-
-        return new JsonResponse([
-            'message' => 'Department updated successfully',
-            'department' => [
-                'id' => $department->getId(),
-                'name' => $department->getName()
-            ]
-        ]);
-    }
-
     #[Route('/department/add', name: 'add_department', methods: ['POST'])]
     public function addDepartment(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
@@ -97,5 +74,72 @@ class DepartmentController extends AbstractController
         }, $departments);
 
         return new JsonResponse($data, Response::HTTP_OK);
+    }
+
+    #[Route('/department/update', name: 'app_department_update', methods: ['PUT'])]
+    public function updateDepartment(
+        EntityManagerInterface $entityManager, 
+        Request $request, 
+        DepartmentRepository $departmentRepository, 
+        CurriculumRepository $curriculumRepository
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        
+        // Vérifier si l'ID est présent
+        if (!isset($data['id'])) {
+            return new JsonResponse(['error' => 'ID du département manquant'], 400);
+        }
+    
+        $department = $departmentRepository->find($data['id']);
+        if (!$department) {
+            return new JsonResponse(['error' => 'Département non trouvé'], 404);
+        }
+    
+        // Mettre à jour le nom si présent
+        if (isset($data['name']) && !empty($data['name'])) {
+            $department->setName($data['name']);
+        }
+    
+        // Mise à jour des cursus associés
+        if (isset($data['curriculums']) && is_array($data['curriculums'])) {
+            $newCurriculums = $curriculumRepository->findBy(['id' => $data['curriculums']]);
+    
+            // Supprimer les cursus qui ne sont plus associés
+            foreach ($department->getCurriculums() as $existingCurriculum) {
+                if (!in_array($existingCurriculum, $newCurriculums)) {
+                    $department->removeCurriculum($existingCurriculum);
+                }
+            }
+            // Ajouter les nouveaux cursus
+            foreach ($newCurriculums as $newCurriculum) {
+                $department->addCurriculum($newCurriculum);
+            }
+        }
+    
+        $entityManager->flush();
+    
+        return new JsonResponse([
+            'message' => 'Département mis à jour avec succès',
+            'department' => [
+                'id' => $department->getId(),
+                'name' => $department->getName(),
+                'curriculums' => array_map(fn($c) => ['id' => $c->getId(), 'name' => $c->getName()], $department->getCurriculums()->toArray())
+            ]
+        ], 200);
+    }
+
+    #[Route('/department/delete/{id}', name: 'app_department_delete', methods: ['DELETE'])]
+    public function deleteDepartment(int $id, EntityManagerInterface $entityManager, DepartmentRepository $departmentRepository): JsonResponse
+    {
+        $department = $departmentRepository->find($id);
+
+        if (!$department) {
+            return new JsonResponse(['error' => 'Département non trouvé'], 404);
+        }
+
+        $entityManager->remove($department);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Département supprimé avec succès'], 200);
     }
 }
