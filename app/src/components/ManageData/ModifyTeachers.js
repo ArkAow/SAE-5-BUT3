@@ -226,11 +226,56 @@ const ModifyTeachers = () => {
                     <span className="text-white text-xl font-bold">
                       Enseignants
                     </span>
-                    <button className="bg-red-700 hover:bg-red-600 text-white font-bold py-1 px-1 rounded-lg">
+                    <button className="bg-red-700 hover:bg-red-600 text-white font-bold py-1 px-1 rounded-lg" onClick={() => setShowForm(!showForm)}>
                       Ajouter
                     </button>
+                    
                   </div>
                 </div>
+                {showForm && (
+                <form onSubmit={handleAddTeacher} className="flex flex-col space-y-4">
+                  <h1 className="text-white text-3xl font-bold mt-1">
+                    Ajouter un enseignant
+                  </h1>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Prénom"
+                    className="p-2 rounded"
+                  />
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Nom"
+                    className="p-2 rounded"
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    max="40"
+                    value={constraint}
+                    onChange={(e) => setConstraint(e.target.value)}
+                    placeholder="Nombre maximum d'heures / semaines"
+                    className="p-2 rounded"
+                  />
+                  <label className="flex justify-center items-center space-x-2 text-white w-full">
+                    <input
+                      type="checkbox"
+                      checked={isPartTime}
+                      onChange={(e) => setIsPartTime(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-500"
+                    />
+                    <span>Enseignant à temps partiel</span>
+                  </label>
+                  <button type="submit" className="btn-default p-2">
+                    Ajouter
+                  </button>
+                </form>
+              )}
+            </div>
+                )}
                 {teachers.length === 0 ? (
                   <span>Il n'y a pas d'enseignants.</span>
                 ) : (
