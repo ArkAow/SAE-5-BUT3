@@ -81,7 +81,7 @@ const ManageDepartments = () => {
                   ) : (
                     <ul className="space-y-4">
                       {departments.map((department) => (
-                        <li className="flex items-center bg-white rounded-lg p-2">
+                        <li key={department.id} className="flex items-center bg-white rounded-lg p-2">
                           <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
                             <span className="w-1/3 text-left font-semibold"> {department.name} </span>
                             <span className="w-1/3 text-left"> {department.curriculums?.length} cursus associés </span>
