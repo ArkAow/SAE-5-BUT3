@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Department;
+use App\Entity\Curriculum;
 
 class DepartmentController extends AbstractController
 {
@@ -88,7 +89,10 @@ class DepartmentController extends AbstractController
                 'curriculums' => array_map(fn($c) => [
                     'id' => $c->getId(),
                     'name' => $c->getName()
-                ], $department->getCurriculums()->toArray())
+                ], $department->getCurriculums()->toArray()),
+                'users' => array_map(fn($u) => [
+                    'id' => $u->getId()
+                ], $department->getUsers()->toArray())
             ];
         }, $departments);
 

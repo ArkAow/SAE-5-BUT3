@@ -25,7 +25,7 @@ const useDepartments = () => {
     try {
       const response = await fetch(routes.dev.departments.add(), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ name, curriculums }),
       });
 
