@@ -27,7 +27,7 @@ class Department
     #[ORM\JoinTable(name: 'department_teacher')]
     private Collection $teachers;
 
-    #[ORM\ManyTomany(targetEntity: Curriculum::class)]
+    #[ORM\ManyToMany(targetEntity: Curriculum::class)]
     #[ORM\JoinTable(name: "department_curriculum")]
     private Collection $curriculums;
 

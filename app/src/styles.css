@@ -27,6 +27,9 @@
     .tooltip-centered {
       @apply bg-white p-5 rounded-lg shadow-lg text-xs border-2 border-gray-300
     }
+    .tooltip-centered-bigger {
+      @apply bg-white p-7 rounded-lg shadow-lg text-lg border-4 border-gray-300
+    }
     .tooltip-select {
       @apply w-full p-1 border rounded-full bg-primary text-white
     }

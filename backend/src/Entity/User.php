@@ -18,7 +18,7 @@ class User
     private int $id;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $identifiant;
+    private string $email;
 
     #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: "users")]
     private Collection $comments;

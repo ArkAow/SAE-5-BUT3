@@ -33,7 +33,7 @@ const ManageDepartments = () => {
 
   const handleAddCurriculum = (curriculum) => {
     if (!departmentCurriculums.some((c) => c.id === curriculum.id)) {
-      setDepartmentCurriculums([...departmentCurriculums, curriculum]);
+      setDepartmentCurriculums([...departmentCurriculums, curriculum.id]);
     }
   };
 
@@ -92,8 +92,8 @@ const ManageDepartments = () => {
                         <li className="flex items-center bg-white rounded-lg p-2">
                           <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
                             <span className="w-1/3 text-left font-semibold"> {department.name} </span>
-                            <span className="w-1/3 text-left"> {department.curriculums.length()} cursus associés </span>
-                            <span className="w-1/3 text-left"> {department.users.length()} membres </span>
+                            <span className="w-1/3 text-left"> {department.curriculums.length} cursus associés </span>
+                            <span className="w-1/3 text-left"> {department.users.length} membres </span>
                           </div>
                           <div className="flex space-x-2">
                             <button className="size-6 flex justify-center items-center">
@@ -118,8 +118,8 @@ const ManageDepartments = () => {
 
           {addingDepartment && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="tooltip-centered">
-                <h2 className="text-xl font-bold mb-4">Ajouter un département</h2>
+              <div className="tooltip-centered-bigger min-w-[345px] w-1/3">
+                <h2 className="text-2xl font-bold mb-4">Ajouter un département</h2>
                 <form onSubmit={handleAddingDepartment} className="space-y-2">
                 <div>
                   <label className="block mb-1">Nom du département :</label>
@@ -144,7 +144,7 @@ const ManageDepartments = () => {
                       ) : (
                         <div className="space-y-2">
                           <label className="block mb-1">Selectionnez les cursus :</label>
-                          <div className="flex flex-wrap gap-2 w-full justify-between">
+                          <div className="flex flex-wrap gap-2 w-full justify-start">
                             {curriculums.map((curriculum) => (
                               <button
                               key={curriculum.id}
