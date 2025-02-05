@@ -93,7 +93,7 @@ const useDepartments = (setToast) => {
     fetchDepartments();
   }, []);
 
-  return { departments, isLoading, error, fetchDepartments, addDepartment, updateDepartment, deleteDepartment};
+  return { departments, isLoading, isSaving, error, fetchDepartments, addDepartment, updateDepartment, deleteDepartment};
 };
 
 export default useDepartments;
