@@ -31,7 +31,7 @@ const DepartmentAddingForm = ({addDepartment, curriculums, setAddingDepartment, 
   return (
     <>
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="tooltip-centered-bigger min-w-[345px] w-1/3">
+        <div className="tooltip-centered-bigger min-w-[450px] w-1/3">
           <h2 className="text-2xl font-bold mb-4">Ajouter un département</h2>
           <form onSubmit={handleAddingDepartment} className="space-y-2">
             <div>

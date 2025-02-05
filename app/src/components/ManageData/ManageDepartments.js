@@ -5,6 +5,7 @@ import useDepartments from "../../hooks/useDepartments.js";
 import useCurriculums from "../../hooks/useCurriculums.js";
 import DepartmentAddingForm from "../forms/DepartmentAddingForm.js";
 import DepartmentUpdatingForm from "../forms/DepartmentUpdatingingForm.js";
+import DepartmentDeletingForm from "../forms/DepartmentDeletingForm.js";
 import Toast from "../Toast/Toast.js";
 
 const ManageDepartments = () => {
@@ -131,6 +132,13 @@ const ManageDepartments = () => {
               curriculums={curriculums}
               setUpdatingDepartment={setUpdatingDepartment}
               isCurriculumLoading={isCurriculumLoading}/>
+          )}
+
+          {deletingDepartment && (
+            <DepartmentDeletingForm
+              department={deletedDepartment}
+              deleteDepartment={deleteDepartment}
+              setDeletingDepartment={setDeletingDepartment}/>
           )}
         </div>
       </div>

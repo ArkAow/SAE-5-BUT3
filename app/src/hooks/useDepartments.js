@@ -74,9 +74,21 @@ const useDepartments = (setToast) => {
   };
   
   const deleteDepartment = async (departmentId) => {
-    await fetch(routes.dev.departments.delete(departmentId), { 
-      method: "DELETE"
-    });
+    try {
+      await fetch(routes.dev.departments.delete(departmentId), { 
+        method: "DELETE"
+      });      
+    } catch (err) {
+      setError(err.message);
+      setToast({
+        message: error.message || "Erreur lors de la suppréssion du département",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setToast({ message: "Département supprimé avec succès", type: "success", visible: true });
+      fetchDepartments();
+    }
   };
 
   useEffect(() => {
