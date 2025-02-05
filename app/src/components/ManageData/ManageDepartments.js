@@ -11,8 +11,8 @@ import Toast from "../Toast/Toast.js";
 const ManageDepartments = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
 
-  const {curriculums, loading: isCurriculumLoading} = useCurriculums();
-  const {departments, loading: isDepartmentLoading, addDepartment, updateDepartment, deleteDepartment} = useDepartments(setToast);
+  const {curriculums, isLoading: isCurriculumLoading} = useCurriculums();
+  const {departments, isLoading: isDepartmentLoading, isSaving, addDepartment, updateDepartment, deleteDepartment} = useDepartments(setToast);
 
   const [addingDepartment, setAddingDepartment] = useState(false);
   const [updatingDepartment, setUpdatingDepartment] = useState(false);
@@ -122,7 +122,8 @@ const ManageDepartments = () => {
               addDepartment={addDepartment}
               setAddingDepartment={setAddingDepartment}
               curriculums={curriculums}
-              isCurriculumLoading={isCurriculumLoading}/>
+              isCurriculumLoading={isCurriculumLoading}
+              isSaving={isSaving}/>
           )}
 
           {updatingDepartment && (
@@ -131,14 +132,16 @@ const ManageDepartments = () => {
               updateDepartment={updateDepartment}
               curriculums={curriculums}
               setUpdatingDepartment={setUpdatingDepartment}
-              isCurriculumLoading={isCurriculumLoading}/>
+              isCurriculumLoading={isCurriculumLoading}
+              isSaving={isSaving}/>
           )}
 
           {deletingDepartment && (
             <DepartmentDeletingForm
               department={deletedDepartment}
               deleteDepartment={deleteDepartment}
-              setDeletingDepartment={setDeletingDepartment}/>
+              setDeletingDepartment={setDeletingDepartment}
+              isSaving={isSaving}/>
           )}
         </div>
       </div>

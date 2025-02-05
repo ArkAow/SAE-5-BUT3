@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-const DepartmentAddingForm = ({addDepartment, curriculums, setAddingDepartment, isCurriculumLoading}) => {
+const DepartmentAddingForm = ({addDepartment, curriculums, setAddingDepartment, isCurriculumLoading, isSaving}) => {
   const [departmentCurriculums, setDepartmentCurriculums] = useState([]);
   const [departmentName, setDepartmentName] = useState("");
   const [error, setError] = useState("");
 
-  const handleCancelAddingDepartment = () => {
+  const handleLeaveAddingDepartment = () => {
     setDepartmentCurriculums([]);
     setDepartmentName("");
     setAddingDepartment(false);
@@ -19,18 +19,19 @@ const DepartmentAddingForm = ({addDepartment, curriculums, setAddingDepartment, 
     }
   };
 
-  const handleAddingDepartment = () => {
+  const handleAddingDepartment = async () => {
     if (!departmentName.trim()) {
       setError("Le nom du département est obligatoire.");
       return;
     }
     setError("");
-    addDepartment(departmentName, departmentCurriculums.map((c) => c.id));
+    await addDepartment(departmentName, departmentCurriculums.map((c) => c.id));
+    handleLeaveAddingDepartment();
   }
 
   return (
     <>
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${isSaving ? 'cursor-wait' : ''}`}f>
         <div className="tooltip-centered-bigger min-w-[450px] w-1/3">
           <h2 className="text-2xl font-bold mb-4">Ajouter un département</h2>
           <form onSubmit={handleAddingDepartment} className="space-y-2">
@@ -94,10 +95,10 @@ const DepartmentAddingForm = ({addDepartment, curriculums, setAddingDepartment, 
             </div>
             {error && <p className="text-red-500">{error}</p>}
             <div className="flex justify-center space-x-2 w-full">
-              <button type="button" onClick={handleCancelAddingDepartment} className="btn-default p-2">
+              <button type="button" onClick={handleLeaveAddingDepartment} className="btn-default p-2" disabled={isSaving}>
                   Retour
               </button>
-              <button type="submit" className="btn-default p-2">
+              <button type="submit" className="btn-default p-2" disabled={isSaving}>
                   Valider
               </button>
             </div>

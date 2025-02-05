@@ -4,11 +4,12 @@ import routes from "../Routes/routes";
 const useCurriculums = () => {
     const [curriculums, setCurriculums] = useState([]);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
   
     useEffect(() => {
       const fetchCurriculums = async () => {
         try {
+          setIsLoading(true);
           const response = await fetch(routes.dev.curriculums.getCurriculums());
           if (!response.ok) {
             throw new Error("Erreur lors du chargement des curriculums");
@@ -18,13 +19,13 @@ const useCurriculums = () => {
         } catch (error) {
           setError(error.message);
         } finally {
-          setLoading(false);
+          setIsLoading(false);
         }
       };
   
       fetchCurriculums();
     }, []);
   
-    return { curriculums, error, loading };
+    return { curriculums, error, isLoading };
   };
 export default useCurriculums;

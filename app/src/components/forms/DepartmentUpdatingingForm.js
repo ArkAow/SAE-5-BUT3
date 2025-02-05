@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setUpdatingDepartment, isCurriculumLoading}) => {
+const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setUpdatingDepartment, isCurriculumLoading, isSaving}) => {
   const [departmentCurriculums, setDepartmentCurriculums] = useState(department.curriculums || []);
   const [departmentName, setDepartmentName] = useState(department.name);
   const [error, setError] = useState("");
 
-  const handleCancelAddingDepartment = () => {
+  const handleLeaveAddingDepartment = () => {
     setDepartmentCurriculums([]);
     setDepartmentName("");
     setUpdatingDepartment(false);
@@ -19,7 +19,7 @@ const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setU
     }
   };
 
-  const handleUpdatingDepartment = () => {
+  const handleUpdatingDepartment = async () => {
     if (!departmentName.trim()) {
       setError("Le nom du département ne peux pas être vide.");
       return;
@@ -30,12 +30,13 @@ const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setU
       name: departmentName,
       curriculums: departmentCurriculums.map((c) => c.id),
     };
-    updateDepartment(payload);
+    await updateDepartment(payload);
+    handleLeaveAddingDepartment();
   }
 
   return (
     <>
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${isSaving ? 'cursor-wait' : ''}`}>
         <div className="tooltip-centered-bigger min-w-[450px] w-1/3">
           <h2 className="text-2xl font-bold mb-4">Modifier le département "{department.name}"</h2>
           <form onSubmit={handleUpdatingDepartment} className="space-y-2">
@@ -100,10 +101,10 @@ const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setU
             </div>
             {error && <p className="text-red-500">{error}</p>}
             <div className="flex justify-center space-x-2 w-full">
-              <button type="button" onClick={handleCancelAddingDepartment} className="btn-default p-2">
+              <button type="button" onClick={handleLeaveAddingDepartment} className="btn-default p-2" disabled={isSaving}>
                 Retour
               </button>
-              <button type="submit" className="btn-default p-2">
+              <button type="submit" className="btn-default p-2" disabled={isSaving}>
                 Valider
               </button>
             </div>
