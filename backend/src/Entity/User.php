@@ -18,6 +18,9 @@ class User
     private int $id;
 
     #[ORM\Column(type: "string", length: 255)]
+    private string $fullname;
+
+    #[ORM\Column(type: "string", length: 255)]
     private string $email;
 
     #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: "users")]
@@ -32,6 +35,7 @@ class User
 
     public function __construct()
     {
+        $this->fullname = "nécessite une première connexion";
         $this->comments = new ArrayCollection();
         $this->departments = new ArrayCollection();
     }
@@ -55,14 +59,25 @@ class User
         return $this;
     }
 
-    public function getIdentifiant(): string
+    public function getEmail(): string
     {
-        return $this->identifiant;
+        return $this->email;
     }
 
-    public function setIdentifiant(string $identifiant): self
+    public function setEmail(string $email): self
     {
-        $this->identifiant = $identifiant;
+        $this->email = $email;
+        return $this;
+    }
+
+    public function getFullname(): string
+    {
+        return $this->fullname;
+    }
+
+    public function setFullnale(string $fullname): self
+    {
+        $this->fullname = $fullname;
         return $this;
     }
 
