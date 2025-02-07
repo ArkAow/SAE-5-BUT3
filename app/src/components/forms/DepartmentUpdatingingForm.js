@@ -41,7 +41,7 @@ const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setU
           <h2 className="text-2xl font-bold mb-4">Modifier le département "{department.name}"</h2>
           <form onSubmit={handleUpdatingDepartment} className="space-y-2">
             <div>
-                <label className="block mb-1">Nom du département :</label>
+                <label className="block mb-1 font-bold">Nom du département<span className="text-red-500">*</span> :</label>
                 <input
                   type="text"
                   value={departmentName}
@@ -59,10 +59,10 @@ const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setU
             ) : (
               <>
                 {curriculums.length === 0 ? (
-                  <span className="w-full text-center">Il n'y a pas de cursus</span>
+                  <span className="w-full text-center font-bold">Il n'y a pas de cursus</span>
                 ) : (
                   <div className="space-y-2">
-                    <label className="block mb-1">Selectionnez les cursus :</label>
+                    <label className="block mb-1 font-bold">Selectionnez les cursus :</label>
                     <div className="flex flex-wrap gap-2 w-full justify-start">
                       {curriculums.map((curriculum) => {
                         const isSelected = departmentCurriculums.some((c) => c.id === curriculum.id);
@@ -86,7 +86,7 @@ const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setU
             )}
 
             <div className="mt-4">
-              <p className="font-bold">Cursus sélectionnés :</p>
+              <p className="font-semibold">Cursus sélectionnés :</p>
               <ul className="list-disc list-inside">
                 {departmentCurriculums.length == 0 ? (
                   <li key={0}> Auncun cursus selectionné</li>
@@ -99,6 +99,7 @@ const DepartmentUpdatingForm = ({department, updateDepartment, curriculums, setU
                 )}
               </ul>
             </div>
+            <p className="text-red-500 text-sm">* champ(s) obligatoire(s)</p>
             {error && <p className="text-red-500">{error}</p>}
             <div className="flex justify-center space-x-2 w-full">
               <button type="button" onClick={handleLeaveAddingDepartment} className="btn-default p-2" disabled={isSaving}>

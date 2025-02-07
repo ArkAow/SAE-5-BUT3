@@ -5,12 +5,13 @@ import useDepartments from "../../hooks/useDepartments.js";
 import UserAddingForm from "../forms/UserAddingForm.js";
 import useUsers from "../../hooks/useUsers.js";
 import Toast from "../Toast/Toast.js";
+import UserUpdatingForm from "../forms/UserUpdatingForm.js";
 
 const ManageUsers = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
 
   const {departments, isLoading: isDepartmentLoading} = useDepartments();
-  const {users, isLoading: isUserLoading, isSaving, addUser, updateUser, deleteUser} = useUsers();
+  const {users, isLoading: isUserLoading, isSaving, addUser, updateUser, deleteUser} = useUsers(setToast);
 
   const [addingUser, setAddingUser] = useState(false);
   const [updatingUser, setUpdatingUser] = useState(false);
@@ -143,7 +144,13 @@ const ManageUsers = () => {
           )}
 
           {updatingUser && (
-            <></>
+            <UserUpdatingForm 
+              user={updatedUser}
+              updateUser={updateUser}
+              departments={departments}
+              isDepartmentLoading={isDepartmentLoading}
+              isSaving={isSaving}
+              setUpdatingUser={setUpdatingUser}/>
           )}
 
           {deletingUser && (

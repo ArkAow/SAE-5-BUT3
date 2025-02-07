@@ -31,7 +31,8 @@ const useUsers = (setToast) => {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload),
       });
-      const newUser = await response.json().user;
+      const data = await response.json();
+      const newUser = data.user;
       setUsers((prev) => [...prev, newUser]);
     } catch (err) {
       setError(err.message);
@@ -55,7 +56,8 @@ const useUsers = (setToast) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const updatedUser = await response.json().user;
+      const data = await response.json();
+      const updatedUser = data.user;
       setUsers((prev) =>
         prev.map((user) => user.id === updatedUser.id ? updatedUser : user)
       );

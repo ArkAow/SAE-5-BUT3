@@ -31,7 +31,8 @@ const useDepartments = (setToast) => {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload),
       });
-      const newDepartment = await response.json().department;
+      const data = await response.json();
+      const newDepartment = data.department;
       setDepartments((prev) => [...prev, newDepartment]);
     } catch (err) {
       setError(err.message);
@@ -55,7 +56,8 @@ const useDepartments = (setToast) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const updatedDepartment = await response.json().department;
+      const data = await response.json();
+      const updatedDepartment = data.department;
       setDepartments((prev) =>
         prev.map((dept) => dept.id === updatedDepartment.id ? updatedDepartment : dept)
       );
