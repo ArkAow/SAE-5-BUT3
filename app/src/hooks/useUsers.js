@@ -34,6 +34,7 @@ const useUsers = (setToast) => {
       const data = await response.json();
       const newUser = data.user;
       setUsers((prev) => [...prev, newUser]);
+      setToast({ message: "Utilisateur ajouté avec succès", type: "success", visible: true });
     } catch (err) {
       setError(err.message);
       setToast({
@@ -42,7 +43,6 @@ const useUsers = (setToast) => {
         visible: true,
       });
     } finally {
-      setToast({ message: "Utilisateur ajouté avec succès", type: "success", visible: true });
       setIsSaving(false);
       fetchUsers();
     }
@@ -61,6 +61,7 @@ const useUsers = (setToast) => {
       setUsers((prev) =>
         prev.map((user) => user.id === updatedUser.id ? updatedUser : user)
       );
+      setToast({ message: "Utilisateur modifié avec succès", type: "success", visible: true });
     } catch (err) {
       setError(err.message);
       setToast({
@@ -69,7 +70,6 @@ const useUsers = (setToast) => {
         visible: true,
       });
     } finally {
-      setToast({ message: "Utilisateur modifié avec succès", type: "success", visible: true });
       setIsSaving(false);
       fetchUsers();
     }
@@ -82,6 +82,7 @@ const useUsers = (setToast) => {
         method: "DELETE"
       });
       setUsers((prev) => prev.filter((user) => user.id !== userId));
+      setToast({ message: "Utilisateur supprimé avec succès", type: "success", visible: true });
     } catch (err) {
       setError(err.message);
       setToast({
@@ -90,7 +91,6 @@ const useUsers = (setToast) => {
         visible: true,
       });
     } finally {
-      setToast({ message: "Utilisateur supprimé avec succès", type: "success", visible: true });
       setIsSaving(false);
       fetchUsers();
     }

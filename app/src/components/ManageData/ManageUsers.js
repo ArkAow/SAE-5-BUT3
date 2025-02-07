@@ -6,6 +6,7 @@ import UserAddingForm from "../forms/UserAddingForm.js";
 import useUsers from "../../hooks/useUsers.js";
 import Toast from "../Toast/Toast.js";
 import UserUpdatingForm from "../forms/UserUpdatingForm.js";
+import UserDeletingForm from "../forms/UserDeletingForm.js";
 
 const ManageUsers = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -154,7 +155,11 @@ const ManageUsers = () => {
           )}
 
           {deletingUser && (
-            <></>
+            <UserDeletingForm
+              user={deletedUser}
+              deleteUser={deleteUser}
+              isSaving={isSaving}
+              setDeletingUser={setDeletingUser}/>
           )}
         </div>
       </div>
