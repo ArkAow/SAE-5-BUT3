@@ -75,7 +75,7 @@ class User
         return $this->fullname;
     }
 
-    public function setFullnale(string $fullname): self
+    public function setFullname(string $fullname): self
     {
         $this->fullname = $fullname;
         return $this;

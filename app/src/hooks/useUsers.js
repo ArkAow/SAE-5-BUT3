@@ -23,6 +23,10 @@ const useUsers = (setToast) => {
     }
   };
 
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return { users, isLoading, isSaving, error, fetchUsers};
 };
 

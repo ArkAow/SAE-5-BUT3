@@ -55,7 +55,7 @@ const ManageUsers = () => {
               {isUserLoading ? (
                 <div className="flex flex-col items-center justify-center  p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
                   <div className="spinner"></div>
-                  <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des départements...</div>
+                  <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des utilisateurs...</div>
                 </div>
               ) : (
                 <>
@@ -66,19 +66,17 @@ const ManageUsers = () => {
                       {users.map((user) => (
                         <li key={user.id} className="flex items-center bg-white rounded-lg p-2">
                           <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
-                            <span className="w-1/4 text-left font-semibold"> {user.fullname} </span>
-                            <span className="w-1/4 text-left"> {user.email} </span>
-                            <span className="w-1/4 text-left"> {user.role} </span>
-                            <span className="w-1/4 text-left"> son département avec un super nom </span>
+                            <span className="w-[25%] truncate text-left font-semibold">{user.fullname}</span>
+                            <span className="w-[25%] truncate text-center">{user.email}</span>
+                            <span className="w-[25%] truncate text-center">{user.role}</span>
+                            <span className="w-[25%] truncate text-right">son département avec un super nom</span>
                           </div>
                           <div className="flex space-x-2">
-                            <button 
-                            className="size-6 flex justify-center items-center">
+                            <button className="size-6 flex justify-center items-center">
                               <img src="images/pen.svg" alt="Modifier" className="size-6" />
                             </button>
-                            <button 
-                            className="size-6 flex justify-center items-center">
-                              <img src="images/trash.svg" alt="Supprmer" className="size-6" />
+                            <button className="size-6 flex justify-center items-center">
+                              <img src="images/trash.svg" alt="Supprimer" className="size-6" />
                             </button>
                           </div>
                         </li>

@@ -15,6 +15,29 @@ use App\Repository\CurriculumRepository;
 
 class DepartmentController extends AbstractController
 {
+    #[Route('/department', name: 'get_departments', methods: ['GET'])]
+    public function getDepartments(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $departmentRepository = $entityManager->getRepository(Department::class);
+        $departments = $departmentRepository->findAll();
+
+        $data = array_map(function ($department) {
+            return [
+                'id' => $department->getId(),
+                'name' => $department->getName(),
+                'curriculums' => array_map(fn($c) => [
+                    'id' => $c->getId(),
+                    'name' => $c->getName()
+                ], $department->getCurriculums()->toArray()),
+                'users' => array_map(fn($u) => [
+                    'id' => $u->getId()
+                ], $department->getUsers()->toArray())
+            ];
+        }, $departments);
+
+        return new JsonResponse($data, Response::HTTP_OK);
+    }
+    
     #[Route('/department/add', name: 'add_department', methods: ['POST'])]
     public function addDepartment(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
@@ -51,29 +74,6 @@ class DepartmentController extends AbstractController
                 'curriculums' => array_map(fn($c) => ['id' => $c->getId(), 'name' => $c->getName()], $department->getCurriculums()->toArray())
             ]
         ], Response::HTTP_CREATED);
-    }
-
-    #[Route('/department', name: 'get_departments', methods: ['GET'])]
-    public function getDepartments(EntityManagerInterface $entityManager): JsonResponse
-    {
-        $departmentRepository = $entityManager->getRepository(Department::class);
-        $departments = $departmentRepository->findAll();
-
-        $data = array_map(function ($department) {
-            return [
-                'id' => $department->getId(),
-                'name' => $department->getName(),
-                'curriculums' => array_map(fn($c) => [
-                    'id' => $c->getId(),
-                    'name' => $c->getName()
-                ], $department->getCurriculums()->toArray()),
-                'users' => array_map(fn($u) => [
-                    'id' => $u->getId()
-                ], $department->getUsers()->toArray())
-            ];
-        }, $departments);
-
-        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     #[Route('/department/update', name: 'app_department_update', methods: ['PUT'])]
