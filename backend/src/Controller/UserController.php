@@ -26,7 +26,10 @@ class UserController extends AbstractController
                 'fullname' => $user->getFullname(),
                 'email' => $user->getEmail(),
                 'role' => $user->getRole(),
-                'departments' => $user->getDepartments()
+                'departments' => array_map(fn($d) => [
+                    'id' => $d->getId(),
+                    'name' => $d->getName()
+                ], $user->getDepartments()->toArray())
             ];
         }, $users);
 
@@ -38,11 +41,10 @@ class UserController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['fullname'], $data['email'], $data['role'])) {
+        if (!isset($data['email'], $data['role'])) {
             return new JsonResponse(['error' => 'Données invalides'], 400);
         }
         $user = new User();
-        $user->setFullname($data['fullname']);
         $user->setEmail($data['email']);
         $user->setRole($data['role']);
         if (isset($data['departments']) && is_array($data['departments'])) {
@@ -61,7 +63,6 @@ class UserController extends AbstractController
             'message' => 'Utilisateur ajouté avec succès',
             'user' => [
                 'id' => $user->getId(),
-                'fullname' => $user->getFullname(),
                 'email' => $user->getEmail(),
                 'role' => $user->getRole(),
                 'departments' => array_map(fn($d) => ['id' => $d->getId(), 'name' => $d->getName()], $user->getDepartments()->toArray())

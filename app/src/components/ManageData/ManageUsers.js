@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
 import useDepartments from "../../hooks/useDepartments.js";
-
-import Toast from "../Toast/Toast.js";
+import UserAddingForm from "../forms/UserAddingForm.js";
 import useUsers from "../../hooks/useUsers.js";
+import Toast from "../Toast/Toast.js";
 
 const ManageUsers = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
 
   const {departments, isLoading: isDepartmentLoading} = useDepartments();
-  const {users, isLoading: isUserLoading} = useUsers();
+  const {users, isLoading: isUserLoading, isSaving, addUser, updateUser, deleteUser} = useUsers();
 
   const [addingUser, setAddingUser] = useState(false);
   const [updatingUser, setUpdatingUser] = useState(false);
@@ -86,10 +86,23 @@ const ManageUsers = () => {
                       {users.map((user) => (
                         <li key={user.id} className="flex items-center bg-white rounded-lg p-2">
                           <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
-                            <span className="w-[25%] truncate text-left font-semibold">{user.fullname}</span>
-                            <span className="w-[25%] truncate text-center">{user.email}</span>
-                            <span className="w-[25%] truncate text-center">{user.role}</span>
-                            <span className={`w-[20%] truncate text-left ${!user.department?.length ? "text-red-500" : ""}`}>
+                            <span 
+                              className="w-[25%] truncate text-left font-semibold" 
+                              title={user.fullname}>
+                                {user.fullname}
+                            </span>
+                            <span 
+                              className="w-[25%] truncate text-center"
+                              title={user.email}>
+                                {user.email}
+                            </span>
+                            <span 
+                              className="w-[25%] truncate text-center"
+                              title={user.role}>
+                                {user.role}
+                            </span>
+                            <span 
+                              className={`w-[20%] truncate text-left ${!user.departments?.length ? "text-red-500" : ""}`}>
                               {user.departments?.length > 1
                                 ? `${user.departments.length} départements`
                                 : user.departments?.length === 1
@@ -121,7 +134,12 @@ const ManageUsers = () => {
           </div>
 
           {addingUser && (
-            <></>
+            <UserAddingForm 
+              addUser={addUser}
+              departments={departments}
+              isDepartmentLoading={isDepartmentLoading}
+              isSaving={isSaving}
+              setAddingUser={setAddingUser}/>
           )}
 
           {updatingUser && (

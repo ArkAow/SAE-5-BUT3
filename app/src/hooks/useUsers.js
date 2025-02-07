@@ -50,14 +50,14 @@ const useUsers = (setToast) => {
   const updateUser = async (payload) => {
     try {
       setIsSaving(true);
-      await fetch(routes.dev.users.update(), {
+      const response = await fetch(routes.dev.users.update(), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const updatedUser = await response.json().user;
-      setDepartments((prev) =>
-        prev.map((dept) => dept.id === updatedUser.id ? updatedUser : dept)
+      setUsers((prev) =>
+        prev.map((user) => user.id === updatedUser.id ? updatedUser : user)
       );
     } catch (err) {
       setError(err.message);

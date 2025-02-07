@@ -23,13 +23,13 @@ const useDepartments = (setToast) => {
     }
   };
 
-  const addDepartment = async (name, curriculums = []) => {
+  const addDepartment = async (payload) => {
     try {
       setIsSaving(true);
       const response = await fetch(routes.dev.departments.add(), {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ name, curriculums }),
+        body: JSON.stringify(payload),
       });
       const newDepartment = await response.json().department;
       setDepartments((prev) => [...prev, newDepartment]);
@@ -50,7 +50,7 @@ const useDepartments = (setToast) => {
   const updateDepartment = async (payload) => {
     try {
       setIsSaving(true);
-      await fetch(routes.dev.departments.update(), {
+      const response = await fetch(routes.dev.departments.update(), {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
