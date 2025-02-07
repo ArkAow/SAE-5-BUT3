@@ -8,9 +8,15 @@ import useUsers from "../../hooks/useUsers.js";
 
 const ManageUsers = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
+
   const {departments, isLoading: isDepartmentLoading} = useDepartments();
   const {users, isLoading: isUserLoading} = useUsers();
 
+  const [addingUser, setAddingUser] = useState(false);
+  const [updatingUser, setUpdatingUser] = useState(false);
+  const [updatedUser, setUpdatedUser] = useState(null);
+  const [deletingUser, setDeletingUser] = useState(false);
+  const [deletedUser, setDeletedUser] = useState(null);
   const navigate = useNavigate();
 
   const goToHomePage = () => {
@@ -19,7 +25,21 @@ const ManageUsers = () => {
 
   const goToManageData = () => {
     navigate("/ManageData");
-  }; 
+  };
+
+  const handleClickingAddButton = () => {
+    setAddingUser(true);
+  }
+
+  const handleClickingUpdateButton = (user) => {
+    setUpdatedUser(user);
+    setUpdatingUser(true);
+  }
+
+  const handleClickingDeleteButton = (user) => {
+    setDeletedUser(user);
+    setDeletingUser(true);
+  }
 
   return (
     <>
@@ -69,13 +89,21 @@ const ManageUsers = () => {
                             <span className="w-[25%] truncate text-left font-semibold">{user.fullname}</span>
                             <span className="w-[25%] truncate text-center">{user.email}</span>
                             <span className="w-[25%] truncate text-center">{user.role}</span>
-                            <span className="w-[25%] truncate text-right">son département avec un super nom</span>
+                            <span className={`w-[20%] truncate text-left ${!user.department?.length ? "text-red-500" : ""}`}>
+                              {user.departments?.length > 1
+                                ? `${user.departments.length} départements`
+                                : user.departments?.length === 1
+                                ? user.departments[0].name
+                                : "aucun département"}
+                            </span>
                           </div>
                           <div className="flex space-x-2">
-                            <button className="size-6 flex justify-center items-center">
+                            <button className="size-6 flex justify-center items-center"
+                            onClick={() => handleClickingUpdateButton(user)}>
                               <img src="images/pen.svg" alt="Modifier" className="size-6" />
                             </button>
-                            <button className="size-6 flex justify-center items-center">
+                            <button className="size-6 flex justify-center items-center"
+                            onClick={() => handleClickingDeleteButton(user)}>
                               <img src="images/trash.svg" alt="Supprimer" className="size-6" />
                             </button>
                           </div>
@@ -84,12 +112,25 @@ const ManageUsers = () => {
                     </ul>
                   )}
                   <button 
-                  className="w-[35%] h-7 btn-default py-3 rounded-full flex justify-center items-center space-x-4 px-10 mt-4 mx-auto">
+                  className="w-[35%] h-7 btn-default py-3 rounded-full flex justify-center items-center space-x-4 px-10 mt-4 mx-auto"
+                  onClick={handleClickingAddButton}>
                     <span>Ajouter</span>
                   </button>
                 </>
               )}
           </div>
+
+          {addingUser && (
+            <></>
+          )}
+
+          {updatingUser && (
+            <></>
+          )}
+
+          {deletingUser && (
+            <></>
+          )}
         </div>
       </div>
       {toast.visible && (

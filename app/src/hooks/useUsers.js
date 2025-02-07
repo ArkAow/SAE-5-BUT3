@@ -23,11 +23,82 @@ const useUsers = (setToast) => {
     }
   };
 
+  const addUser = async (payload) => {
+    try {
+      setIsSaving(true);
+      const response = await fetch(routes.dev.users.add(), {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload),
+      });
+      const newUser = await response.json().user;
+      setUsers((prev) => [...prev, newUser]);
+    } catch (err) {
+      setError(err.message);
+      setToast({
+        message: error.message || "Erreur lors de l'ajout du utilisateur",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setToast({ message: "Utilisateur ajouté avec succès", type: "success", visible: true });
+      setIsSaving(false);
+      fetchUsers();
+    }
+  };
+
+  const updateUser = async (payload) => {
+    try {
+      setIsSaving(true);
+      await fetch(routes.dev.users.update(), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const updatedUser = await response.json().user;
+      setDepartments((prev) =>
+        prev.map((dept) => dept.id === updatedUser.id ? updatedUser : dept)
+      );
+    } catch (err) {
+      setError(err.message);
+      setToast({
+        message: error.message || "Erreur lors de la modification du utilisateur",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setToast({ message: "Utilisateur modifié avec succès", type: "success", visible: true });
+      setIsSaving(false);
+      fetchUsers();
+    }
+  };
+  
+  const deleteUser = async (userId) => {
+    try {
+      setIsSaving(true);
+      await fetch(routes.dev.users.delete(userId), { 
+        method: "DELETE"
+      });
+      setUsers((prev) => prev.filter((user) => user.id !== userId));
+    } catch (err) {
+      setError(err.message);
+      setToast({
+        message: error.message || "Erreur lors de la suppréssion de l'utilisateur",
+        type: "error",
+        visible: true,
+      });
+    } finally {
+      setToast({ message: "Utilisateur supprimé avec succès", type: "success", visible: true });
+      setIsSaving(false);
+      fetchUsers();
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  return { users, isLoading, isSaving, error, fetchUsers};
+  return { users, isLoading, isSaving, error, fetchUsers, addUser, updateUser, deleteUser};
 };
 
 export default useUsers;

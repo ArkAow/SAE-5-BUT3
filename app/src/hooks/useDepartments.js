@@ -31,8 +31,8 @@ const useDepartments = (setToast) => {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ name, curriculums }),
       });
-      const newDepartment = await response.json();
-      setDepartments((prev) => [...prev, newDepartment.department]);
+      const newDepartment = await response.json().department;
+      setDepartments((prev) => [...prev, newDepartment]);
     } catch (err) {
       setError(err.message);
       setToast({
@@ -55,6 +55,10 @@ const useDepartments = (setToast) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      const updatedDepartment = await response.json().department;
+      setDepartments((prev) =>
+        prev.map((dept) => dept.id === updatedDepartment.id ? updatedDepartment : dept)
+      );
     } catch (err) {
       setError(err.message);
       setToast({
@@ -74,7 +78,8 @@ const useDepartments = (setToast) => {
       setIsSaving(true);
       await fetch(routes.dev.departments.delete(departmentId), { 
         method: "DELETE"
-      });      
+      });
+      setDepartments((prev) => prev.filter((dept) => dept.id !== departmentId));
     } catch (err) {
       setError(err.message);
       setToast({

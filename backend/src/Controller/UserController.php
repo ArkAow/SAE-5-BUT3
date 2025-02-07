@@ -57,7 +57,16 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Utilisateur ajouté avec succès', 'id' => $user->getId()], 201);
+        return new JsonResponse([
+            'message' => 'Utilisateur ajouté avec succès',
+            'user' => [
+                'id' => $user->getId(),
+                'fullname' => $user->getFullname(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+                'departments' => array_map(fn($d) => ['id' => $d->getId(), 'name' => $d->getName()], $user->getDepartments()->toArray())
+            ]
+        ], Response::HTTP_CREATED);
     }
 
     #[Route('/users/update', name: 'update_users', methods: ['PUT'])]
@@ -88,7 +97,7 @@ class UserController extends AbstractController
 
         if (isset($data['departments']) && is_array($data['departments'])) {
             $departmentRepository = $entityManager->getRepository(Department::class);
-            $user->getDepartments()->clear(); // Supprime tous les départements existants
+            $user->getDepartments()->clear(); // Supprime tous les départements de l'utilisateur
 
             foreach ($data['departments'] as $deptId) {
                 $department = $departmentRepository->find($deptId);
@@ -99,7 +108,16 @@ class UserController extends AbstractController
         }
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Utilisateur mis à jour avec succès']);
+        return new JsonResponse([
+            'message' => 'Utilisateur mis à jour avec succès',
+            'user' => [
+                'id' => $user->getId(),
+                'fullname' => $user->getFullname(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+                'departments' => array_map(fn($d) => ['id' => $d->getId(), 'name' => $d->getName()], $user->getDepartments()->toArray())
+            ]
+        ]);
     }
 
     #[Route('/users/delete/{id}', name: 'delete_users', methods: ['DELETE'])]

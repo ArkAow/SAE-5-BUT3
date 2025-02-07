@@ -45,7 +45,10 @@ const routes = {
       update: () => `${routes.dev.default}teacher/update`,
     },
     users: {
+      add: () => `${routes.dev.default}users/add`,
+      delete: (id) => `${routes.dev.default}users/delete/${id}`,
       getAll: () => `${routes.dev.default}users`,
+      update: () => `${routes.dev.default}users/update`,
     },
   },
   insertData: "http://localhost:8600/insert-data",
