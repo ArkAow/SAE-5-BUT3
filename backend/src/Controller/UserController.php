@@ -13,7 +13,7 @@ use App\Entity\Department;
 
 class UserController extends AbstractController
 {
-    #[Route("/users", name:"get_user", methods:["GET"])]
+    #[Route("/users", name:"get_users", methods:["GET"])]
     public function getUsers(EntityManagerInterface $entityManager): JsonResponse
     {
         $userRepository = $entityManager->getRepository(User::class);
@@ -23,126 +23,116 @@ class UserController extends AbstractController
         {
             return [
                 'id' => $user->getID(),
-                'identifiant' => $user->getIdentifiant(),
-                'role' => $user->getRole()
+                'fullname' => $user->getFullname(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+                'departments' => array_map(fn($d) => [
+                    'id' => $d->getId(),
+                    'name' => $d->getName()
+                ], $user->getDepartments()->toArray())
             ];
         }, $users);
 
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
-    #[Route("users/{id}/role", name:"set_role", methods:["PUT"])]
-    public function setRole(EntityManagerInterface $entityManager, int $id, Request $request): JsonResponse
+    #[Route('/users/add', name: 'add_users', methods: ['POST'])]
+    public function addUser(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $userRepository = $entityManager->getRepository(User::class);
-        $user = $userRepository->find($id);
-
-        if (!$user)
-        {
-            return new JsonResponse(['error' => 'Ustilisateur n\'existe pas ou n\'est pas trouvé'], Response::HTTP_NOT_FOUND);
-        }
-
         $data = json_decode($request->getContent(), true);
 
-        if (!in_array($data['role'], User::ROLES, true)) {
-            return new JsonResponse(['error' => 'Rôle invalide. Rôles possibles : ' . implode(', ', User::ROLES)], Response::HTTP_BAD_REQUEST);
+        if (!isset($data['email'], $data['role'])) {
+            return new JsonResponse(['error' => 'Données invalides'], 400);
         }
-
+        $user = new User();
+        $user->setEmail($data['email']);
         $user->setRole($data['role']);
+        if (isset($data['departments']) && is_array($data['departments'])) {
+            $departmentRepository = $entityManager->getRepository(Department::class);
+            foreach ($data['departments'] as $deptId) {
+                $department = $departmentRepository->find($deptId);
+                if ($department) {
+                    $user->addDepartment($department);
+                }
+            }
+        }
+        $entityManager->persist($user);
         $entityManager->flush();
 
         return new JsonResponse([
-            'message' => 'Rôle mis à jour avec succès',
+            'message' => 'Utilisateur ajouté avec succès',
             'user' => [
                 'id' => $user->getId(),
-                'identifiant' => $user->getIdentifiant(),
+                'email' => $user->getEmail(),
                 'role' => $user->getRole(),
+                'departments' => array_map(fn($d) => ['id' => $d->getId(), 'name' => $d->getName()], $user->getDepartments()->toArray())
             ]
-        ], Response::HTTP_OK);
+        ], Response::HTTP_CREATED);
     }
 
-    #[Route("/users/{id}/department", name:"get_department_for_a_user", methods:['GET'])]
-    public function getDepartmentForAUser(EntityManagerInterface $entityManager, int $id): JsonResponse
+    #[Route('/users/update', name: 'update_users', methods: ['PUT'])]
+    public function updateUser(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $userRepository = $entityManager->getRepository(User::class);
-        $user = $userRepository->find($id);
+        $data = json_decode($request->getContent(), true);
 
-        if (!$user)
-        {
-            return new JsonResponse(['error' => "L\'utilisateur n\'existe pas ou n\' pas été trouvé"], Response::HTTP_NOT_FOUND);
+        if (!isset($data['id'])) {
+            return new JsonResponse(['error' => 'ID utilisateur manquant'], 400);
+        }
+        $user = $entityManager->getRepository(User::class)->find($data['id']);
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
+        }
+        if (isset($data['fullname'])) {
+            $user->setFullname($data['fullname']);
+        }
+        if (isset($data['email'])) {
+            $user->setEmail($data['email']);
+        }
+        if (isset($data['role'])) {
+            try {
+                $user->setRole($data['role']);
+            } catch (\InvalidArgumentException $e) {
+                return new JsonResponse(['error' => $e->getMessage()], 400);
+            }
         }
 
-        $departments = $user->getDepartments();
-        $data = [];
+        if (isset($data['departments']) && is_array($data['departments'])) {
+            $departmentRepository = $entityManager->getRepository(Department::class);
+            $user->getDepartments()->clear(); // Supprime tous les départements de l'utilisateur
 
-        foreach ($departments as $department)
-        {
-            $data[] = [
-                'id' => $department->getId(),
-                'name' => $department->getName()
-            ];
+            foreach ($data['departments'] as $deptId) {
+                $department = $departmentRepository->find($deptId);
+                if ($department) {
+                    $user->addDepartment($department);
+                }
+            }
         }
-
-        return new JsonResponse($data, Response::HTTP_OK);
-    }
-
-    #[Route("user/{id}/department/{departmentId}", name:"add_department_to_user", methods:['POST'])]
-    public function addDepartmentForAUser(EntityManagerInterface $entityManager, int $id, int $departmentId): JsonResponse
-    {
-        $userRepository = $entityManager->getRepository(User::class);
-        $user = $userRepository->find($id);
-
-        if (!$user)
-        {
-            return new JsonResponse(['error' => "L'utilisateur n'existe pas ou n'a pas été trouvé"], Response::HTTP_NOT_FOUND);
-        }
-
-        $departmentRepository = $entityManager->getRepository(Department::class);
-        $department = $departmentRepository->find($departmentId);
-
-        if (!$department)
-        {
-            return new JsonResponse(['error' => "Le département n'existe pas ou n'a pas été trouvé"], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($user->getDepartments()->contains($department))
-        {
-            return new JsonResponse(['error' => "Le département est déjà associé à l'utilisateur"], Response::HTTP_BAD_REQUEST);
-        }
-
-        $user->addDepartment($department);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => "Département ajouté à l'utilisateur avec succès"], Response::HTTP_OK);
+        return new JsonResponse([
+            'message' => 'Utilisateur mis à jour avec succès',
+            'user' => [
+                'id' => $user->getId(),
+                'fullname' => $user->getFullname(),
+                'email' => $user->getEmail(),
+                'role' => $user->getRole(),
+                'departments' => array_map(fn($d) => ['id' => $d->getId(), 'name' => $d->getName()], $user->getDepartments()->toArray())
+            ]
+        ]);
     }
 
-    #[Route("user/{id}/department/{departmentId}", name:"modify_department_from_user", methods:['PUT'])]
-    public function modifyDepartmentForAUser(EntityManagerInterface $entityManager, int $id, int $departmentId): JsonResponse
+    #[Route('/users/delete/{id}', name: 'delete_users', methods: ['DELETE'])]
+    public function deleteUser(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
-        $userRepository = $entityManager->getRepository(User::class);
-        $user = $userRepository->find($id);
+        $user = $entityManager->getRepository(User::class)->find($id);
 
-        if (!$user)
-        {
-            return new JsonResponse(['error' => "L\'utilisateur n\'existe pas ou n\' pas été trouvé"], Response::HTTP_NOT_FOUND);
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non trouvé'], 404);
         }
-
-        $departmentRepository = $entityManager->getRepository(Department::class);
-        $department = $departmentRepository->find($departmentId);
-
-        if (!$department)
-        {
-            return new JsonResponse(['error' => "Le département n\'existe pas ou n\' pas été trouvé"], Response::HTTP_NOT_FOUND);
-        }
-
-        if (!$user->getDepartments()->contains($department))
-        {
-            return new JsonResponse(['error' => "Le département n\'est pas associé à l\'utilisateur"], Response::HTTP_BAD_REQUEST);
-        }
-
-        $user->removeDepartment($department);
+        $entityManager->remove($user);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => "Département retiré de l\'utilisateur avec succès"], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Utilisateur supprimé avec succès']);
     }
+
 }

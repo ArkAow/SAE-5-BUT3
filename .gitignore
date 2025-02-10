@@ -1,29 +1,29 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# ----- Frontend -----
+## dependencies
 /app/node_modules
 /app/.pnp
 /app/.pnp.js
 
-# testing
+## testing
 /app/coverage
 
-# production
+## production
 /app/build
 
-# misc
+## misc
 /app/.DS_Store
 /app/.env.local
 /app/.env.development.local
 /app/.env.test.local
 /app/.env.production.local
-
 /app/npm-debug.log*
 /app/yarn-debug.log*
 /app/yarn-error.log*
 
-### ----- Backend -----
-###> symfony/framework-bundle ###
+# ----- Backend -----
+##> symfony/framework-bundle ###
 /backend/.env
 /backend/.env.local
 /backend/.env.local.php
@@ -32,9 +32,12 @@
 /backend/public/bundles/
 /backend/var/
 /backend/vendor/
-###< symfony/framework-bundle ###
+##< symfony/framework-bundle ###
 
-### fichiers excels
+## fichiers excels
 /backend/public/uploads
-
 /backend/.env
+
+# ----- Global -----
+/node_modules
+/vendor
