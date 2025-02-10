@@ -1,10 +1,14 @@
 import React from "react";
 import AppRoutes from "./Routes/AppRoutes"; // Importer vos routes
 import { UserProvider } from "./contexts/UserContext"; // Importer le UserProvider
+const cors = require("cors");
 
 function App() {
   return (
-    <div className="App bg-cover bg-center bg-landscape" style={{ WebkitAppRegion: "no-drag" }}>
+    <div
+      className="App bg-cover bg-center bg-landscape"
+      style={{ WebkitAppRegion: "no-drag" }}
+    >
       <UserProvider>
         <AppRoutes />
       </UserProvider>

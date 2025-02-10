@@ -7,31 +7,61 @@ use App\Entity\Comment;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity] 
 class User
 {
+    public const ROLES = ['superadmin', 'admin', 'extendedviewer', 'restrictedviewer'];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id;
 
-    #[ORM\Column(type: "string", length: 150)]
+    #[ORM\Column(type: "string", length: 255)]
+    private string $fullname;
+
+    #[ORM\Column(type: "string", length: 255)]
     private string $email;
 
-    #[ORM\Column(type: "string", length: 150)]
-    private string $password;
-
     #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: "users")]
+    #[ORM\JoinTable(
+        name: 'user_comment',
+        joinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'comment_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
     private Collection $comments;
+
+    #[ORM\Column(type: "string", length: 20)]
+    private string $role;
+
+    #[ORM\ManyToMany(targetEntity: Department::class, inversedBy: "users")]
+    #[ORM\JoinTable(name: "user_department")]
+    private Collection $departments;
 
     public function __construct()
     {
+        $this->fullname = "nécessite une première connexion";
         $this->comments = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
 
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): self
+    {
+        if (!in_array($role, self::ROLES, true)) {
+            throw new \InvalidArgumentException("Rôle invalide : " . $role);
+        }
+        $this->role = $role;
+        return $this;
     }
 
     public function getEmail(): string
@@ -45,14 +75,14 @@ class User
         return $this;
     }
 
-    public function getPassword(): string
+    public function getFullname(): string
     {
-        return $this->password;
+        return $this->fullname;
     }
 
-    public function setPassword(string $password): self
+    public function setFullname(string $fullname): self
     {
-        $this->password = $password;
+        $this->fullname = $fullname;
         return $this;
     }
 
@@ -73,6 +103,27 @@ class User
     public function removeComment(Comment $comment): self
     {
         $this->comments->removeElement($comment);
+        return $this;
+    }
+
+    public function getDepartments(): Collection
+    {
+        return $this->departments;
+    }
+
+    public function addDepartment(Department $department): self
+    {
+        if (!$this->departments->contains($department)) {
+            $this->departments[] = $department;
+        }
+
+        return $this;
+    }
+
+    public function removeDepartment(Department $department): self
+    {
+        $this->departments->removeElement($department);
+
         return $this;
     }
 }

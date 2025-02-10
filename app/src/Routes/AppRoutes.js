@@ -12,8 +12,11 @@ import PreviEdit from "../components/MainGridEdit/PreviEdit";
 import SeePrevi from "../components/SeePrevi/SeePrevi";
 import InsertM3C from "../components/ManageData/InsertM3C";
 import ManageData from "../components/ManageData/ManageData";
+import ManageDepartments from  "../components/ManageData/ManageDepartments";
+import ManageUsers from  "../components/ManageData/ManageUsers";
 import ModifyTeachers from "../components/ManageData/ModifyTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
+import ModifyGroups from "../components/ManageData/ModifyGroups";
 
 const AppRoutes = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -69,6 +72,30 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <ModifyTeachers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ModifyGroups"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ModifyGroups />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageDepartments"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ManageDepartments />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageUsers"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ManageUsers />
             </ProtectedRoute>
           }
         />
