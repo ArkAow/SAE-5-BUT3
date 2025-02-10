@@ -4,7 +4,7 @@ import Header from "../header/header.js";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
 
-const ModifyTeachers = () => {
+const ManageTeachers = () => {
   const [teachers, setTeachers] = useState([]);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -236,4 +236,4 @@ const ModifyTeachers = () => {
   );
 };
 
-export default ModifyTeachers;
+export default ManageTeachers;

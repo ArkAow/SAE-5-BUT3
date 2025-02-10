@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const ManageData = () => {
   const navigate = useNavigate();
 
-  const goToModifyTeacher = () => navigate("/ModifyTeachers");
+  const goToManageTeacher = () => navigate("/ManageTeachers");
   const goToModifyGroups = () => navigate("/ModifyGroups");
   const goToManageDepartments = () => navigate("/ManageDepartments");
   const goToManageUsers = () => navigate("/ManageUsers");
@@ -37,9 +37,9 @@ const ManageData = () => {
                     <p className="text-white text-lg text-center">Insérer le M3C</p>
                 </div>
 
-                {/* Modify Teachers */}
+                {/* Manage Teachers */}
                 <div className="bg-black bg-opacity-70 size-[280px] rounded-2xl p-2 transition-transform duration-200 hover:scale-105 cursor-pointer flex flex-col justify-center items-center"
-                onClick={goToModifyTeacher}>
+                onClick={goToManageTeacher}>
                     <div className="size-[150px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
                         <img src="/images/profile_picture_anonym.png" className="size-[90px] md:size-[120px]"/>
                     </div>

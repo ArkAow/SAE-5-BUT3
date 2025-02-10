@@ -14,7 +14,7 @@ import InsertM3C from "../components/ManageData/InsertM3C";
 import ManageData from "../components/ManageData/ManageData";
 import ManageDepartments from  "../components/ManageData/ManageDepartments";
 import ManageUsers from  "../components/ManageData/ManageUsers";
-import ModifyTeachers from "../components/ManageData/ModifyTeachers";
+import ManageTeachers from "../components/ManageData/ManageTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
 import ModifyGroups from "../components/ManageData/ModifyGroups";
 
@@ -68,10 +68,10 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/ModifyTeachers"
+          path="/ManageTeachers"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <ModifyTeachers />
+              <ManageTeachers />
             </ProtectedRoute>
           }
         />

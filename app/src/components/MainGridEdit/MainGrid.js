@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
+import useGroups from "../../hooks/useGroups.js";
+import useTeachers from "../../hooks/useTeachers.js";
+import { createPortal } from "react-dom";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../../services/courseService.js";
 import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
-import useGroups from "../../hooks/useGroups.js";
 
 const MainGrid = ({ curriculum }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
   const { groups, fetchGroups, addGroups, deleteGroups, deleteHalfGroups, addSubGroups, isGroupLoading, getGroupList } = useGroups(curriculum, setToast);
+  const { teachers } = useTeachers(setToast);
 
   const [items, setItems] = useState({});
   const [modifiedCourses, setModifiedCourses] = useState([])
@@ -23,7 +25,6 @@ const MainGrid = ({ curriculum }) => {
   const [availableSemesters, setAvailableSemesters] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState({});
   const [availableSubjects, setAvailableSubjects] = useState([]);
-  const [teachers, setTeachers] = useState([]);
 
   const [courseTypes, setCourseTypes] = useState([]);
   const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
@@ -167,29 +168,6 @@ const MainGrid = ({ curriculum }) => {
     setItems(initialItems);
   }, [selectedSubject]);
 
-
-  /* Gestion des ENSEIGNANTS */
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      try {
-        console.log(`Chargement des enseigants...`);
-          const response = await fetch(routes.dev.teachers.get());
-          if (!response.ok) {
-            throw new Error("Erreur lors du chargement des enseignants.");
-          }
-          const data = await response.json();
-          setTeachers(data);
-      } catch (error) {
-          console.error(error);
-      } finally {
-        console.log(`Chargement des enseigants réussi`);
-      }
-    };
-
-    fetchTeachers();
-  }, []);
-
-  
   /* Gestion des COURS -------------------------------------------- */
   const fetchCoursesForSubjects = async () => {
     if (!selectedSemester) return;
