@@ -11,7 +11,7 @@ const Login = ({ setIsAuthenticated }) => {
   const [password, setPassword] = useState(""); // Champ "password"
   const [error, setError] = useState(""); // Gestion des erreurs
   const [loading, setLoading] = useState(false); // Gestion du chargement
-  const { setFullName, setEmail, setDepartments } = useUserContext(); // Récupère la fonction setFullName depuis le UserContext
+  const { setFullName, setEmail, setDepartments, setRole } = useUserContext(); // Récupère la fonction setFullName depuis le UserContext
 
   const navigate = useNavigate();
 
@@ -49,7 +49,7 @@ const Login = ({ setIsAuthenticated }) => {
   
       const { surname = "Unknown", name = "Unknown", email = null } = data.data[0];
       // Si l'utilisateur n'est pas "admin root", on vérifie l'email
-      if (!(surname === "admin" && name === "root")) { // /!\ A SECURISER
+      if (!(surname === "admin" && name === "root")) { // /!\ A SECURISER -> mettre dans un .env
         if (!email) {
           setError("Aucune adresse email trouvée pour ce compte.");
           return;
@@ -70,10 +70,12 @@ const Login = ({ setIsAuthenticated }) => {
         setEmail(logingInUser.email);
         setFullName(logingInUser.fullname);
         setDepartments(logingInUser.departments || []);
+        setRole(logingInUser.role);
       } else {
         setEmail(`admin@root`);
         setFullName(`Administrateur`);
         setDepartments([]);
+        setRole("superadmin");
       }
   
       // Connexion réussie
