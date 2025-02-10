@@ -135,4 +135,25 @@ class UserController extends AbstractController
         return new JsonResponse(['message' => 'Utilisateur supprimé avec succès']);
     }
 
+    #[Route("/users/{email}", name: "get_user_by_email", methods: ["GET"])]
+    public function getUserByEmail(string $email, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $userRepository = $entityManager->getRepository(User::class);
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'fullname' => $user->getFullname(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole(),
+            'departments' => array_map(fn($d) => [
+                'id' => $d->getId(),
+                'name' => $d->getName()
+            ], $user->getDepartments()->toArray()),
+        ], Response::HTTP_OK);
+    }
 }

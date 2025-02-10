@@ -53,14 +53,15 @@ public function login(Request $request): JsonResponse
     $password = $data['password'];
 
     // Vérifier si l'utilisateur est le compte root
+    // /!\ A CHANGER POUR DES DONNEES SECURISEES
     if ($username === 'root' && $password === 'admin') {
         return new JsonResponse([
             'success' => true,
             'message' => 'Authentication successful (root account)',
             'data' => [
                 [
-                    'givenName' => 'admin', // Prénom
-                    'sn' => 'root',         // Nom
+                    'surname' => 'admin', // Prénom
+                    'name' => 'root',         // Nom
                     'mail' => null,         // Adresse mail
                 ],
             ],
@@ -94,9 +95,9 @@ public function login(Request $request): JsonResponse
         foreach ($result as $entry) {
             $attributes = $entry->getAttributes();
             $data[] = [
-                'givenName' => $attributes['givenName'][0] ?? null, // Extraction de givenName
-                'sn' => $attributes['sn'][0] ?? null,              // Extraction de sn
-                'mail' => $attributes['mail'][0] ?? null,          // Extraction de mail
+                'surname' => $attributes['givenName'][0] ?? null, // Extraction de givenName
+                'name' => $attributes['sn'][0] ?? null,              // Extraction de sn
+                'email' => $attributes['mail'][0] ?? null,          // Extraction de mail
             ];
         }
 

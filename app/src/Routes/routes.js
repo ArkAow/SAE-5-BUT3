@@ -24,6 +24,9 @@ const routes = {
       get: () => `${routes.dev.default}department`,
       update: () => `${routes.dev.default}department/update`,
     },
+    ldap: {
+      login: () => `${routes.dev.default}ldap/login`,
+    },
     groups: {
       addGroups: () => `${routes.dev.default}groups/add`,
       addSubGroups: () => `${routes.dev.default}groups/add/halfgroup`,
@@ -48,6 +51,7 @@ const routes = {
       add: () => `${routes.dev.default}users/add`,
       delete: (id) => `${routes.dev.default}users/delete/${id}`,
       getAll: () => `${routes.dev.default}users`,
+      getByEmail: (email) => `users/${email}`,
       update: () => `${routes.dev.default}users/update`,
     },
   },

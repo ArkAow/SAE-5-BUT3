@@ -88,11 +88,21 @@ const ManageUsers = () => {
                       {users.map((user) => (
                         <li key={user.id} className="flex items-center bg-white rounded-lg p-2">
                           <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
-                            <span 
-                              className="w-[25%] truncate text-left font-semibold" 
-                              title={user.fullname}>
-                                {user.fullname}
-                            </span>
+                            {user.fullname ? (
+                              <span 
+                                className="w-[25%] truncate text-left font-semibold" 
+                                title={user.fullname}>
+                                  {user.fullname}
+                              </span>                              
+                            ) : (
+                              <span 
+                                className="w-[25%] truncate text-left font-semibold text-red-500" 
+                                title="Not set">
+                                  Nécessite une première connexion
+                              </span>   
+                            )}
+                            
+
                             <span 
                               className="w-[25%] truncate text-center"
                               title={user.email}>

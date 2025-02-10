@@ -38,7 +38,7 @@ const useUsers = (setToast) => {
     } catch (err) {
       setError(err.message);
       setToast({
-        message: error.message || "Erreur lors de l'ajout du utilisateur",
+        message: err.message || "Erreur lors de l'ajout du utilisateur",
         type: "error",
         visible: true,
       });
@@ -65,7 +65,7 @@ const useUsers = (setToast) => {
     } catch (err) {
       setError(err.message);
       setToast({
-        message: error.message || "Erreur lors de la modification du utilisateur",
+        message: err.message || "Erreur lors de la modification du utilisateur",
         type: "error",
         visible: true,
       });
@@ -86,7 +86,7 @@ const useUsers = (setToast) => {
     } catch (err) {
       setError(err.message);
       setToast({
-        message: error.message || "Erreur lors de la suppréssion de l'utilisateur",
+        message: err.message || "Erreur lors de la suppréssion de l'utilisateur",
         type: "error",
         visible: true,
       });
@@ -96,11 +96,28 @@ const useUsers = (setToast) => {
     }
   };
 
+  const getUserByEmail = async (email) => {
+    try {
+      setIsSaving(true);
+      const response = await fetch(routes.dev.users.getByEmail(email), { 
+        method: "GET"
+      });
+      const data = await response.json();
+      const user = data;
+      return user;
+    } catch (err) {
+      setError("Erreur lors de la vérification :", err.message);
+      return null;
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  return { users, isLoading, isSaving, error, fetchUsers, addUser, updateUser, deleteUser};
+  return { users, isLoading, isSaving, error, fetchUsers, addUser, updateUser, deleteUser, getUserByEmail};
 };
 
 export default useUsers;
