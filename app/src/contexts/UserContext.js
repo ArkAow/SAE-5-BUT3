@@ -15,4 +15,4 @@ export const UserProvider = ({ children }) => {
 };
 
 // Hook pour utiliser le contexte
-export const useUser = () => useContext(UserContext);
+export const useUserContext = () => useContext(UserContext);

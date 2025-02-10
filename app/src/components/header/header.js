@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Import de useLocation pour détecter la route actuelle
-import { useUser } from "../../contexts/UserContext"; // Import du UserContext
+import { useUserContext } from "../../contexts/UserContext"; // Import du UserContext
 
 const Header = () => {
-  const { fullName } = useUser(); // Récupère fullName depuis le contexte
+  const { fullName } = useUserContext(); // Récupère fullName depuis le contexte
   const navigate = useNavigate();
   const location = useLocation(); // Pour détecter la route actuelle
 

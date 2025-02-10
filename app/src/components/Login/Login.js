@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import LoginHeader from "../header/header";
-import { useUser } from "../../contexts/UserContext"; // Import du UserContext
+import Header from "../header/header";
+import { useUserContext } from "../../contexts/UserContext"; // Import du UserContext
 
 const Login = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState(""); // Champ "username"
   const [password, setPassword] = useState(""); // Champ "password"
   const [error, setError] = useState(""); // Gestion des erreurs
   const [loading, setLoading] = useState(false); // Gestion du chargement
-  const { setFullName } = useUser(); // Récupère la fonction setFullName depuis le UserContext
+  const { setFullName } = useUserContext(); // Récupère la fonction setFullName depuis le UserContext
 
   const navigate = useNavigate();
 
@@ -64,7 +64,7 @@ const Login = ({ setIsAuthenticated }) => {
 
   return (
     <div className="min-h-screen flex flex-col items-center">
-      <LoginHeader />
+      <Header />
       <div className="flex items-center w-1/2 justify-center max-w-[60%] mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-8">
         <form
           onSubmit={handleSubmit}

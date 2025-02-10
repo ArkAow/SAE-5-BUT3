@@ -185,197 +185,54 @@ const ModifyTeachers = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <>
       <Header />
-      {toast.visible && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast({ ...toast, visible: false })}
-        />
-      )}
-      <div className="flex flex-row items-center mt-16 ml-10 py-1 px-8 text-white bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg">
-        <span onClick={goToHomePage} className="cursor-pointer hover:underline">
-          Page d'accueil /
-        </span>
-        <img src="/images/options.svg" alt="Options Icon" className="w-8 h-8" />
-        <span
-          onClick={goToManageData}
-          className="cursor-pointer hover:underline"
-        >
-          Gestion des données /
-        </span>
-        <span>Modifier les enseignants</span>
+
+      {/* Navigation */}
+      <div className="absolute flex flex-row items-center top-16 left-10 space-x-4">
+        <div 
+          className="flex items-center justify-center p-4 bg-black bg-opacity-70 rounded-lg cursor-pointer"
+          onClick={goToHomePage}>
+          <img src="/images/home.svg" className="w-8 h-8"/>
+        </div>
+        <div 
+          className="flex items-center justify-center p-4 bg-black bg-opacity-70 rounded-lg cursor-pointer"
+          onClick={goToManageData}>
+          <img src="/images/options.svg" className="w-8 h-8"/>
+        </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center flex-1 space-y-5 py-10">
-        <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-2 rounded-lg justify-between">
-          {/* Div du milieu qui prend le plus d'espace */}
-          <div className="flex flex-col flex-grow  p-6 rounded-lg transition-opacity duration-300">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center  p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
-                <div className="spinner"></div>
-                <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">
-                  Chargement des enseignants...
-                </div>
-              </div>
-            ) : (
-              <div className="text-white text-l font-bold m-1 overflow-y-auto custom-scrollbar-light min-w-44 w-full max-h-[300px]">
-                <div className="w-full">
-                  <div className="flex items-center justify-between pb-3">
-                    <span className="text-white text-xl font-bold">
-                      Enseignants
-                    </span>
-                    <button className="bg-red-700 hover:bg-red-600 text-white font-bold py-1 px-1 rounded-lg" onClick={() => setShowForm(!showForm)}>
-                      Ajouter
-                    </button>
-                    
-                  </div>
-                </div>
-                {showForm && (
-                <form onSubmit={handleAddTeacher} className="flex flex-col space-y-4">
-                  <h1 className="text-white text-3xl font-bold mt-1">
-                    Ajouter un enseignant
-                  </h1>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Prénom"
-                    className="p-2 rounded"
-                  />
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Nom"
-                    className="p-2 rounded"
-                  />
-                  <input
-                    type="number"
-                    min="0"
-                    max="40"
-                    value={constraint}
-                    onChange={(e) => setConstraint(e.target.value)}
-                    placeholder="Nombre maximum d'heures / semaines"
-                    className="p-2 rounded"
-                  />
-                  <label className="flex justify-center items-center space-x-2 text-white w-full">
-                    <input
-                      type="checkbox"
-                      checked={isPartTime}
-                      onChange={(e) => setIsPartTime(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-500"
-                    />
-                    <span>Enseignant à temps partiel</span>
-                  </label>
-                  <button type="submit" className="btn-default p-2">
-                    Ajouter
-                  </button>
-                </form>
-              )}
+      <div className="min-h-screen flex flex-col justify-center items-center px-8">
+        <div className="flex justify-around w-full mx-10 mt-40">
+          
+          {/* Liste des enseignants */}
+          <div className="w-1/2 min-w-[300px] h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg flex flex-col">
+            <h2 className="text-white text-center text-lg font-bold mb-4">
+              Enseignants
+            </h2>
+            <div className="space-y-2 flex-grow overflow-auto">
+              {/*éléments ici*/}
             </div>
-                )}
-                {teachers.length === 0 ? (
-                  <span>Il n'y a pas d'enseignants.</span>
-                ) : (
-                  <ul className="space-y-4">
-                    {teachers.map((teacher) => (
-                      <li
-                        key={teacher.id}
-                        className="flex justify-between items-center bg-white rounded-lg p-2"
-                      >
-                        <span className="text-base text-black max-w-[80%]">
-                          {teacher.code}
-                          <span className="font-normal text-sm">
-                            {" "}
-                            maximum {teacher.time_constraints}h / semaines
-                          </span>
-                        </span>
-                        <div>
-                          <button
-                            onClick={() => startEditingTeacher(teacher)}
-                            className="size-4 btn-default justify-items-center ml-1"
-                          >
-                            <img
-                              src="images/options.svg"
-                              alt="Modifier"
-                              className="size-3"
-                            />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteTeacher(teacher)}
-                            className="size-4 btn-default justify-items-center ml-1"
-                          >
-                            <img
-                              src="images/cross.svg"
-                              alt="Fermer"
-                              className="size-3"
-                            />
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
+            <button className="mt-4 w-full p-2 btn-default justify-between">
+              Ajouter
+            </button>
+          </div>
+
+          {/* Enseignemants des enseignants */}
+          <div className="w-1/2 min-w-[300px] h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg mx-4 flex flex-col">
+            <h2 className="text-white text-center text-lg font-bold mb-4">
+              Enseignemants
+            </h2>
+            <div className="space-y-2 flex-grow overflow-auto">
+              {/*éléments ici*/}
+            </div>
+            <button className="mt-4 w-full p-2 btn-default justify-between">
+              Ajouter
+            </button>
           </div>
         </div>
       </div>
-      {editingTeacher && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="tooltip-centered">
-            <h2 className="text-xl font-bold mb-4">Modifier l'enseignant</h2>
-            <form onSubmit={handleEditTeacher} className="space-y-4">
-              <input
-                type="text"
-                value={editedFirstName}
-                onChange={(e) => setEditedFirstName(e.target.value)}
-                placeholder="Prénom"
-                className="p-2 rounded w-full bg-gray-300"
-              />
-              <input
-                type="text"
-                value={editedLastName}
-                onChange={(e) => setEditedLastName(e.target.value)}
-                placeholder="Nom"
-                className="p-2 rounded w-full bg-gray-300"
-              />
-              <input
-                type="number"
-                min="0"
-                max="40"
-                value={editedConstraint}
-                onChange={(e) => setEditedConstraint(e.target.value)}
-                placeholder="Nombre maximum d'heures / semaines"
-                className="p-2 rounded w-full bg-gray-300"
-              />
-              <label className="flex items-center ml-3 space-x-2">
-                <input
-                  type="checkbox"
-                  checked={editedIsPartTime}
-                  onChange={(e) => setEditedIsPartTime(e.target.checked)}
-                />
-                <span>Enseignant à temps partiel</span>
-              </label>
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setEditingTeacher(null)}
-                  className="btn-default p-2"
-                >
-                  Annuler
-                </button>
-                <button type="submit" className="btn-default p-2">
-                  Valider
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 

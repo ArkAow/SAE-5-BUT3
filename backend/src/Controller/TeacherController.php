@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Teacher;
+use App\Repository\TeacherRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 class TeacherController extends AbstractController
@@ -94,13 +95,10 @@ class TeacherController extends AbstractController
         return new JsonResponse($data, 200);
     }
 
-    #[Route('/teacher/delete', name: 'delete_teacher', methods: ['DELETE'])]
-    public function deleteTeacher(EntityManagerInterface $entityManager, Request $request) : JsonResponse
+    #[Route('/teacher/delete/{id}', name: 'delete_teacher', methods: ['DELETE'])]
+    public function deleteTeacher(int $id, TeacherRepository $teacherRepository, EntityManagerInterface $entityManager, Request $request) : JsonResponse
     {
-        $teacherId = json_decode($request->getContent(), true)['id'];
-    
-        $teacherRepository = $entityManager->getRepository(Teacher::class);
-        $teacher = $teacherRepository->findOneBy(['id' => $teacherId]);
+        $teacher = $teacherRepository->find($id);
     
         if ($teacher === null) {
             return new JsonResponse(['error' => 'Professeur non trouvé.'], 404);

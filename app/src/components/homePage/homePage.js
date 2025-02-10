@@ -1,12 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../header/header";
-import { useUser } from "../../contexts/UserContext"; // Import du UserContext
+import { useUserContext } from "../../contexts/UserContext"; // Import du UserContext
 
 const HomePage = () => {
   const navigate = useNavigate();
 
-  const { fullName } = useUser(); // Récupère fullName depuis le contexte
+  const { fullName } = useUserContext(); // Récupère fullName depuis le contexte
 
   const goToPreviEdit = () => {
     navigate("/PreGridEdit");

@@ -40,7 +40,7 @@ const routes = {
     },
     teachers: {
       add: () => `${routes.dev.default}teacher/add`,
-      delete: () => `${routes.dev.default}teacher/delete`,
+      delete: (id) => `${routes.dev.default}teacher/delete/${id}`,
       get: () => `${routes.dev.default}teacher`,
       update: () => `${routes.dev.default}teacher/update`,
     },
