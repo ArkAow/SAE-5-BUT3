@@ -218,10 +218,10 @@ const ManageTeachers = () => {
             </button>
           </div>
 
-          {/* Enseignemants des enseignants */}
+          {/* Enseignements des enseignants */}
           <div className="w-1/2 min-w-[300px] h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg mx-4 flex flex-col">
             <h2 className="text-white text-center text-lg font-bold mb-4">
-              Enseignemants
+              Enseignements
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
               {/*éléments ici*/}

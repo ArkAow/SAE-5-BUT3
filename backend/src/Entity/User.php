@@ -40,7 +40,7 @@ class User
 
     public function __construct()
     {
-        $this->fullname = null;
+        $this->fullname = "";
         $this->comments = new ArrayCollection();
         $this->departments = new ArrayCollection();
     }

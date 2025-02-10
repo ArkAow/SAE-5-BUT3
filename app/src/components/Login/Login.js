@@ -62,7 +62,7 @@ const Login = ({ setIsAuthenticated }) => {
         }
 
         //si c'est la première connexion de l'utilisateur -> mettre à jour le nom
-        if (!logingInUser.fullname) {
+        if (logingInUser.fullname === "") {
           logingInUser.fullname = `${surname} ${name}`;
           updateUser(logingInUser);
         }
