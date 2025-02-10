@@ -6,7 +6,7 @@ const ManageData = () => {
   const navigate = useNavigate();
 
   const goToManageTeacher = () => navigate("/ManageTeachers");
-  const goToModifyGroups = () => navigate("/ModifyGroups");
+  const goToManageGroups = () => navigate("/ManageGroups");
   const goToManageDepartments = () => navigate("/ManageDepartments");
   const goToManageUsers = () => navigate("/ManageUsers");
   const goToInsertM3C = () => navigate("/InsertM3C");
@@ -49,9 +49,9 @@ const ManageData = () => {
 
             {/* Deuxième ligne (3 boutons) */}
             <div className="grid grid-cols-3 gap-x-8 w-full">
-                {/* Modify Groups */}
+                {/* Manage Groups */}
                 <div className="bg-black bg-opacity-70 size-[280px] rounded-2xl p-2 transition-transform duration-200 hover:scale-105 cursor-pointer flex flex-col justify-center items-center"
-                onClick={goToModifyGroups}>
+                onClick={goToManageGroups}>
                     <div className="size-[130px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
                         <img src="/images/student.svg" className="size-[80px] md:size-[100px]"/>
                     </div>

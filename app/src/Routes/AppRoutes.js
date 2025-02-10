@@ -16,7 +16,7 @@ import ManageDepartments from  "../components/ManageData/ManageDepartments";
 import ManageUsers from  "../components/ManageData/ManageUsers";
 import ManageTeachers from "../components/ManageData/ManageTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
-import ModifyGroups from "../components/ManageData/ModifyGroups";
+import ManageGroups from "../components/ManageData/ManageGroups";
 
 const AppRoutes = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -76,10 +76,10 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/ModifyGroups"
+          path="/ManageGroups"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <ModifyGroups />
+              <ManageGroups />
             </ProtectedRoute>
           }
         />

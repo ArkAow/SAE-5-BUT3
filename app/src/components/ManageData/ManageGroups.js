@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
 import useGroups from "../../hooks/useGroups.js";
-import useCurriculums from "../../hooks/useCurriculums";
+import useCurriculums from "../../hooks/useCurriculums.js";
 
-const ModifyGroups = () => {
+const ManageGroups = () => {
   const navigate = useNavigate();
   const goToHomePage = () => navigate("/homePage");
   const goToManageData = () => navigate("/ManageData");
@@ -96,4 +96,4 @@ const ModifyGroups = () => {
   );
 };
 
-export default ModifyGroups;
+export default ManageGroups;
