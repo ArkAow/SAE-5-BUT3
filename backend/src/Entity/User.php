@@ -24,6 +24,11 @@ class User
     private string $email;
 
     #[ORM\ManyToMany(targetEntity: Comment::class, mappedBy: "users")]
+    #[ORM\JoinTable(
+        name: 'user_comment',
+        joinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'comment_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
     private Collection $comments;
 
     #[ORM\Column(type: "string", length: 20)]

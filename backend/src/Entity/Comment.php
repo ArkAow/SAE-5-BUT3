@@ -21,6 +21,11 @@ class Comment
     private ?string $text = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'comments')]
+    #[ORM\JoinTable(
+        name: 'user_comment',
+        joinColumns: [new ORM\JoinColumn(name: 'comment_id', referencedColumnName: 'id', onDelete: 'CASCADE')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    )]
     private Collection $users;
 
     #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'comments')]
