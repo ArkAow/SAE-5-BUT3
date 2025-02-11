@@ -6,7 +6,6 @@ const UserDeletingForm = ({user, deleteUser, setDeletingUser, isSaving}) => {
   }
 
   const handleDeletingUser = async () => {
-    console.log(user);
     await deleteUser(user.id);
     handleLeaving()
   }
