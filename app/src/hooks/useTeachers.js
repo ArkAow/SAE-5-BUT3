@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import routes from "../Routes/routes";
 
-const useTeachers = (setToast = () => {}) => {
+const useTeachers = (setToast = () => {}, department = null) => {
   const [teachers, setTeachers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchTeachers = async () => {
+  const fetchTeachersFromDepartment = async () => {
+    if (!department) {return;}
     setIsLoading(true);
     try {
       console.log(`Chargement des enseignants...`);
-      const response = await fetch(routes.dev.teachers.get());
+      const response = await fetch(routes.dev.teachers.getFromDepartment(department.id));
       if (!response.ok) throw new Error("Erreur lors du chargement des enseignants");
       const data = await response.json();
       setTeachers(data);
@@ -23,10 +24,10 @@ const useTeachers = (setToast = () => {}) => {
     }
   };
 
-  const addTeacher = async (payload) => {
+  const addTeacherForDepartment = async (payload) => {
     try {
       setIsSaving(true);
-      const response = await fetch(routes.dev.teachers.add(), {
+      const response = await fetch(routes.dev.teachers.addForDepartment(department.id), {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload),
@@ -37,14 +38,14 @@ const useTeachers = (setToast = () => {}) => {
     } catch (err) {
       setError(err.message);
       setToast({
-        message: error.message || "Erreur lors de l'ajout de l'enseignants",
+        message: error.message || "Erreur lors de l'ajout de l'enseignant",
         type: "error",
         visible: true,
       });
     } finally {
-      setToast({ message: "Enseignants ajouté avec succès", type: "success", visible: true });
+      setToast({ message: "Enseignant ajouté avec succès", type: "success", visible: true });
       setIsSaving(false);
-      fetchTeachers();
+      fetchTeachersFromDepartment();
     }
   };
 
@@ -71,7 +72,7 @@ const useTeachers = (setToast = () => {}) => {
     } finally {
       setToast({ message: "Enseignants modifié avec succès", type: "success", visible: true });
       setIsSaving(false);
-      fetchTeachers();
+      fetchTeachersFromDepartment();
     }
   };
   
@@ -92,15 +93,15 @@ const useTeachers = (setToast = () => {}) => {
     } finally {
       setToast({ message: "Enseignants supprimé avec succès", type: "success", visible: true });
       setIsSaving(false);
-      fetchTeachers();
+      fetchTeachersFromDepartment();
     }
   };
 
   useEffect(() => {
-    fetchTeachers();
-  }, []);
+    fetchTeachersFromDepartment();
+  }, [department]);
 
-  return { teachers, isLoading, isSaving, error, fetchTeachers, addTeacher, updateTeacher, deleteTeacher};
+  return { teachers, isLoading, isSaving, error, fetchTeachersFromDepartment, addTeacherForDepartment, updateTeacher, deleteTeacher};
 };
 
 export default useTeachers;

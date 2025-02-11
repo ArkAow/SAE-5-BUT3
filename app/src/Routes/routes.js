@@ -42,9 +42,9 @@ const routes = {
       get: (semesterId) => `${routes.dev.default}semester/${semesterId}/subjects`,
     },
     teachers: {
-      add: () => `${routes.dev.default}teacher/add`,
+      addForDepartment: (departmentId) => `${routes.dev.default}teacher/add/department/${departmentId}`,
       delete: (id) => `${routes.dev.default}teacher/delete/${id}`,
-      get: () => `${routes.dev.default}teacher`,
+      getFromDepartment: (departmentId) => `${routes.dev.default}teacher/department/${departmentId}`,
       update: () => `${routes.dev.default}teacher/update`,
     },
     users: {

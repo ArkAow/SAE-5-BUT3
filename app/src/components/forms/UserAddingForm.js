@@ -62,7 +62,9 @@ const UserAddingForm = ({addUser, departments, setAddingUser, isDepartmentLoadin
                 className="flex w-full items-center bg-gray-200 p-2 rounded-xl"
                 required/>
             </div>
-            <p className="text-red-500 text-sm">L'adresse email doit être celle de l'IUT pour se connecter avec les identifiants Biome.</p>
+            <p className="text-xs text-justify">
+              <span className="text-xs underline">Email :</span> L'adresse email doit être celle de l'IUT pour se connecter avec les identifiants Biome.
+            </p>
             
             <div>
               <label className="block mb-1 font-bold">Rôle de l'utilisateur<span className="text-red-500">*</span> :</label>

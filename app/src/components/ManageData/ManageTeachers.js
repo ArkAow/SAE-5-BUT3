@@ -4,23 +4,25 @@ import Toast from "../Toast/Toast.js";
 import useTeachers from "../../hooks/useTeachers.js";
 import DepartmentSelect from "./DepartmentSelect.js";
 import Navigation from "./Navigation.js";
+import TeacherAddingForm from "../forms/TeacherAddingForm.js";
 import { useUserContext } from "../../contexts/UserContext.js";
 
 const ManageTeachers = () => {
+  const [toast, setToast] = useState({ message: "", type: "", visible: false });
+
   const { departments } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
+  const { teachers, isLoading: isTeacherLoading, isSaving, addTeacherForDepartment, updateTeacher, deleteTeacher } = useTeachers(setToast, selectedDepartment);
 
-  const [toast, setToast] = useState({ message: "", type: "", visible: false });
-  const { teachers, isLoading: isTeacherLoading, isSaving, addTeacher, updateTeacher, deleteTeacher } = useTeachers(setToast);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [addingTeacher, setAddingTeacher] = useState(false);
 
   const handleClickingTeacher = (teacher) => {
     setSelectedTeacher(teacher);
   }
 
   const handleClickingAddButton = () => {
-    console.log(departments);
-    console.log(selectedDepartment);
+    setAddingTeacher(true);
   }
 
   const handleClickingUpdateButton = (teacher) => {
@@ -68,7 +70,7 @@ const ManageTeachers = () => {
                           <span className="w-fit text-left font-semibold"> {teacher.code} </span>
                           <span className="w-fit truncate text-left"> {teacher.firstName} </span>
                           <span className="w-fit truncate text-left"> {teacher.lastName} </span>
-                          <span className="w-fit truncate text-right"> {teacher.isPartimeTutor ? "Enseigant" : "Vacataire"} </span>
+                          <span className="w-fit truncate text-right"> {teacher.isPartimeTutor ? "Vacataire" : "Enseigant"} </span>
                         </div>
                         <div className="flex space-x-2">
                           <button 
@@ -125,6 +127,13 @@ const ManageTeachers = () => {
           </div>
         </div>
       </div>
+      {addingTeacher && (
+        <TeacherAddingForm 
+          addTeacherForDepartment={addTeacherForDepartment}
+          setAddingTeacher={setAddingTeacher}
+          isSaving={isSaving}/>
+      )}
+
       {toast.visible && (
         <Toast
           message={toast.message}
