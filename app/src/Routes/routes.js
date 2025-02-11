@@ -51,7 +51,7 @@ const routes = {
       add: () => `${routes.dev.default}users/add`,
       delete: (id) => `${routes.dev.default}users/delete/${id}`,
       getAll: () => `${routes.dev.default}users`,
-      getByEmail: (email) => `users/${email}`,
+      getByEmail: (email) => `${routes.dev.default}users/email?email=${email}`,
       update: () => `${routes.dev.default}users/update`,
     },
   },

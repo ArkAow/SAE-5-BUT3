@@ -54,8 +54,8 @@ const Login = ({ setIsAuthenticated }) => {
           setError("Aucune adresse email trouvée pour ce compte.");
           return;
         }
-  
         const logingInUser = await getUserByEmail(email);
+        console.log(logingInUser);
         if (!logingInUser) {
           setError("Compte non autorisé.");
           return;
@@ -63,8 +63,15 @@ const Login = ({ setIsAuthenticated }) => {
 
         //si c'est la première connexion de l'utilisateur -> mettre à jour le nom
         if (logingInUser.fullname === "") {
-          logingInUser.fullname = `${surname} ${name}`;
-          updateUser(logingInUser);
+          logingInUser.fullname = `${surname} ${name.toUpperCase()}`;
+          const payload = {
+            id: logingInUser.id,
+            fullname: logingInUser.fullname,
+            email: logingInUser.email,
+            role: logingInUser.role,
+            departments: logingInUser.departments.map((d) => d.id),
+          };
+          await updateUser(payload);
         }
         // Mise à jour du userContext
         setEmail(logingInUser.email);
