@@ -2,7 +2,8 @@ import React from "react";
 
 const DepartmentSelect = ({ departments, selectedDepartment, setSelectedDepartment }) => {
     const handleChange = (e) => {
-        const selectedDept = departments.find(dept => dept.id === e.target.value);
+        const selectedDeptId = e.target.value;
+        const selectedDept = departments.find(dept => dept.id == selectedDeptId);
         setSelectedDepartment(selectedDept);
     };
 
