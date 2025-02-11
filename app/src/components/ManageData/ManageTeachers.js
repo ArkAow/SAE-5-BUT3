@@ -1,221 +1,98 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import Header from "../header/header.js";
 import Toast from "../Toast/Toast.js";
-import routes from "../../Routes/routes.js";
+import useTeachers from "../../hooks/useTeachers.js";
+import DepartmentSelect from "./DepartmentSelect.js";
+import Navigation from "./Navigation.js";
+import { useUserContext } from "../../contexts/UserContext.js";
 
 const ManageTeachers = () => {
-  const [teachers, setTeachers] = useState([]);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [constraint, setConstraint] = useState();
-  const [isPartTime, setIsPartTime] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { departments } = useUserContext();
+  const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
+
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
+  const { teachers, isLoading: isTeacherLoading, isSaving, addTeacher, updateTeacher, deleteTeacher } = useTeachers(setToast);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
 
-  const [editingTeacher, setEditingTeacher] = useState(null);
-  const [editedFirstName, setEditedFirstName] = useState("");
-  const [editedLastName, setEditedLastName] = useState("");
-  const [editedConstraint, setEditedConstraint] = useState(0);
-  const [editedIsPartTime, setEditedIsPartTime] = useState(false);
+  const handleClickingTeacher = (teacher) => {
+    setSelectedTeacher(teacher);
+  }
 
-  const startEditingTeacher = (teacher) => {
-    setEditingTeacher(teacher);
-    setEditedFirstName(teacher.firstName);
-    setEditedLastName(teacher.lastName);
-    setEditedConstraint(teacher.time_constraints || 0);
-    setEditedIsPartTime(teacher.is_partimetutor || false);
-  };
+  const handleClickingAddButton = () => {
+    console.log(departments);
+    console.log(selectedDepartment);
+  }
 
-  const navigate = useNavigate();
+  const handleClickingUpdateButton = (teacher) => {
+    console.log(teacher);
+  }
 
-  const goToHomePage = () => navigate("/homePage");
-  const goToManageData = () => navigate("/ManageData");
-
-  const fetchTeachers = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(routes.dev.teachers.get());
-      if (!response.ok)
-        throw new Error("Erreur lors du chargement des enseignants");
-      const data = await response.json();
-      setTeachers(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteTeacher = async (teacher) => {
-    try {
-      const response = await fetch(routes.dev.teachers.delete(), {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: teacher.id }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erreur lors de la suppression.");
-      }
-      setToast({
-        message: "Professeur supprimé avec succès.",
-        type: "success",
-        visible: true,
-      });
-      setTeachers((prev) => prev.filter((t) => t.id !== teacher.id));
-    } catch (error) {
-      console.error(error);
-      setToast({
-        message: "Erreur lors de la suppression de l'enseignant",
-        type: "error",
-        visible: true,
-      });
-    }
-  };
-
-  const handleEditTeacher = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch(routes.dev.teachers.update(), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: editingTeacher.id,
-          firstName: editedFirstName,
-          lastName: editedLastName,
-          time_constraints: editedConstraint,
-          is_partimetutor: editedIsPartTime,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erreur lors de la modification.");
-      }
-
-      setToast({
-        message: "Professeur modifié avec succès.",
-        type: "success",
-        visible: true,
-      });
-      setTeachers((prev) =>
-        prev.map((teacher) =>
-          teacher.id === editingTeacher.id
-            ? {
-                ...teacher,
-                firstName: editedFirstName,
-                lastName: editedLastName,
-                time_constraints: editedConstraint,
-                is_partimetutor: editedIsPartTime,
-              }
-            : teacher
-        )
-      );
-      setEditingTeacher(null);
-    } catch (error) {
-      console.error(error);
-      setToast({
-        message: "Erreur lors de la modification de l'enseignant",
-        type: "error",
-        visible: true,
-      });
-    }
-  };
-
-  const handleAddTeacher = async (e) => {
-    e.preventDefault();
-
-    if (!firstName.trim() || !lastName.trim()) {
-      setToast({
-        message: "Veuillez fournir un nom et un prénom.",
-        type: "error",
-        visible: true,
-      });
-      return;
-    }
-    if (constraint > 40 || constraint < 1) {
-      setToast({
-        message: "La contrainte horaire est invalide",
-        type: "error",
-        visible: true,
-      });
-      return;
-    }
-
-    try {
-      const response = await fetch(routes.dev.teachers.add(), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          constraint: constraint,
-          is_partimetutor: isPartTime,
-        }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erreur lors de l'ajout.");
-      }
-      const result = await response.json();
-      setToast({
-        message: "Professeur ajouté avec succès.",
-        type: "success",
-        visible: true,
-      });
-      setTeachers((prev) => [...prev, { ...result, firstName, lastName }]);
-      setFirstName("");
-      setLastName("");
-      setConstraint(0);
-      setIsPartTime(false);
-    } catch (error) {
-      console.error(error);
-      setToast({
-        message: "Erreur lors de l'ajout de l'enseignant",
-        type: "error",
-        visible: true,
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchTeachers();
-  }, []);
+  const handleClickingDeleteButton = (teacher) => {
+    console.log(teacher);
+  }
 
   return (
     <>
       <Header />
+      <Navigation />
+      <DepartmentSelect 
+        departments={departments} 
+        selectedDepartment={selectedDepartment} 
+        setSelectedDepartment={setSelectedDepartment} />
 
-      {/* Navigation */}
-      <div className="absolute flex flex-row items-center top-16 left-10 space-x-4">
-        <div 
-          className="flex items-center justify-center p-4 bg-black bg-opacity-70 rounded-lg cursor-pointer"
-          onClick={goToHomePage}>
-          <img src="/images/home.svg" className="w-8 h-8"/>
-        </div>
-        <div 
-          className="flex items-center justify-center p-4 bg-black bg-opacity-70 rounded-lg cursor-pointer"
-          onClick={goToManageData}>
-          <img src="/images/options.svg" className="w-8 h-8"/>
-        </div>
-      </div>
-
-      <div className="min-h-screen flex flex-col justify-center items-center px-8">
+      <div className="min-h-screen flex flex-col justify-center items-center px-8">          
         <div className="flex justify-around w-full mx-10 mt-40">
-          
+
           {/* Liste des enseignants */}
           <div className="w-1/2 min-w-[300px] h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg flex flex-col">
             <h2 className="text-white text-center text-lg font-bold mb-4">
               Enseignants
             </h2>
-            <div className="space-y-2 flex-grow overflow-auto">
-              {/*éléments ici*/}
-            </div>
-            <button className="mt-4 w-full p-2 btn-default justify-between">
-              Ajouter
-            </button>
+            {isTeacherLoading ? (
+              <div className="flex flex-col items-center justify-center  p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
+                <div className="spinner"></div>
+                <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des enseignants...</div>
+              </div>
+            ) : (
+              <>
+                {teachers.length === 0 ? (
+                  <span className="w-full text-center text-white">Il n'y a pas d'enseignants</span>
+                ) : (
+                  <ul className="space-y-4">
+                    {teachers.map((teacher) => (
+                      <li 
+                        key={teacher.id}
+                        className={`flex items-center rounded-lg p-2 ${ selectedTeacher == teacher ? "bg-gray-300" : "bg-white cursor-pointer"}`}
+                        onClick={() => handleClickingTeacher(teacher)}>
+                        <div className="text-base text-black w-full flex flex-row ml-2 justify-around" title={`${teacher.firstName} ${teacher.lastName}, ${teacher.isPartimeTutor ? "enseigant" : "vacataire"}`}>
+                          <span className="w-fit text-left font-semibold"> {teacher.code} </span>
+                          <span className="w-fit truncate text-left"> {teacher.firstName} </span>
+                          <span className="w-fit truncate text-left"> {teacher.lastName} </span>
+                          <span className="w-fit truncate text-right"> {teacher.isPartimeTutor ? "Enseigant" : "Vacataire"} </span>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button 
+                          className="size-6 flex justify-center items-center"
+                          onClick={() => handleClickingUpdateButton(teacher)}>
+                            <img src="images/pen.svg" alt="Modifier" className="size-6" />
+                          </button>
+                          <button 
+                          className="size-6 flex justify-center items-center"
+                          onClick={() => handleClickingDeleteButton(teacher)}>
+                            <img src="images/trash.svg" alt="Supprmer" className="size-6" />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <button 
+                className="w-full h-7 btn-default py-3 rounded-full flex justify-center items-center space-x-4 px-10 mt-4 mx-auto"
+                onClick={handleClickingAddButton}>
+                  <span>Ajouter</span>
+                </button>
+              </>
+            )}
           </div>
 
           {/* Enseignements des enseignants */}
@@ -224,7 +101,23 @@ const ManageTeachers = () => {
               Enseignements
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
-              {/*éléments ici*/}
+              {selectedTeacher ? (
+                selectedTeacher.subjects && selectedTeacher.subjects.length > 0 ? (
+                  <ul className="text-white">
+                    {selectedTeacher.subjects.map((subject, index) => (
+                      <li key={index} className="bg-gray-800 p-2 rounded-lg shadow">
+                        {subject}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-white text-center">
+                    Aucun enseignement pour {selectedTeacher.firstName} {selectedTeacher.lastName}
+                  </p>
+                )
+              ) : (
+                <p className="text-white text-center">Veuillez sélectionner un enseignant</p>
+              )}
             </div>
             <button className="mt-4 w-full p-2 btn-default justify-between">
               Ajouter
@@ -232,6 +125,13 @@ const ManageTeachers = () => {
           </div>
         </div>
       </div>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, visible: false })}
+        />
+      )}
     </>
   );
 };

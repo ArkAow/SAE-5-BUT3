@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import routes from "../Routes/routes";
 
-const useTeachers = (setToast) => {
+const useTeachers = (setToast = () => {}) => {
   const [teachers, setTeachers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);

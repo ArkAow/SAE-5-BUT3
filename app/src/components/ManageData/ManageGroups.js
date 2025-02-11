@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
+import Navigation from "./Navigation.js";
 import useGroups from "../../hooks/useGroups.js";
 import useCurriculums from "../../hooks/useCurriculums.js";
 
 const ManageGroups = () => {
-  const navigate = useNavigate();
-  const goToHomePage = () => navigate("/homePage");
-  const goToManageData = () => navigate("/ManageData");
   const { curriculums, error, loading } = useCurriculums();
   const [selectedCurriculum, setSelectedCurriculum] = useState(null);
   const { groups, isGroupLoading, getGroupList } = useGroups(selectedCurriculum);
@@ -15,20 +12,7 @@ const ManageGroups = () => {
   return (
     <>
       <Header />
-
-      {/* Navigation */}
-      <div className="absolute flex flex-row items-center top-16 left-10 space-x-4">
-        <div 
-          className="flex items-center justify-center p-4 bg-black bg-opacity-70 rounded-lg cursor-pointer"
-          onClick={goToHomePage}>
-          <img src="/images/home.svg" className="w-8 h-8"/>
-        </div>
-        <div 
-          className="flex items-center justify-center p-4 bg-black bg-opacity-70 rounded-lg cursor-pointer"
-          onClick={goToManageData}>
-          <img src="/images/options.svg" className="w-8 h-8"/>
-        </div>
-      </div>
+      <Navigation />
 
       <div className="min-h-screen flex flex-col justify-center items-center px-8">
         <div className="flex justify-around w-full mx-10 mt-40">

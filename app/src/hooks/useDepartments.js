@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import routes from "../Routes/routes";
 
-const useDepartments = (setToast) => {
+const useDepartments = (setToast = () => {}) => {
   const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
