@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import Header from "../header/header";
 import routes from "../../Routes/routes";
 import useUsers from "../../hooks/useUsers";
+import useDepartments from "../../hooks/useDepartments";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext"; // Import du UserContext
 
 const Login = ({ setIsAuthenticated }) => {
   const { getUserByEmail, updateUser } = useUsers();
+  const { departments } = useDepartments();
   const [username, setUsername] = useState(""); // Champ "username"
   const [password, setPassword] = useState(""); // Champ "password"
   const [error, setError] = useState(""); // Gestion des erreurs
@@ -81,7 +83,7 @@ const Login = ({ setIsAuthenticated }) => {
       } else {
         setEmail(`admin@root`);
         setFullName(`Administrateur`);
-        setDepartments([]);
+        setDepartments(departments);
         setRole("superadmin");
       }
   

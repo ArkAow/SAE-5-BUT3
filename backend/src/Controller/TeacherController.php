@@ -149,8 +149,8 @@ class TeacherController extends AbstractController
         $id = $data['id'] ?? null;
         $firstName = $data['firstName'] ?? null;
         $lastName = $data['lastName'] ?? null;
-        $timeConstraints = $data['time_constraints'] ?? null;
-        $isPartimeTutor = $data['is_partimetutor'] ?? null;
+        $timeConstraints = $data['constraint'] ?? null;
+        $isPartimeTutor = $data['isPartimeTutor'] ?? null;
 
         if (!$id || !$firstName || !$lastName) {
             return new JsonResponse(['error' => 'Données invalides'], 400);
@@ -169,6 +169,18 @@ class TeacherController extends AbstractController
 
         $entityManager->flush();
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'message' => 'Enseignant mis à jour avec succès',
+            'teacher' => [
+                'id' => $teacher->getId(),
+                'firstName' => $teacher->getFirstName(),
+                'lastName' => $teacher->getLastName(),
+                'code' => $teacher->getCode(),
+                'subjects' => $teacher->getSubjects(),
+                'courses' => $teacher->getCourses(),
+                'timeConstraints' => $teacher->getTimeConstraints(),
+                'isPartimeTutor' => $teacher->getIsPartimeTutor(),
+            ]
+        ], 200);
     }
 }

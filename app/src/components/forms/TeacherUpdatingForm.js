@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-const TeacherAddingForm = ({addTeacherForDepartment, setAddingTeacher, isSaving}) => {
-  const [teacherFirstname, setTeacherFirstname] = useState("");
-  const [teacherLastname, setTeacherLastname] = useState("");
-  const [isPartTime, setIsPartTime] = useState(false);
-  const [timeConstraint, setTimeConstraint] = useState(20);
+const TeacherUpdatingForm = ({teacher, updateTeacher, setUpdatingTeacher, isSaving}) => {
+  const [teacherFirstname, setTeacherFirstname] = useState(teacher.firstName);
+  const [teacherLastname, setTeacherLastname] = useState(teacher.lastName);
+  const [isPartTime, setIsPartTime] = useState(teacher.isPartimeTutor);
+  const [timeConstraint, setTimeConstraint] = useState(teacher.timeConstraints);
   const [error, setError] = useState("");
 
   const handleLeaving = () => {
@@ -12,10 +12,10 @@ const TeacherAddingForm = ({addTeacherForDepartment, setAddingTeacher, isSaving}
     setTeacherLastname("");
     setIsPartTime(false);
     setTimeConstraint(20);
-    setAddingTeacher(false);
+    setUpdatingTeacher(false);
   }
 
-  const handleAddingTeacher = async (e) => {
+  const handleUpdatingTeacher = async (e) => {
     e.preventDefault();
     const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s-]+$/; // Lettres, espaces et tirets autorisés
     if (!teacherFirstname.trim()) {
@@ -41,13 +41,13 @@ const TeacherAddingForm = ({addTeacherForDepartment, setAddingTeacher, isSaving}
     }
     setError("");
     const payload = {
+      id: teacher.id,
       firstName: teacherFirstname.trim(),
       lastName: teacherLastname.trim(),
       constraint: constraintInt,
-      is_partimetutor: isPartTime,
+      isPartimeTutor: isPartTime,
     };
-
-    await addTeacherForDepartment(payload);
+    await updateTeacher(payload);
     handleLeaving();
   };
 
@@ -55,8 +55,8 @@ const TeacherAddingForm = ({addTeacherForDepartment, setAddingTeacher, isSaving}
     <>
       <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${isSaving ? 'cursor-wait' : ''}`}>
         <div className="tooltip-centered-bigger min-w-[450px] w-1/3">
-          <h2 className="text-2xl font-bold mb-4">Ajouter un enseignant</h2>
-          <form onSubmit={handleAddingTeacher} className="space-y-2">
+          <h2 className="text-2xl font-bold mb-4">Modifier l'enseignant</h2>
+          <form onSubmit={handleUpdatingTeacher} className="space-y-2">
             <div>
               <label className="block mb-1 font-bold">Nom de l'enseigant<span className="text-red-500">*</span> :</label>
               <input
@@ -116,4 +116,4 @@ const TeacherAddingForm = ({addTeacherForDepartment, setAddingTeacher, isSaving}
   );
 };
 
-export default TeacherAddingForm;
+export default TeacherUpdatingForm;

@@ -58,14 +58,14 @@ const useTeachers = (setToast = () => {}, department = null) => {
         body: JSON.stringify(payload),
       });
       const data = await response.json();
-      const updatedDepartment = data.department;
+      const updatedTeacher = data.teacher;
       setTeachers((prev) =>
-        prev.map((dept) => dept.id === updatedDepartment.id ? updatedDepartment : dept)
+        prev.map((teacher) => teacher.id === updatedTeacher.id ? updatedTeacher : teacher)
       );
     } catch (err) {
       setError(err.message);
       setToast({
-        message: error.message || "Erreur lors de la modification de l'enseignants",
+        message: err.message || "Erreur lors de la modification de l'enseignants",
         type: "error",
         visible: true,
       });

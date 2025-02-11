@@ -6,6 +6,7 @@ import DepartmentSelect from "./DepartmentSelect.js";
 import Navigation from "./Navigation.js";
 import TeacherAddingForm from "../forms/TeacherAddingForm.js";
 import { useUserContext } from "../../contexts/UserContext.js";
+import TeacherUpdatingForm from "../forms/TeacherUpdatingForm.js";
 
 const ManageTeachers = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -16,6 +17,11 @@ const ManageTeachers = () => {
 
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [addingTeacher, setAddingTeacher] = useState(false);
+  const [updatingTeacher, setUpdatingTeacher] = useState(false);
+  const [updatedTeacher, setUpdatedTeacher] = useState(false);
+  const [deletingTeacher, setDeletingTeacher] = useState(false);
+  const [deletedTeacher, setDeletedTeacher] = useState(false);
+
 
   const handleClickingTeacher = (teacher) => {
     setSelectedTeacher(teacher);
@@ -26,11 +32,13 @@ const ManageTeachers = () => {
   }
 
   const handleClickingUpdateButton = (teacher) => {
-    console.log(teacher);
+    setUpdatedTeacher(teacher);
+    setUpdatingTeacher(true);
   }
 
   const handleClickingDeleteButton = (teacher) => {
-    console.log(teacher);
+    setDeletedTeacher(teacher);
+    setDeletingTeacher(true);
   }
 
   return (
@@ -58,7 +66,7 @@ const ManageTeachers = () => {
             ) : (
               <>
                 {teachers.length === 0 ? (
-                  <span className="w-full text-center text-white">Il n'y a pas d'enseignants</span>
+                  <span className="w-full text-center text-white">Il n'y a pas d'enseignants dans le département "{selectedDepartment.name}"</span>
                 ) : (
                   <ul className="space-y-4">
                     {teachers.map((teacher) => (
@@ -131,6 +139,14 @@ const ManageTeachers = () => {
         <TeacherAddingForm 
           addTeacherForDepartment={addTeacherForDepartment}
           setAddingTeacher={setAddingTeacher}
+          isSaving={isSaving}/>
+      )}
+
+      {updatingTeacher && (
+        <TeacherUpdatingForm
+          teacher={updatedTeacher} 
+          updateTeacher={updateTeacher}
+          setUpdatingTeacher={setUpdatingTeacher}
           isSaving={isSaving}/>
       )}
 
