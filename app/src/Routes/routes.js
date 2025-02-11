@@ -43,7 +43,7 @@ const routes = {
     },
     teachers: {
       addForDepartment: (departmentId) => `${routes.dev.default}teacher/add/department/${departmentId}`,
-      delete: (id) => `${routes.dev.default}teacher/delete/${id}`,
+      deleteForDepartment: (id, departmentId) => `${routes.dev.default}teacher/delete/${id}/${departmentId}`,
       getFromDepartment: (departmentId) => `${routes.dev.default}teacher/department/${departmentId}`,
       update: () => `${routes.dev.default}teacher/update`,
     },

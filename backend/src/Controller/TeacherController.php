@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Teacher;
 use App\Entity\Department;
 use App\Repository\TeacherRepository;
+use App\Repository\DepartmentRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 class TeacherController extends AbstractController
@@ -126,19 +127,44 @@ class TeacherController extends AbstractController
         ], 201);
     }
 
-    #[Route('/teacher/delete/{id}', name: 'delete_teacher', methods: ['DELETE'])]
-    public function deleteTeacher(int $id, TeacherRepository $teacherRepository, EntityManagerInterface $entityManager, Request $request) : JsonResponse
-    {
+    #[Route('/teacher/delete/{id}/{departmentId}', name: 'remove_teacher_department', methods: ['DELETE'])]
+    public function removeTeacherDepartment(
+        int $id, 
+        int $departmentId, 
+        TeacherRepository $teacherRepository, 
+        DepartmentRepository $departmentRepository,
+        EntityManagerInterface $entityManager
+    ) : JsonResponse {
         $teacher = $teacherRepository->find($id);
+        $department = $departmentRepository->find($departmentId);
     
-        if ($teacher === null) {
+        if (!$teacher) {
             return new JsonResponse(['error' => 'Professeur non trouvé.'], 404);
         }
     
-        $entityManager->remove($teacher);
+        if (!$department) {
+            return new JsonResponse(['error' => 'Département non trouvé.'], 404);
+        }
+    
+        // Vérifier si le professeur est associé à ce département
+        if (!$teacher->getDepartments()->contains($department)) {
+            return new JsonResponse(['error' => 'Le professeur n\'est pas associé à ce département.'], 400);
+        }
+    
+        // Retirer le département du professeur
+        $teacher->removeDepartment($department);
+    
+        // Vérifier s'il reste des départements
+        if ($teacher->getDepartments()->isEmpty()) {
+            $entityManager->remove($teacher);
+            $message = 'Professeur supprimé car il n\'avait plus de départements.';
+        } else {
+            $message = 'Département retiré avec succès du professeur.';
+        }
+    
         $entityManager->flush();
     
-        return new JsonResponse(['message' => 'Professeur supprimé avec succès.'], 200);
+        return new JsonResponse(['message' => $message], 200);
     }
 
     #[Route('/teacher/update', name: 'update_teachers', methods: ['PUT'])]

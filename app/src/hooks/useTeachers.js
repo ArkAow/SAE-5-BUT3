@@ -32,9 +32,6 @@ const useTeachers = (setToast = () => {}, department = null) => {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
-      const newDepartment = data.department;
-      setTeachers((prev) => [...prev, newDepartment]);
     } catch (err) {
       setError(err.message);
       setToast({
@@ -57,11 +54,6 @@ const useTeachers = (setToast = () => {}, department = null) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
-      const updatedTeacher = data.teacher;
-      setTeachers((prev) =>
-        prev.map((teacher) => teacher.id === updatedTeacher.id ? updatedTeacher : teacher)
-      );
     } catch (err) {
       setError(err.message);
       setToast({
@@ -76,13 +68,12 @@ const useTeachers = (setToast = () => {}, department = null) => {
     }
   };
   
-  const deleteTeacher = async (teacherId) => {
+  const deleteTeacherForDepartment = async (teacherId, departmentId) => {
     try {
       setIsSaving(true);
-      await fetch(routes.dev.teachers.delete(teacherId), { 
+      await fetch(routes.dev.teachers.deleteForDepartment(teacherId, departmentId), { 
         method: "DELETE"
       });
-      setTeachers((prev) => prev.filter((dept) => dept.id !== teacherId));
     } catch (err) {
       setError(err.message);
       setToast({
@@ -101,7 +92,7 @@ const useTeachers = (setToast = () => {}, department = null) => {
     fetchTeachersFromDepartment();
   }, [department]);
 
-  return { teachers, isLoading, isSaving, error, fetchTeachersFromDepartment, addTeacherForDepartment, updateTeacher, deleteTeacher};
+  return { teachers, isLoading, isSaving, error, fetchTeachersFromDepartment, addTeacherForDepartment, updateTeacher, deleteTeacherForDepartment};
 };
 
 export default useTeachers;

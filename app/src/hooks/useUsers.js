@@ -31,9 +31,6 @@ const useUsers = (setToast = () => {}) => {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
-      const newUser = data.user;
-      setUsers((prev) => [...prev, newUser]);
       setToast({ message: "Utilisateur ajouté avec succès", type: "success", visible: true });
     } catch (err) {
       setError(err.message);
@@ -56,11 +53,6 @@ const useUsers = (setToast = () => {}) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
-      const updatedUser = data.user;
-      setUsers((prev) =>
-        prev.map((user) => user.id === updatedUser.id ? updatedUser : user)
-      );
       setToast({ message: "Utilisateur modifié avec succès", type: "success", visible: true });
     } catch (err) {
       setError(err.message);
@@ -81,7 +73,6 @@ const useUsers = (setToast = () => {}) => {
       await fetch(routes.dev.users.delete(userId), { 
         method: "DELETE"
       });
-      setUsers((prev) => prev.filter((user) => user.id !== userId));
       setToast({ message: "Utilisateur supprimé avec succès", type: "success", visible: true });
     } catch (err) {
       setError(err.message);

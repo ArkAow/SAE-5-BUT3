@@ -7,13 +7,14 @@ import Navigation from "./Navigation.js";
 import TeacherAddingForm from "../forms/TeacherAddingForm.js";
 import { useUserContext } from "../../contexts/UserContext.js";
 import TeacherUpdatingForm from "../forms/TeacherUpdatingForm.js";
+import TeacherDeletingForm from "../forms/TeacherDeletingForm.js";
 
 const ManageTeachers = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
 
   const { departments } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
-  const { teachers, isLoading: isTeacherLoading, isSaving, addTeacherForDepartment, updateTeacher, deleteTeacher } = useTeachers(setToast, selectedDepartment);
+  const { teachers, isLoading: isTeacherLoading, isSaving, addTeacherForDepartment, updateTeacher, deleteTeacherForDepartment } = useTeachers(setToast, selectedDepartment);
 
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [addingTeacher, setAddingTeacher] = useState(false);
@@ -147,6 +148,15 @@ const ManageTeachers = () => {
           teacher={updatedTeacher} 
           updateTeacher={updateTeacher}
           setUpdatingTeacher={setUpdatingTeacher}
+          isSaving={isSaving}/>
+      )}
+
+      {deletingTeacher && (
+        <TeacherDeletingForm
+          teacher={deletedTeacher}
+          department={selectedDepartment}
+          deleteTeacherForDepartment={deleteTeacherForDepartment}
+          setDeletingTeacher={setDeletingTeacher}
           isSaving={isSaving}/>
       )}
 
