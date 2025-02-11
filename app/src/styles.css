@@ -99,3 +99,14 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes dots {
+  0% { content: "."; }
+  33% { content: ".."; }
+  66% { content: "..."; }
+}
+
+.dots::after {
+  content: ".";
+  animation: dots 1.5s infinite steps(1);
+}

@@ -37,18 +37,28 @@ const ManageData = () => {
                     <p className="text-white text-lg text-center">Insérer le M3C</p>
                 </div>
 
-                {/* Manage Teachers */}
+                {/* Manage Departments */}
                 <div className="bg-black bg-opacity-70 size-[280px] rounded-2xl p-2 transition-transform duration-200 hover:scale-105 cursor-pointer flex flex-col justify-center items-center"
-                onClick={goToManageTeacher}>
-                    <div className="size-[150px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
-                        <img src="/images/profile_picture_anonym.png" className="size-[90px] md:size-[120px]"/>
+                onClick={goToManageDepartments}>
+                    <div className="size-[130px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
+                        <img src="/images/school.svg" className="size-[80px] md:size-[100px]"/>
                     </div>
-                    <p className="text-white text-lg text-center">Modifier les enseignants</p>
+                    <p className="text-white text-lg text-center">Gérer les départements</p>
                 </div>
             </div>
 
             {/* Deuxième ligne (3 boutons) */}
             <div className="grid grid-cols-3 gap-x-8 w-full">
+
+                {/* Manage Users */}
+                <div className="bg-black bg-opacity-70 size-[280px] rounded-2xl p-2 transition-transform duration-200 hover:scale-105 cursor-pointer flex flex-col justify-center items-center"
+                onClick={goToManageUsers}>
+                    <div className="size-[130px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
+                        <img src="/images/configuration.svg" className="size-[80px] md:size-[100px]"/>
+                    </div>
+                    <p className="text-white text-lg text-center">Gérer les utilisateurs</p>
+                </div>
+                
                 {/* Manage Groups */}
                 <div className="bg-black bg-opacity-70 size-[280px] rounded-2xl p-2 transition-transform duration-200 hover:scale-105 cursor-pointer flex flex-col justify-center items-center"
                 onClick={goToManageGroups}>
@@ -58,22 +68,13 @@ const ManageData = () => {
                     <p className="text-white text-lg text-center">Modifier les groupes</p>
                 </div>
 
-                {/* Manage Departments */}
+                {/* Manage Teachers */}
                 <div className="bg-black bg-opacity-70 size-[280px] rounded-2xl p-2 transition-transform duration-200 hover:scale-105 cursor-pointer flex flex-col justify-center items-center"
-                onClick={goToManageDepartments}>
-                    <div className="size-[130px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
-                        <img src="/images/school.svg" className="size-[80px] md:size-[100px]"/>
+                onClick={goToManageTeacher}>
+                    <div className="size-[150px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
+                        <img src="/images/profile_picture_anonym.png" className="size-[90px] md:size-[120px]"/>
                     </div>
-                    <p className="text-white text-lg text-center">Gérer les départements</p>
-                </div>
-
-                {/* Manage Users */}
-                <div className="bg-black bg-opacity-70 size-[280px] rounded-2xl p-2 transition-transform duration-200 hover:scale-105 cursor-pointer flex flex-col justify-center items-center"
-                onClick={goToManageUsers}>
-                    <div className="size-[130px] md:size-[200px] m-5 bg-primary flex justify-center items-center rounded-2xl shadow-lg">
-                        <img src="/images/configuration.svg" className="size-[80px] md:size-[100px]"/>
-                    </div>
-                    <p className="text-white text-lg text-center">Gérer les utilisateurs</p>
+                    <p className="text-white text-lg text-center">Modifier les enseignants</p>
                 </div>
             </div>
         </div>            

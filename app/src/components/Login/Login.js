@@ -97,59 +97,66 @@ const Login = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center">
+    <>
       <Header />
-      <div className="flex items-center w-[400px] h-[600px] justify-center mx-auto mt-20 bg-[rgba(0,0,0,0.7)] rounded-2xl shadow-lg p-2">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center w-full"
-        >
-          <div className="bg-primary rounded-full size-24 mb-16 bg-center bg-cover bg-pfp" />
+      <div className="min-h-screen flex flex-col justify-center items-center bg-darklogin">
 
-          <div className="flex flex-col w-3/4 items-start mb-6">
-            <label htmlFor="username" className="text-white mb-2">
-              Identifiant
-            </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              autoComplete="username"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
+        {loading ? (
+          <div className="size-20 mb-10 animate-spin border-4 border-gray-300 border-t-transparent rounded-full"></div>
+        ) : (
+          <img src="/images/Universite_de_Limoges_white.png" className="size-20 mb-10"/>
+        )}
+        <div className="flex items-center w-[500px] h-[350px] justify-center bg-darklogintint rounded-2xl shadow-lg px-6">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col items-center w-full">
 
-          <div className="flex flex-col w-3/4 items-start mb-6">
-            <label htmlFor="password" className="text-white mb-2">
-              Mot de passe :
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
+            <p className="text-white text-2xl mb-3">Veuillez vous authentifier</p>
 
-          <button
-            type="submit"
-            className="btn-login"
-            disabled={loading} // Désactive le bouton si en chargement
-          >
-            {loading ? "Connexion..." : "Se connecter"}
-          </button>
+            <div className="flex flex-col w-full items-start mb-6">
+              <label htmlFor="username" className="text-white text-xs mb-1">
+                Identifiant
+              </label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                autoComplete="username"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
 
-          {error && (
-            <p className="text-red-500 text-right text-sm mt-4 h-6">{error}</p>
-          )}
-        </form>
+            <div className="flex flex-col w-full items-start mb-6">
+              <label htmlFor="password" className="text-white text-xs mb-1">
+                Mot de passe :
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn-login"
+              disabled={loading}>
+              {loading ? <span>Connexion<span className="dots"></span></span> : "Se connecter"}
+            </button>
+
+            {error && (
+              <p className="text-red-500 text-right text-sm mt-4 h-6">{error}</p>
+            )}
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
