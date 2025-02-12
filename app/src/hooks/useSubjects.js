@@ -39,21 +39,21 @@ const useSubjects = (semesterId = null, departmentId = null) => {
       }
     };
 
-    useEffect(() => {
-      const fetchSubjects = async () => {
-        if (semesterId) {
-          await fetchSubjectsForSemester();
-          return;
-        }
-        if (departmentId) {
-          await fetchSubjectsForDepartment();
-          return;
-        }
+    const fetchSubjects = async () => {
+      if (semesterId) {
+        await fetchSubjectsForSemester();
+        return;
       }
-  
+      if (departmentId) {
+        await fetchSubjectsForDepartment();
+        return;
+      }
+    }
+
+    useEffect(() => {
       fetchSubjects();
     }, [semesterId, departmentId]);
   
-    return { subjects, error, isLoading };
+    return { subjects, error, isLoading, fetchSubjects };
   };
 export default useSubjects;
