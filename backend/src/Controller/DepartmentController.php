@@ -142,4 +142,48 @@ class DepartmentController extends AbstractController
 
         return new JsonResponse(['message' => 'Département supprimé avec succès'], 200);
     }
+
+    #[Route('/department/{departmentId}/subjects', name: 'get_department_subjects', methods: ['GET'])]
+    public function getDepartmentSubjects(
+        int $departmentId,
+        DepartmentRepository $departmentRepository
+    ): JsonResponse {
+        $department = $departmentRepository->find($departmentId);
+
+        if (!$department) {
+            return new JsonResponse(['error' => 'Département non trouvé.'], 404);
+        }
+
+        $data = [];
+
+        foreach ($department->getCurriculums() as $curriculum) {
+            $curriculumData = [
+                'id' => $curriculum->getId(),
+                'name' => $curriculum->getName(),
+                'semesters' => []
+            ];
+
+            foreach ($curriculum->getSemesters() as $semester) {
+                $semesterData = [
+                    'id' => $semester->getId(),
+                    'name' => $semester->getName(),
+                    'subjects' => []
+                ];
+
+                foreach ($semester->getSubjects() as $subject) {
+                    $semesterData['subjects'][] = [
+                        'id' => $subject->getId(),
+                        'name' => $subject->getName(),
+                        'code' => $subject->getCode(),
+                    ];
+                }
+
+                $curriculumData['semesters'][] = $semesterData;
+            }
+
+            $data[] = $curriculumData;
+        }
+
+        return new JsonResponse($data, 200);
+    }
 }

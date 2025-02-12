@@ -39,17 +39,20 @@ const routes = {
       get: (curriculumId) => `${routes.dev.default}curriculum/${curriculumId}/semesters`,
     },
     subjects: {
-      get: (semesterId) => `${routes.dev.default}semester/${semesterId}/subjects`,
+      getFromSemester: (semesterId) => `${routes.dev.default}semester/${semesterId}/subjects`,
+      getFromDepartment: (departmentId) => `${routes.dev.default}department/${departmentId}/subjects`
     },
     teachers: {
       addForDepartment: (departmentId) => `${routes.dev.default}teacher/add/department/${departmentId}`,
-      deleteForDepartment: (id, departmentId) => `${routes.dev.default}teacher/delete/${id}/${departmentId}`,
+      addSubject: (teacheId, subjectId) => `${routes.dev.default}teacher/${teacheId}/add-subject/${subjectId}`,
+      deleteForDepartment: (teacheId, departmentId) => `${routes.dev.default}teacher/delete/${teacheId}/${departmentId}`,
+      deleteSubject: (teacheId, subjectId) => `${routes.dev.default}teacher/${teacheId}/remove-subject/${subjectId}`,
       getFromDepartment: (departmentId) => `${routes.dev.default}teacher/department/${departmentId}`,
       update: () => `${routes.dev.default}teacher/update`,
     },
     users: {
       add: () => `${routes.dev.default}users/add`,
-      delete: (id) => `${routes.dev.default}users/delete/${id}`,
+      delete: (userId) => `${routes.dev.default}users/delete/${userId}`,
       getAll: () => `${routes.dev.default}users`,
       getByEmail: (email) => `${routes.dev.default}users/email?email=${email}`,
       update: () => `${routes.dev.default}users/update`,

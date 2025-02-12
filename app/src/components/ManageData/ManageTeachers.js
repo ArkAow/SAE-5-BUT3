@@ -8,13 +8,18 @@ import TeacherAddingForm from "../forms/TeacherAddingForm.js";
 import { useUserContext } from "../../contexts/UserContext.js";
 import TeacherUpdatingForm from "../forms/TeacherUpdatingForm.js";
 import TeacherDeletingForm from "../forms/TeacherDeletingForm.js";
+import useSubjects from "../../hooks/useSubjects.js";
+import TeachingAddingForm from "../forms/TeachingAddingForm.js";
 
 const ManageTeachers = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
 
   const { departments } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
-  const { teachers, isLoading: isTeacherLoading, isSaving, addTeacherForDepartment, updateTeacher, deleteTeacherForDepartment } = useTeachers(setToast, selectedDepartment);
+  const { teachers, isLoading: isTeacherLoading, isSaving,
+    addTeacherForDepartment, updateTeacher, deleteTeacherForDepartment,
+    addSubjectForTeacher, deleteSubjectForTeacher } = useTeachers(setToast, selectedDepartment);
+  const { subjects, isLoading: isSubjectsLoading } = useSubjects(null, selectedDepartment.id)
 
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [addingTeacher, setAddingTeacher] = useState(false);
@@ -37,7 +42,6 @@ const ManageTeachers = () => {
   }
 
   const handleClickingAddTeachingButton = () => {
-    console.log(selectedTeacher);
     setAddingTeaching(true);
   }
 
@@ -46,9 +50,13 @@ const ManageTeachers = () => {
     setUpdatingTeacher(true);
   }
 
-  const handleClickingDeleteButton = (teacher) => {
+  const handleClickingDeleteTeacher = (teacher) => {
     setDeletedTeacher(teacher);
     setDeletingTeacher(true);
+  }
+
+  const handleClickingDeleteTeaching = (subject) => {
+    deleteSubjectForTeacher(selectedTeacher.id, subject.id);
   }
 
   return (
@@ -98,7 +106,7 @@ const ManageTeachers = () => {
                           </button>
                           <button 
                           className="size-6 flex justify-center items-center"
-                          onClick={() => handleClickingDeleteButton(teacher)}>
+                          onClick={() => handleClickingDeleteTeacher(teacher)}>
                             <img src="images/trash.svg" alt="Supprmer" className="size-6" />
                           </button>
                         </div>
@@ -118,16 +126,21 @@ const ManageTeachers = () => {
           {/* Enseignements des enseignants */}
           <div className="w-1/2 min-w-[300px] h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg mx-4 flex flex-col">
             <h2 className="text-white items-center text-center text-lg font-bold mb-4">
-              Enseignements
+              Matière(s) enseignée(s) <span className="text-sm font-normal">{selectedTeacher ? `par ${selectedTeacher.firstName} ${selectedTeacher.lastName}` : ""}</span>
             </h2>
             <div className="w-full space-y-2 flex flex-col overflow-auto">
               {selectedTeacher ? (
                 <>
                   {selectedTeacher.subjects && selectedTeacher.subjects.length > 0 ? (
-                    <ul className="text-white">
+                    <ul className="space-y-4">
                       {selectedTeacher.subjects.map((subject, index) => (
-                        <li key={index} className="bg-gray-800 p-2 rounded-lg shadow">
-                          {subject.name}
+                        <li key={index} className="flex items-center justify-between rounded-lg p-2 text-left bg-white">
+                          <p className="truncate w-5/6">{subject.name}</p>
+                          <button 
+                          className="size-6 flex justify-center items-center"
+                          onClick={() => handleClickingDeleteTeaching(subject)}>
+                            <img src="images/trash.svg" alt="Supprmer" className="size-6" />
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -136,11 +149,9 @@ const ManageTeachers = () => {
                       Aucun enseignement pour {selectedTeacher.firstName} {selectedTeacher.lastName}
                     </p>
                   )}
-
                   <button
                     className="w-full h-7 btn-default py-3 rounded-full flex justify-center items-center space-x-4 px-10 mt-4 mx-auto"
-                    onClick={handleClickingAddTeachingButton}
-                  >
+                    onClick={handleClickingAddTeachingButton}>
                     <span>Ajouter</span>
                   </button>
                 </>
@@ -173,6 +184,15 @@ const ManageTeachers = () => {
           deleteTeacherForDepartment={deleteTeacherForDepartment}
           setDeletingTeacher={setDeletingTeacher}
           isSaving={isSaving}/>
+      )}
+
+      {addingTeaching && (
+        <TeachingAddingForm
+          teacher={selectedTeacher}
+          subjects={subjects}
+          addSubjectForTeacher={addSubjectForTeacher}
+          isSaving={isSaving}
+          setAddingTeaching={setAddingTeaching}/>
       )}
 
       {toast.visible && (

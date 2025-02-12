@@ -10,6 +10,7 @@ use App\Entity\Teacher;
 use App\Entity\Department;
 use App\Repository\TeacherRepository;
 use App\Repository\DepartmentRepository;
+use App\Repository\SubjectRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 class TeacherController extends AbstractController
@@ -226,6 +227,74 @@ class TeacherController extends AbstractController
                 'timeConstraints' => $teacher->getTimeConstraints(),
                 'isPartimeTutor' => $teacher->getIsPartimeTutor(),
             ]
+        ], 200);
+    }
+
+    #[Route('/teacher/{teacherId}/add-subject/{subjectId}', name: 'add_subject_to_teacher', methods: ['POST'])]
+    public function addSubjectToTeacher(
+        int $teacherId,
+        int $subjectId,
+        TeacherRepository $teacherRepository,
+        SubjectRepository $subjectRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $teacher = $teacherRepository->find($teacherId);
+        $subject = $subjectRepository->find($subjectId);
+
+        if (!$teacher) {
+            return new JsonResponse(['error' => 'Enseignant non trouvé.'], 404);
+        }
+
+        if (!$subject) {
+            return new JsonResponse(['error' => 'Matière non trouvée.'], 404);
+        }
+
+        if ($teacher->getSubjects()->contains($subject)) {
+            return new JsonResponse(['error' => 'Cette matière est déjà assignée à cet enseignant.'], 400);
+        }
+
+        $teacher->addSubject($subject);
+        $entityManager->persist($teacher);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Matière ajoutée avec succès à l\'enseignant.',
+            'teacherId' => $teacher->getId(),
+            'subjectId' => $subject->getId(),
+        ], 200);
+    }
+
+    #[Route('/teacher/{teacherId}/remove-subject/{subjectId}', name: 'remove_subject_from_teacher', methods: ['DELETE'])]
+    public function removeSubjectFromTeacher(
+        int $teacherId,
+        int $subjectId,
+        TeacherRepository $teacherRepository,
+        SubjectRepository $subjectRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $teacher = $teacherRepository->find($teacherId);
+        $subject = $subjectRepository->find($subjectId);
+
+        if (!$teacher) {
+            return new JsonResponse(['error' => 'Enseignant non trouvé.'], 404);
+        }
+
+        if (!$subject) {
+            return new JsonResponse(['error' => 'Matière non trouvée.'], 404);
+        }
+
+        if (!$teacher->getSubjects()->contains($subject)) {
+            return new JsonResponse(['error' => 'Cette matière n\'est pas assignée à cet enseignant.'], 400);
+        }
+
+        $teacher->removeSubject($subject);
+        $entityManager->persist($teacher);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Matière supprimée avec succès de l\'enseignant.',
+            'teacherId' => $teacher->getId(),
+            'subjectId' => $subject->getId(),
         ], 200);
     }
 }

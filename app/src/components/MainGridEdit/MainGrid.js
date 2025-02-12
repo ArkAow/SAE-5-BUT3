@@ -83,7 +83,7 @@ const MainGrid = ({ curriculum }) => {
   const fetchSubjects = async (semesterId) => {
     try {
       console.log(`Chargement des matières...`);
-      const response = await fetch(routes.dev.subjects.get(semesterId));
+      const response = await fetch(routes.dev.subjects.getFromSemester(semesterId));
       if (!response.ok) {
         throw new Error("Erreur lors du chargement des matières.");
       }
