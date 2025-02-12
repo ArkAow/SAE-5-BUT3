@@ -32,6 +32,7 @@ class Subject
     private Collection $semesters;
 
     #[ORM\ManyToMany(targetEntity: Teacher::class, mappedBy: 'subjects')]
+    #[ORM\JoinTable(name: 'subject_teacher')]
     private Collection $teachers;
     
     #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'subjects')]

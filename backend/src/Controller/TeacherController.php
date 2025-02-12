@@ -32,7 +32,11 @@ class TeacherController extends AbstractController
                 'firstName' => $teacher->getFirstName(),
                 'lastName' => $teacher->getLastName(),
                 'code' => $teacher->getCode(),
-                'subjects' => $teacher->getSubjects(),
+                'subjects' => array_map(fn($s) => [
+                    'id' => $s->getId(),
+                    'name' => $s->getName(),
+                    'code' => $s->getCode(),
+                ], $teacher->getSubjects()->toArray()),
                 'courses' => $teacher->getCourses(),
                 'timeConstraints' => $teacher->getTimeConstraints(),
                 'isPartimeTutor' => $teacher->getIsPartimeTutor(),
@@ -137,38 +141,48 @@ class TeacherController extends AbstractController
     ): JsonResponse {
         $teacher = $teacherRepository->find($id);
         $department = $departmentRepository->find($departmentId);
-    
+
         if (!$teacher) {
             return new JsonResponse(['error' => 'Professeur non trouvé.'], 404);
         }
-    
+
         if (!$department) {
             return new JsonResponse(['error' => 'Département non trouvé.'], 404);
         }
-    
-        // Vérifier si le professeur est associé à ce département
+
+        // Vérifier si le professeur est bien dans ce département
         if (!$teacher->getDepartments()->contains($department)) {
             return new JsonResponse(['error' => 'Le professeur n\'est pas associé à ce département.'], 400);
         }
-    
-        // Retirer le professeur du département
+
+        // Supprimer l'association entre le professeur et le département
         $department->removeTeacher($teacher);
         $teacher->removeDepartment($department);
-    
-        // Mettre à jour l'EntityManager pour refléter le changement
         $entityManager->persist($department);
         $entityManager->persist($teacher);
-    
-        // Vérifier s'il reste des départements
+
+        // Vérifier s'il reste des départements associés
         if ($teacher->getDepartments()->isEmpty()) {
+            // Supprimer manuellement toutes les entrées de la table pivot
+            $connection = $entityManager->getConnection();
+            $connection->executeStatement('DELETE FROM department_teacher WHERE teacher_id = :teacherId', [
+                'teacherId' => $teacher->getId()
+            ]);
+
+            $connection2 = $entityManager->getConnection();
+            $connection2->executeStatement('DELETE FROM teacher WHERE id = :teacherId', [
+                'teacherId' => $teacher->getId()
+            ]);
+
+            // Supprimer définitivement le professeur
             $entityManager->remove($teacher);
             $message = 'Professeur supprimé car il n\'avait plus de départements.';
         } else {
             $message = 'Département retiré avec succès du professeur.';
         }
-    
+
         $entityManager->flush();
-    
+
         return new JsonResponse(['message' => $message], 200);
     }
 

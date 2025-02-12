@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../header/header.js";
 import Toast from "../Toast/Toast.js";
 import useTeachers from "../../hooks/useTeachers.js";
@@ -18,18 +18,27 @@ const ManageTeachers = () => {
 
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [addingTeacher, setAddingTeacher] = useState(false);
+  const [addingTeaching, setAddingTeaching] = useState(false);
   const [updatingTeacher, setUpdatingTeacher] = useState(false);
   const [updatedTeacher, setUpdatedTeacher] = useState(false);
   const [deletingTeacher, setDeletingTeacher] = useState(false);
   const [deletedTeacher, setDeletedTeacher] = useState(false);
-
+  
+  useEffect(() => {
+    setSelectedTeacher(null);
+  }, [selectedDepartment]);
 
   const handleClickingTeacher = (teacher) => {
     setSelectedTeacher(teacher);
   }
 
-  const handleClickingAddButton = () => {
+  const handleClickingAddTeacherButton = () => {
     setAddingTeacher(true);
+  }
+
+  const handleClickingAddTeachingButton = () => {
+    console.log(selectedTeacher);
+    setAddingTeaching(true);
   }
 
   const handleClickingUpdateButton = (teacher) => {
@@ -60,7 +69,7 @@ const ManageTeachers = () => {
               Enseignants
             </h2>
             {isTeacherLoading ? (
-              <div className="flex flex-col items-center justify-center  p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
+              <div className="flex flex-col items-center justify-center p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
                 <div className="spinner"></div>
                 <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des enseignants...</div>
               </div>
@@ -99,7 +108,7 @@ const ManageTeachers = () => {
                 )}
                 <button 
                 className="w-full h-7 btn-default py-3 rounded-full flex justify-center items-center space-x-4 px-10 mt-4 mx-auto"
-                onClick={handleClickingAddButton}>
+                onClick={handleClickingAddTeacherButton}>
                   <span>Ajouter</span>
                 </button>
               </>
@@ -108,31 +117,37 @@ const ManageTeachers = () => {
 
           {/* Enseignements des enseignants */}
           <div className="w-1/2 min-w-[300px] h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg mx-4 flex flex-col">
-            <h2 className="text-white text-center text-lg font-bold mb-4">
+            <h2 className="text-white items-center text-center text-lg font-bold mb-4">
               Enseignements
             </h2>
-            <div className="space-y-2 flex-grow overflow-auto">
+            <div className="w-full space-y-2 flex flex-col overflow-auto">
               {selectedTeacher ? (
-                selectedTeacher.subjects && selectedTeacher.subjects.length > 0 ? (
-                  <ul className="text-white">
-                    {selectedTeacher.subjects.map((subject, index) => (
-                      <li key={index} className="bg-gray-800 p-2 rounded-lg shadow">
-                        {subject}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-white text-center">
-                    Aucun enseignement pour {selectedTeacher.firstName} {selectedTeacher.lastName}
-                  </p>
-                )
+                <>
+                  {selectedTeacher.subjects && selectedTeacher.subjects.length > 0 ? (
+                    <ul className="text-white">
+                      {selectedTeacher.subjects.map((subject, index) => (
+                        <li key={index} className="bg-gray-800 p-2 rounded-lg shadow">
+                          {subject.name}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="w-full text-center text-white">
+                      Aucun enseignement pour {selectedTeacher.firstName} {selectedTeacher.lastName}
+                    </p>
+                  )}
+
+                  <button
+                    className="w-full h-7 btn-default py-3 rounded-full flex justify-center items-center space-x-4 px-10 mt-4 mx-auto"
+                    onClick={handleClickingAddTeachingButton}
+                  >
+                    <span>Ajouter</span>
+                  </button>
+                </>
               ) : (
-                <p className="text-white text-center">Veuillez sélectionner un enseignant</p>
+                <p className="w-full text-center text-white">Veuillez sélectionner un enseignant</p>
               )}
             </div>
-            <button className="mt-4 w-full p-2 btn-default justify-between">
-              Ajouter
-            </button>
           </div>
         </div>
       </div>
