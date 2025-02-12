@@ -64,7 +64,6 @@ class Department
         return $this->formationLevels;
     }
 
-
     public function addFormationLevel(FormationLevel $formationLevel): self
     {
         if (!$this->formationLevels->contains($formationLevel)) {

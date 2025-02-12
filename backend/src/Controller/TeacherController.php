@@ -134,7 +134,7 @@ class TeacherController extends AbstractController
         TeacherRepository $teacherRepository, 
         DepartmentRepository $departmentRepository,
         EntityManagerInterface $entityManager
-    ) : JsonResponse {
+    ): JsonResponse {
         $teacher = $teacherRepository->find($id);
         $department = $departmentRepository->find($departmentId);
     
@@ -151,8 +151,13 @@ class TeacherController extends AbstractController
             return new JsonResponse(['error' => 'Le professeur n\'est pas associé à ce département.'], 400);
         }
     
-        // Retirer le département du professeur
+        // Retirer le professeur du département
+        $department->removeTeacher($teacher);
         $teacher->removeDepartment($department);
+    
+        // Mettre à jour l'EntityManager pour refléter le changement
+        $entityManager->persist($department);
+        $entityManager->persist($teacher);
     
         // Vérifier s'il reste des départements
         if ($teacher->getDepartments()->isEmpty()) {
