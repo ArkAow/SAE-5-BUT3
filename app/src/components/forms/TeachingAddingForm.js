@@ -2,6 +2,9 @@ import React, { useState } from "react";
 
 const TeachingAddingForm = ({teacher, subjects, addSubjectForTeacher, setAddingTeaching, isSaving}) => {
   const [error, setError] = useState("");
+  const availableSubjects = subjects.filter(subject => 
+    !teacher.subjects.some(teacherSubject => teacherSubject.id === subject.id)
+  );
 
   const handleLeaving = () => {
     setAddingTeaching(false);
@@ -18,9 +21,9 @@ const TeachingAddingForm = ({teacher, subjects, addSubjectForTeacher, setAddingT
           <h2 className="text-2xl font-bold mb-4 text-center">Ajouter un enseignement</h2>
           {error && <p className="text-red-500 text-center mb-2">{error}</p>}
           <div className="space-y-2 max-h-[500px] h-2/3 overflow-y-auto">
-            {subjects.length > 0 ? (
+            {availableSubjects.length > 0 ? (
               <ul className="space-y-4">
-                {subjects.map((subject) => (
+                {availableSubjects.map((subject) => (
                   <li 
                     key={subject.id} 
                     className="w-full flex items-center rounded-lg p-2 bg-gray-200 hover:bg-gray-300 cursor-pointer transition"
