@@ -208,7 +208,19 @@ class DepartmentController extends AbstractController
                         'id' => $c->getId(),
                         'name' => $c->getName(),
                     ];
-                }, $formationLevel->getCurriculums()->toArray()), // Obtenir les sous-groupes
+                }, $formationLevel->getCurriculums()->toArray()),
+                'groups' => array_map(function ($g) {
+                    return [
+                        'id' => $g->getId(),
+                        'name' => $g->getName(),
+                        'subGroups' => array_map(function ($sg) {
+                            return [
+                                'id' => $sg->getId(),
+                                'name' => $sg->getName(),
+                            ];
+                        }, $g->getHalfGroups()->toArray()), // Obtenir les sous-groupes
+                    ];
+                }, $formationLevel->getGroups()->toArray())
             ];
         }
 

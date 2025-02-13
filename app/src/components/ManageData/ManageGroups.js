@@ -12,16 +12,17 @@ const ManageGroups = () => {
   const { departments } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
   
-  const { formationLevels, isFormationLevelLoading, groups, isGroupLoading, fetchGroups } = useGroups(selectedDepartment.id, setToast)
+  const { formationLevels, isFormationLevelLoading} = useGroups(selectedDepartment.id, setToast)
   const [selectedFormationLevel, setSelectedFormationLevel] = useState(null);
+  const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [subGroups, setSubGroups] = useState([]);
 
-  const handleSelectFormationLevel = async (formationLevel) => {
+  const handleSelectFormationLevel = (formationLevel) => {
     setSelectedFormationLevel(formationLevel);
+    setGroups(formationLevel.groups);
     setSelectedGroup(null);
     setSubGroups([]);
-    await fetchGroups(formationLevel.id);
   }
 
   const handleSelectGroup = (group) => {
@@ -82,12 +83,7 @@ const ManageGroups = () => {
                 <p className="text-white text-center">Sélectionnez une promotion</p>
               ) : (
                 <>
-                  {isGroupLoading ? (
-                    <div className="flex flex-col items-center justify-center p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
-                      <div className="spinner"></div>
-                      <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des groupes...</div>
-                    </div>
-                  ) : groups.length === 0 ? ( 
+                  {groups.length === 0 ? ( 
                     <p className="text-white text-center">Aucun groupe pour les {selectedFormationLevel.name}</p>
                   ) : (
                     groups.map((group) => (
