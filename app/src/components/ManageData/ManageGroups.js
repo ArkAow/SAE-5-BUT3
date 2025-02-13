@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Header from "../header/header.js";
+import Toast from "../Toast/Toast.js";
 import Navigation from "./Navigation.js";
 import DepartmentSelect from "./DepartmentSelect.js";
 import useGroups from "../../hooks/useGroups.js";
@@ -7,12 +8,14 @@ import useCurriculums from "../../hooks/useCurriculums.js";
 import { useUserContext } from "../../contexts/UserContext.js";
 
 const ManageGroups = () => {
+  const [toast, setToast] = useState({ message: "", type: "", visible: false });
+  
   const { departments } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
   
-  const { curriculums, error, loading } = useCurriculums();
-  const [selectedCurriculum, setSelectedCurriculum] = useState(null);
-  const { groups, isGroupLoading, getGroupList } = useGroups(selectedCurriculum);
+  const { formationLevels, isFormationLevelLoading } = useGroups(null, selectedDepartment.id, setToast)
+  const [selectedformationLevel, setSelectedformationLevel] = useState(null);
+
 
   return (
     <>
@@ -32,22 +35,18 @@ const ManageGroups = () => {
               Niveaux de formation
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
-              {loading ? (
+              {isFormationLevelLoading ? (
                 <p className="text-white text-center">Chargement...</p>
-              ) : error ? (
-                <p className="text-red-500 text-center">Erreur : {error}</p>
               ) : (
-                curriculums.map((curriculum) => (
+                formationLevels.map((formationLevel) => (
                   <div
-                    key={curriculum.id}
-                    onClick={() => setSelectedCurriculum(curriculum)}
-                    className={`p-2 cursor-pointer rounded-lg ${
-                      selectedCurriculum?.id === curriculum.id
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-700 text-gray-300"
-                    }`}
-                  >
-                    {curriculum.name}
+                    key={formationLevel.id}
+                    onClick={() => setSelectedformationLevel(formationLevel)}
+                    className={`flex items-center rounded-lg p-2 ${
+                      selectedformationLevel?.id === formationLevel.id
+                        ? "bg-gray-300"
+                        : "bg-white cursor-pointer"}`}>
+                    <span className="w-full text-center font-semibold">{formationLevel.name}</span>
                   </div>
                 ))
               )}

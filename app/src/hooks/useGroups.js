@@ -1,9 +1,29 @@
 import { useState, useEffect } from "react";
 import routes from "../Routes/routes";
 
-const useGroups = (curriculum, setToast) => {
+const useGroups = (curriculum, departmentId = null, setToast) => {
+  const [formationLevels, setFormationLevels] = useState([]);
+  const [isFormationLevelLoading, setIsFormationLevelLoading] = useState(true);
+
   const [groups, setGroups] = useState([]);
   const [isGroupLoading, setIsGroupLoading] = useState(true);
+
+  const fetchFormationLevels = async () => {
+    try {
+      console.log(`Chargement des promotions...`);
+      if (!departmentId) throw new Error("Aucun departmentId");
+      const response = await fetch(routes.dev.groups.getFormationLevels(departmentId));
+      if (!response.ok) throw new Error("Erreur lors du chargement des promotions");
+
+      const data = await response.json();
+      setFormationLevels(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsFormationLevelLoading(false);
+      console.log(`Chargement des promotions réussi`);
+    }
+  };
 
   const fetchGroups = async () => {
     try {
@@ -29,6 +49,12 @@ const useGroups = (curriculum, setToast) => {
       fetchGroups();
     }
   }, [curriculum]);
+
+  useEffect(() => {
+    if (departmentId) {
+      fetchFormationLevels();
+    }
+  }, [departmentId]);
 
   const getGroupList = () => {
     const mainGroups = groups.map((group) => group.name);
@@ -158,7 +184,8 @@ const useGroups = (curriculum, setToast) => {
     }
   };
 
-  return { groups, isGroupLoading, getGroupList, addGroups, deleteGroups, deleteHalfGroups, addSubGroups };
+  return { groups, isGroupLoading, formationLevels, isFormationLevelLoading, getGroupList, addGroups,
+    deleteGroups, deleteHalfGroups, addSubGroups };
 };
 
 export default useGroups;
