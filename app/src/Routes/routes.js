@@ -28,13 +28,13 @@ const routes = {
       login: () => `${routes.dev.default}ldap/login`,
     },
     groups: {
-      addGroups: () => `${routes.dev.default}groups/add`,
+      addFormationLevel: (departmentId) => `${routes.dev.default}formation-levels/add/${departmentId}`,
+      addGroup: (formationLevelId) => `${routes.dev.default}groups/add/${formationLevelId}`,
       addSubGroups: () => `${routes.dev.default}groups/add/halfgroup`,
+      deleteFormationLevel: (formationLevelId) => `${routes.dev.default}formation-levels/delete/${formationLevelId}`,
       deleteGroup: (groupId) => `${routes.dev.default}groups/delete/${groupId}`,
       deleteSubGroup: (groupId) => `${routes.dev.default}groups/delete/halfgroup/${groupId}`,
       getFormationLevels: (departmentId) => `${routes.dev.default}departments/${departmentId}/formation-levels`,
-      getGroups: (formationLevelId) => `${routes.dev.default}groups/${formationLevelId}`,
-      getSubGroups: (groupId) => `${routes.dev.default}groups/${groupId}/half_group`,
     },
     semesters: {
       get: (curriculumId) => `${routes.dev.default}curriculum/${curriculumId}/semesters`,

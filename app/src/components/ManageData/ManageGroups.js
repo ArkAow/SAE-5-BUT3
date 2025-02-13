@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import Header from "../header/header.js";
 import Toast from "../Toast/Toast.js";
 import Navigation from "./Navigation.js";
-import DepartmentSelect from "./DepartmentSelect.js";
 import useGroups from "../../hooks/useGroups.js";
+import DepartmentSelect from "./DepartmentSelect.js";
 import { useUserContext } from "../../contexts/UserContext.js";
+import FormationLevelAddingForm from "../forms/FormationLevelAddingForm.js";
+import FormationLevelDeletingForm from "../forms/FormationLevelDeletingForm.js";
 
 const ManageGroups = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -12,31 +14,52 @@ const ManageGroups = () => {
   const { departments } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
   
-  const { formationLevels, isFormationLevelLoading} = useGroups(selectedDepartment.id, setToast)
+  const { formationLevels, isFormationLevelLoading, isSaving,
+    addGroup, addFormationLevel, deleteFormationLevel } = useGroups(selectedDepartment.id, setToast)
   const [selectedFormationLevel, setSelectedFormationLevel] = useState(null);
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [subGroups, setSubGroups] = useState([]);
 
-  const handleSelectFormationLevel = (formationLevel) => {
+  const [addingFormationLevel, setAddingFormationLevel] = useState(false);
+  const [addingGroup, setAddingGroup] = useState(false);
+  const [addingSubGroup, setAddingSubGroup] = useState(false);
+
+  const [deletingFormationLevel, setDeletingFormationLevel] = useState(false);
+  const [deletingGroup, setDeletingGroup] = useState(false);
+  const [deletingSubGroup, setDeletingSubGroup] = useState(false);
+  const [deletedFormationLevel, setDeletedFormationLevel] = useState(null);
+  const [deletedGroup, setDeletedGroup] = useState(null);
+  const [deletedSubGroup, setDeletedSubGroup] = useState(null);
+
+  const handleClickingFormationLevel = (formationLevel) => {
     setSelectedFormationLevel(formationLevel);
     setGroups(formationLevel.groups);
     setSelectedGroup(null);
     setSubGroups([]);
   }
 
-  const handleSelectGroup = (group) => {
+  const handleClinkingGroup = (group) => {
     setSelectedGroup(group);
     setSubGroups(group.subGroups);
+  }
+
+  const handleClickingAddFormationLevelButton = () => {
+    setAddingFormationLevel(true);
+  }
+
+  const handleClickingDeleteFormationLevelButton = (formationLevel) => {
+    setDeletedFormationLevel(formationLevel);
+    setDeletingFormationLevel(true);
   }
 
   return (
     <>
       <Header />
       <Navigation />
-      <DepartmentSelect 
-        departments={departments} 
-        selectedDepartment={selectedDepartment} 
+      <DepartmentSelect
+        departments={departments}
+        selectedDepartment={selectedDepartment}
         setSelectedDepartment={setSelectedDepartment} />
 
       <div className="min-h-screen flex flex-col justify-center items-center px-8">
@@ -57,18 +80,22 @@ const ManageGroups = () => {
                 formationLevels.map((formationLevel) => (
                   <div
                     key={formationLevel.id}
-                    onClick={() => handleSelectFormationLevel(formationLevel)}
-                    className={`flex items-center rounded-lg py-2 px-4 ${
+                    onClick={() => handleClickingFormationLevel(formationLevel)}
+                    className={`flex items-center justify-between rounded-lg py-2 px-4 ${
                       selectedFormationLevel?.id === formationLevel.id
                         ? "bg-gray-300"
                         : "bg-white cursor-pointer"}`}>
-                    <span className="w-1/2 text-left font-semibold">{formationLevel.name}</span>
-                    <span className="w-1/2 text-right font-semibold">{formationLevel.curriculums[0]?.name}</span>
+                    <span className="w-fit text-left font-semibold">{formationLevel.name}</span>
+                    <span className="w-fit text-right font-semibold truncate">{formationLevel.curriculums[0]?.name}</span>
+                    <button 
+                    className="size-6 flex justify-center items-center">
+                      <img src="images/trash.svg" alt="Supprimer" className="size-6" onClick={() => handleClickingDeleteFormationLevelButton(formationLevel)}/>
+                    </button>
                   </div>
                 ))
               )}
             </div>
-            <button className="mt-4 w-full p-2 btn-default justify-between">
+            <button className="mt-4 w-full p-2 btn-default justify-between" onClick={handleClickingAddFormationLevelButton}>
               Ajouter
             </button>
           </div>
@@ -76,7 +103,7 @@ const ManageGroups = () => {
           {/* Groupes */}
           <div className="w-1/3 max-w-sm h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg mx-4 flex flex-col">
             <h2 className="text-white text-center text-lg font-bold mb-4">
-              Groupes
+              Groupes {selectedFormationLevel ? `${selectedFormationLevel.name}` : ``}
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
               {!selectedFormationLevel ? (
@@ -89,10 +116,14 @@ const ManageGroups = () => {
                     groups.map((group) => (
                       <div
                         key={group.id}
-                        onClick={() => handleSelectGroup(group)}
-                        className={`flex items-center rounded-lg p-2 ${
+                        onClick={() => handleClinkingGroup(group)}
+                        className={`flex items-center rounded-lg p-2 justify-between ${
                           selectedGroup?.id === group.id ? "bg-gray-300" : "bg-white cursor-pointer"}`}>
-                        <span className="w-full text-center font-semibold">{group.name}</span>
+                        <span className="w-fit text-center font-semibold">{group.name}</span>
+                        <button 
+                        className="size-6 flex justify-center items-center">
+                          <img src="images/trash.svg" alt="Supprimer" className="size-6" />
+                        </button>
                       </div>
                     ))
                   )}
@@ -107,7 +138,7 @@ const ManageGroups = () => {
           {/* Demi-groupes */}
           <div className="w-1/3 max-w-sm h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg flex flex-col">
             <h2 className="text-white text-center text-lg font-bold mb-4">
-              Demi-groupes
+              Demi-groupes {selectedGroup ? `${selectedGroup.name}` : ``}
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
               {!selectedGroup ? (
@@ -120,8 +151,12 @@ const ManageGroups = () => {
                     subGroups.map((subGroup) => (
                       <div
                         key={subGroup.id}
-                        className="flex items-center rounded-lg p-2 bg-white">
-                        <span className="w-full text-center font-semibold">{subGroup.name}</span>
+                        className="flex items-center rounded-lg p-2 bg-white justify-between">
+                        <span className="w-fit text-center font-semibold">{subGroup.name}</span>
+                        <button 
+                        className="size-6 flex justify-center items-center">
+                          <img src="images/trash.svg" alt="Supprimer" className="size-6" />
+                        </button>
                       </div>
                     ))
                   )}
@@ -134,6 +169,39 @@ const ManageGroups = () => {
           </div>
         </div>
       </div>
+      
+      {addingFormationLevel && (
+        <FormationLevelAddingForm 
+          addFormationLevel={addFormationLevel}
+          isSaving={isSaving}
+          selectedDepartment={selectedDepartment}
+          setAddingFormationLevel={setAddingFormationLevel}/>
+      )}
+
+      {addingGroup && (
+        <></>
+      )}
+
+      {addingSubGroup && (
+        <></>
+      )}
+
+      {deletingFormationLevel && (
+        <FormationLevelDeletingForm 
+          deleteFormationLevel={deleteFormationLevel}
+          formationLevel={deletedFormationLevel}
+          isSaving={isSaving}
+          setDeletingFormationLevel={setDeletingFormationLevel}/>
+      )}
+
+      {deletingGroup && (
+        <></>
+      )}
+
+      {deletingSubGroup && (
+        <></>
+      )}
+
       {toast.visible && (
         <Toast
           message={toast.message}

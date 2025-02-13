@@ -20,8 +20,8 @@ const ManageTeachers = () => {
     addTeacherForDepartment, updateTeacher, deleteTeacherForDepartment,
     addSubjectForTeacher, deleteSubjectForTeacher } = useTeachers(setToast, selectedDepartment);
   const { subjects, isLoading: isSubjectsLoading } = useSubjects(null, selectedDepartment.id)
-
   const [selectedTeacher, setSelectedTeacher] = useState(null);
+  
   const [addingTeacher, setAddingTeacher] = useState(false);
   const [addingTeaching, setAddingTeaching] = useState(false);
   const [updatingTeacher, setUpdatingTeacher] = useState(false);

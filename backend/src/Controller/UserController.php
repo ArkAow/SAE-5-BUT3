@@ -158,7 +158,11 @@ class UserController extends AbstractController
             'role' => $user->getRole(),
             'departments' => array_map(fn($d) => [
                 'id' => $d->getId(),
-                'name' => $d->getName()
+                'name' => $d->getName(),
+                'curriculums' => array_map(fn($c) => [
+                    'id' => $c->getId(),
+                    'name' => $c->getName()
+                ], $d->getCurriculums()->toArray()),
             ], $user->getDepartments()->toArray()),
         ], Response::HTTP_OK);
     }

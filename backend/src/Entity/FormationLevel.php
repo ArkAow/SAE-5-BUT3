@@ -88,6 +88,7 @@ class FormationLevel
     {
         if (!$this->curriculums->contains($curriculum)) {
             $this->curriculums[] = $curriculum;
+            $curriculum->addFormationLevel($this);
         }
         return $this;
     }
