@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import routes from "../Routes/routes";
 
-const useGroups = (curriculum, departmentId = null, setToast) => {
+const useGroups = (departmentId = null, setToast) => {
   const [formationLevels, setFormationLevels] = useState([]);
   const [isFormationLevelLoading, setIsFormationLevelLoading] = useState(true);
 
@@ -10,6 +10,7 @@ const useGroups = (curriculum, departmentId = null, setToast) => {
 
   const fetchFormationLevels = async () => {
     try {
+      setIsFormationLevelLoading(true);
       console.log(`Chargement des promotions...`);
       if (!departmentId) throw new Error("Aucun departmentId");
       const response = await fetch(routes.dev.groups.getFormationLevels(departmentId));
@@ -25,30 +26,22 @@ const useGroups = (curriculum, departmentId = null, setToast) => {
     }
   };
 
-  const fetchGroups = async () => {
+  const fetchGroups = async (formationLevelId) => {
     try {
-        console.log(`Chargement des groupes...`);
-        const formation_levelID = curriculum?.formationLevels?.[0]?.id;
-        if (!formation_levelID) throw new Error("Aucun formation_levelID trouvé");
+      setIsGroupLoading(true);
+      console.log(`Chargement des groupes...`);
+      const response = await fetch(routes.dev.groups.getGroups(formationLevelId));
+      if (!response.ok) throw new Error("Erreur lors du chargement des groupes");
 
-        const response = await fetch(routes.dev.groups.getGroups(formation_levelID));
-        if (!response.ok) throw new Error("Erreur lors du chargement des groupes");
-
-        const data = await response.json();
-        setGroups(data);
+      const data = await response.json();
+      setGroups(data);
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
-        setIsGroupLoading(false);
-        console.log(`Chargement des groupes réussi`);
+      setIsGroupLoading(false);
+      console.log(`Chargement des groupes réussi`);
     }
   };
-
-  useEffect(() => {
-    if (curriculum) {
-      fetchGroups();
-    }
-  }, [curriculum]);
 
   useEffect(() => {
     if (departmentId) {
@@ -65,8 +58,7 @@ const useGroups = (curriculum, departmentId = null, setToast) => {
   };
 
   // Ajouter des groupes
-  const addGroups = async (newGroups) => {
-    const actualformationLevelID = curriculum.formationLevels[0].id;
+  const addGroups = async (newGroups, formationLevelID) => {
     const filteredNewGroups = newGroups.filter(
       (newGroup) => !groups.some((g) => g.name === newGroup.name)
     );
@@ -82,7 +74,7 @@ const useGroups = (curriculum, departmentId = null, setToast) => {
           body: JSON.stringify({
             name: group.name,
             halfgroups: group.subGroups || [],
-            formationLevelID: actualformationLevelID,
+            formationLevelID: formationLevelID,
           }),
         });
 
@@ -185,7 +177,7 @@ const useGroups = (curriculum, departmentId = null, setToast) => {
   };
 
   return { groups, isGroupLoading, formationLevels, isFormationLevelLoading, getGroupList, addGroups,
-    deleteGroups, deleteHalfGroups, addSubGroups };
+    deleteGroups, deleteHalfGroups, addSubGroups, fetchGroups };
 };
 
 export default useGroups;

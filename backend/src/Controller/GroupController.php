@@ -26,10 +26,6 @@ class GroupController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        if (!$groups) {
-            return new JsonResponse(['error' => 'Aucun groupe trouvé pour cette promotion.'], 404);
-        }
-
         // Construire la réponse avec les sous-groupes
         $data = array_map(function ($group) {
             return [

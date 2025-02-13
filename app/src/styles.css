@@ -6,6 +6,9 @@
     .btn-default {
       @apply bg-primary text-white rounded hover:bg-primaryshade active:bg-primarytint transition-colors duration-200;
     }
+    .btn-default:disabled {
+      @apply bg-primaryshade cursor-not-allowed;
+    }
     .btn-login {
       @apply w-[220px] py-2 mt-6 bg-primary hover:bg-primaryshade active:bg-primarytint text-white font-bold text-lg rounded-md transform hover:scale-105 transition duration-300;
     }

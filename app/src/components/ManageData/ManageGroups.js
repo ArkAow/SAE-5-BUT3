@@ -4,7 +4,6 @@ import Toast from "../Toast/Toast.js";
 import Navigation from "./Navigation.js";
 import DepartmentSelect from "./DepartmentSelect.js";
 import useGroups from "../../hooks/useGroups.js";
-import useCurriculums from "../../hooks/useCurriculums.js";
 import { useUserContext } from "../../contexts/UserContext.js";
 
 const ManageGroups = () => {
@@ -13,9 +12,22 @@ const ManageGroups = () => {
   const { departments } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
   
-  const { formationLevels, isFormationLevelLoading } = useGroups(null, selectedDepartment.id, setToast)
-  const [selectedformationLevel, setSelectedformationLevel] = useState(null);
+  const { formationLevels, isFormationLevelLoading, groups, isGroupLoading, fetchGroups } = useGroups(selectedDepartment.id, setToast)
+  const [selectedFormationLevel, setSelectedFormationLevel] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [subGroups, setSubGroups] = useState([]);
 
+  const handleSelectFormationLevel = async (formationLevel) => {
+    setSelectedFormationLevel(formationLevel);
+    setSelectedGroup(null);
+    setSubGroups([]);
+    await fetchGroups(formationLevel.id);
+  }
+
+  const handleSelectGroup = (group) => {
+    setSelectedGroup(group);
+    setSubGroups(group.subGroups);
+  }
 
   return (
     <>
@@ -36,17 +48,21 @@ const ManageGroups = () => {
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
               {isFormationLevelLoading ? (
-                <p className="text-white text-center">Chargement...</p>
+                <div className="flex flex-col items-center justify-center p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
+                  <div className="spinner"></div>
+                  <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des promotions...</div>
+                </div>
               ) : (
                 formationLevels.map((formationLevel) => (
                   <div
                     key={formationLevel.id}
-                    onClick={() => setSelectedformationLevel(formationLevel)}
-                    className={`flex items-center rounded-lg p-2 ${
-                      selectedformationLevel?.id === formationLevel.id
+                    onClick={() => handleSelectFormationLevel(formationLevel)}
+                    className={`flex items-center rounded-lg py-2 px-4 ${
+                      selectedFormationLevel?.id === formationLevel.id
                         ? "bg-gray-300"
                         : "bg-white cursor-pointer"}`}>
-                    <span className="w-full text-center font-semibold">{formationLevel.name}</span>
+                    <span className="w-1/2 text-left font-semibold">{formationLevel.name}</span>
+                    <span className="w-1/2 text-right font-semibold">{formationLevel.curriculums[0]?.name}</span>
                   </div>
                 ))
               )}
@@ -62,9 +78,32 @@ const ManageGroups = () => {
               Groupes
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
-              {/*éléments ici*/}
+              {!selectedFormationLevel ? (
+                <p className="text-white text-center">Sélectionnez une promotion</p>
+              ) : (
+                <>
+                  {isGroupLoading ? (
+                    <div className="flex flex-col items-center justify-center p-6 rounded-lg transition-opacity duration-300 opacity-100 w-full">
+                      <div className="spinner"></div>
+                      <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des groupes...</div>
+                    </div>
+                  ) : groups.length === 0 ? ( 
+                    <p className="text-white text-center">Aucun groupe pour les {selectedFormationLevel.name}</p>
+                  ) : (
+                    groups.map((group) => (
+                      <div
+                        key={group.id}
+                        onClick={() => handleSelectGroup(group)}
+                        className={`flex items-center rounded-lg p-2 ${
+                          selectedGroup?.id === group.id ? "bg-gray-300" : "bg-white cursor-pointer"}`}>
+                        <span className="w-full text-center font-semibold">{group.name}</span>
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
             </div>
-            <button className="mt-4 w-full p-2 btn-default justify-between">
+            <button className="mt-4 w-full p-2 btn-default justify-between" disabled={!selectedFormationLevel}>
               Ajouter
             </button>
           </div>
@@ -75,15 +114,37 @@ const ManageGroups = () => {
               Demi-groupes
             </h2>
             <div className="space-y-2 flex-grow overflow-auto">
-              {/*éléments ici*/}
+              {!selectedGroup ? (
+                <p className="text-white text-center">Sélectionnez un groupe</p>
+              ) : (
+                <>
+                  {subGroups.length === 0 ? ( 
+                    <p className="text-white text-center">Aucun sous-groupe pour le groupe {selectedGroup.name}</p>
+                  ) : (
+                    subGroups.map((subGroup) => (
+                      <div
+                        key={subGroup.id}
+                        className="flex items-center rounded-lg p-2 bg-white">
+                        <span className="w-full text-center font-semibold">{subGroup.name}</span>
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
             </div>
-            <button className="mt-4 w-full p-2 btn-default justify-between">
+            <button className="mt-4 w-full p-2 btn-default justify-between" disabled={!selectedGroup}>
               Ajouter
             </button>
           </div>
-
         </div>
       </div>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, visible: false })}
+        />
+      )}
     </>
   );
 };

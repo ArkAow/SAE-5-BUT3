@@ -203,7 +203,12 @@ class DepartmentController extends AbstractController
             $data[] = [
                 'id' => $formationLevel->getId(),
                 'name' => $formationLevel->getName(),
-                'groups'=> $formationLevel->getGroups()
+                'curriculums' => array_map(function ($c) {
+                    return [
+                        'id' => $c->getId(),
+                        'name' => $c->getName(),
+                    ];
+                }, $formationLevel->getCurriculums()->toArray()), // Obtenir les sous-groupes
             ];
         }
 

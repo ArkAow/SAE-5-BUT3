@@ -33,7 +33,7 @@ const routes = {
       deleteGroup: (groupId) => `${routes.dev.default}groups/delete/${groupId}`,
       deleteSubGroup: (groupId) => `${routes.dev.default}groups/delete/halfgroup/${groupId}`,
       getFormationLevels: (departmentId) => `${routes.dev.default}departments/${departmentId}/formation-levels`,
-      getGroups: (classID) => `${routes.dev.default}groups/${classID}`,
+      getGroups: (formationLevelId) => `${routes.dev.default}groups/${formationLevelId}`,
       getSubGroups: (groupId) => `${routes.dev.default}groups/${groupId}/half_group`,
     },
     semesters: {
