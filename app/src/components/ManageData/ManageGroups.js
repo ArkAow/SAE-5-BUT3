@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import Header from "../header/header.js";
 import Navigation from "./Navigation.js";
+import DepartmentSelect from "./DepartmentSelect.js";
 import useGroups from "../../hooks/useGroups.js";
 import useCurriculums from "../../hooks/useCurriculums.js";
+import { useUserContext } from "../../contexts/UserContext.js";
 
 const ManageGroups = () => {
+  const { departments } = useUserContext();
+  const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
+  
   const { curriculums, error, loading } = useCurriculums();
   const [selectedCurriculum, setSelectedCurriculum] = useState(null);
   const { groups, isGroupLoading, getGroupList } = useGroups(selectedCurriculum);
@@ -13,6 +18,10 @@ const ManageGroups = () => {
     <>
       <Header />
       <Navigation />
+      <DepartmentSelect 
+        departments={departments} 
+        selectedDepartment={selectedDepartment} 
+        setSelectedDepartment={setSelectedDepartment} />
 
       <div className="min-h-screen flex flex-col justify-center items-center px-8">
         <div className="flex justify-around w-full mx-10 mt-40">

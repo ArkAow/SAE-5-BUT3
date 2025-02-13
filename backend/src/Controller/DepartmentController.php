@@ -186,4 +186,27 @@ class DepartmentController extends AbstractController
 
         return new JsonResponse($data, 200);
     }
+
+    #[Route('/departments/{id}/formation-levels', name: 'get_department_formation_levels', methods: ['GET'])]
+    public function getFormationLevels(DepartmentRepository $departmentRepository, int $id): JsonResponse
+    {
+        $department = $departmentRepository->find($id);
+
+        if (!$department) {
+            return $this->json(['error' => 'Département non trouvé'], 404);
+        }
+
+        $formationLevels = $department->getFormationLevels();
+
+        $data = [];
+        foreach ($formationLevels as $formationLevel) {
+            $data[] = [
+                'id' => $formationLevel->getId(),
+                'name' => $formationLevel->getName(),
+                'groups'=> $formationLevel->getGroups()
+            ];
+        }
+
+        return $this->json($data);
+    }
 }
