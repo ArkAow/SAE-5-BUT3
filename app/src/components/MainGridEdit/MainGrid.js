@@ -10,11 +10,11 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../../services/courseService.js";
 import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
 
-const MainGrid = ({ curriculum, groups }) => {
+const MainGrid = ({ department, curriculum, groups }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
-  const { teachers } = useTeachers(setToast);
+  const { teachers } = useTeachers(setToast, department);
 
   const [items, setItems] = useState({});
   const [modifiedCourses, setModifiedCourses] = useState([])
