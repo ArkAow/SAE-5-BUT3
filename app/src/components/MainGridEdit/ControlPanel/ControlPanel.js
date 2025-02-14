@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { CourseButton } from "./CourseButton";
-import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
 import { CourseTypeButton } from "./CourseTypeButton";
 import { SaveButton } from "./SaveButton";
@@ -8,17 +7,12 @@ import { SaveButton } from "./SaveButton";
 const ControlPanel = ({
   isExpanded,
   setIsExpanded,
-  curriculum,
   selectedSemester,
   setToast,
   teachers,
 
   groups,
   groupList,
-  addGroups,
-  addSubGroups,
-  deleteGroups,
-  deleteHalfGroups,
 
   courseTypes,
   setCourseTypes,
@@ -100,15 +94,6 @@ const ControlPanel = ({
           courseTypes={courseTypes}
           setCourseTypes={setCourseTypes}
           updateCoursesForRemovedType={updateCoursesForRemovedType}/>
-
-        <GroupButton 
-          curriculum={curriculum}
-          groups={groups}
-          isNoGroups={isNoGroups}
-          addGroups={addGroups}
-          addSubGroups={addSubGroups}
-          deleteGroups={deleteGroups}
-          deleteHalfGroups={deleteHalfGroups}/>
 
         <PrintButton />
 

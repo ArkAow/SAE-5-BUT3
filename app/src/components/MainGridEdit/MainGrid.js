@@ -3,7 +3,6 @@ import Node from "./Node";
 import ControlPanel from "./ControlPanel/ControlPanel";
 import Toast from "../Toast/Toast.js";
 import routes from "../../Routes/routes.js";
-import useGroups from "../../hooks/useGroups.js";
 import useTeachers from "../../hooks/useTeachers.js";
 import { createPortal } from "react-dom";
 import { DndProvider } from "react-dnd";
@@ -11,11 +10,10 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../../services/courseService.js";
 import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../../services/courseGroupService.js";
 
-const MainGrid = ({ curriculum }) => {
+const MainGrid = ({ curriculum, groups }) => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
 
-  const { groups, fetchGroups, addGroups, deleteGroups, deleteHalfGroups, addSubGroups, isGroupLoading, getGroupList } = useGroups(curriculum, setToast);
   const { teachers } = useTeachers(setToast);
 
   const [items, setItems] = useState({});
@@ -44,12 +42,22 @@ const MainGrid = ({ curriculum }) => {
   };
 
   useEffect(() => {
-    if (!isGroupLoading && !isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
+    if (!isSemesterLoading && !isSubjectLoading && !isCourseTypeLoading) {
       setLoading(false);
     } else {
       setLoading(true);
     }
-  }, [isGroupLoading, isSemesterLoading, isSubjectLoading, isCourseTypeLoading]);
+  }, [isSemesterLoading, isSubjectLoading, isCourseTypeLoading]);
+
+
+  const getGroupList = () => {
+    const mainGroups = groups.map((group) => group.name);
+    const subGroups = groups.flatMap((group) =>
+      (group.subGroups || []).map((subGroup) => subGroup.name)
+    );
+    return ["Tous", ...mainGroups, ...subGroups];
+  };
+
 
   /* Gestion des SEMESTRES et MATIERES -------------------------------------------- */
   useEffect(() => {
@@ -457,12 +465,11 @@ const MainGrid = ({ curriculum }) => {
 
                 groups={groups}
                 groupList={groupList}
-                addGroups={addGroups}
-                addSubGroups={addSubGroups}
-                deleteGroups={deleteGroups}
-                deleteHalfGroups={deleteHalfGroups}
+                addGroup={addGroup}
+                addSubgroup={addSubgroup}
+                deleteGroup={deleteGroup}
+                deleteSubgroup={deleteSubgroup}
 
-                fetchGroups={fetchGroups}
                 courseTypes={courseTypes}
                 setCourseTypes={setCourseTypes}
                 updateCoursesForRemovedType={updateCoursesForRemovedType}
