@@ -29,7 +29,7 @@ const useGroups = (department = null, setToast) => {
       fetchFormationLevels();
     }
   }, [department]);
-  
+
   const addFormationLevel = async (payload) => {
     try {
       setIsSaving(true);
@@ -140,8 +140,7 @@ const useGroups = (department = null, setToast) => {
   };
 
   return { formationLevels, isLoading, isSaving,
-    addGroup, addFormationLevel, deleteFormationLevel, deleteGroup, addSubgroup, deleteSubgroup,
-    getGroupList };
+    addGroup, addFormationLevel, deleteFormationLevel, deleteGroup, addSubgroup, deleteSubgroup };
 };
 
 export default useGroups;

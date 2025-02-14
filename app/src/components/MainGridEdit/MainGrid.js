@@ -465,10 +465,6 @@ const MainGrid = ({ curriculum, groups }) => {
 
                 groups={groups}
                 groupList={groupList}
-                addGroup={addGroup}
-                addSubgroup={addSubgroup}
-                deleteGroup={deleteGroup}
-                deleteSubgroup={deleteSubgroup}
 
                 courseTypes={courseTypes}
                 setCourseTypes={setCourseTypes}
