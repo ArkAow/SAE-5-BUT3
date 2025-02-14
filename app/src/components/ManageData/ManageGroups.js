@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../header/header.js";
 import Toast from "../Toast/Toast.js";
 import Navigation from "./Navigation.js";
@@ -7,6 +7,10 @@ import DepartmentSelect from "./DepartmentSelect.js";
 import { useUserContext } from "../../contexts/UserContext.js";
 import FormationLevelAddingForm from "../forms/FormationLevelAddingForm.js";
 import FormationLevelDeletingForm from "../forms/FormationLevelDeletingForm.js";
+import GroupAddingForm from "../forms/GroupAddingForm.js";
+import GroupDeletingForm from "../forms/GroupDeletingForm.js";
+import SubgroupDeletingForm from "../forms/SubgroupDeletingForm.js";
+import SubgroupAddingForm from "../forms/SubgroupAddingForm.js";
 
 const ManageGroups = () => {
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
@@ -15,7 +19,8 @@ const ManageGroups = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] || null);
   
   const { formationLevels, isFormationLevelLoading, isSaving,
-    addGroup, addFormationLevel, deleteFormationLevel } = useGroups(selectedDepartment.id, setToast)
+    addGroup, addFormationLevel, deleteFormationLevel, deleteGroup,
+    addSubgroup, deleteSubgroup } = useGroups(selectedDepartment, setToast)
   const [selectedFormationLevel, setSelectedFormationLevel] = useState(null);
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
@@ -31,6 +36,13 @@ const ManageGroups = () => {
   const [deletedFormationLevel, setDeletedFormationLevel] = useState(null);
   const [deletedGroup, setDeletedGroup] = useState(null);
   const [deletedSubGroup, setDeletedSubGroup] = useState(null);
+
+  useEffect(() => {
+    setGroups([]);
+    setSubGroups([]);
+    setSelectedFormationLevel(null);
+    setSelectedGroup(null);
+  }, [formationLevels]);
 
   const handleClickingFormationLevel = (formationLevel) => {
     setSelectedFormationLevel(formationLevel);
@@ -51,6 +63,24 @@ const ManageGroups = () => {
   const handleClickingDeleteFormationLevelButton = (formationLevel) => {
     setDeletedFormationLevel(formationLevel);
     setDeletingFormationLevel(true);
+  }
+
+  const handleClickingAddGroupButton = () => {
+    setAddingGroup(true);
+  }
+
+  const handleClickingDeleteGroupButton = (group) => {
+    setDeletedGroup(group);
+    setDeletingGroup(true);
+  }
+
+  const handleClickingAddSubgroupButton = () => {
+    setAddingSubGroup(true);
+  }
+
+  const handleClickingDeleteSubgroupButton = (subgroup) => {
+    setDeletedSubGroup(subgroup);
+    setDeletingSubGroup(true);
   }
 
   return (
@@ -121,7 +151,7 @@ const ManageGroups = () => {
                           selectedGroup?.id === group.id ? "bg-gray-300" : "bg-white cursor-pointer"}`}>
                         <span className="w-fit text-center font-semibold">{group.name}</span>
                         <button 
-                        className="size-6 flex justify-center items-center">
+                        className="size-6 flex justify-center items-center" onClick={() => handleClickingDeleteGroupButton(group)}>
                           <img src="images/trash.svg" alt="Supprimer" className="size-6" />
                         </button>
                       </div>
@@ -130,7 +160,7 @@ const ManageGroups = () => {
                 </>
               )}
             </div>
-            <button className="mt-4 w-full p-2 btn-default justify-between" disabled={!selectedFormationLevel}>
+            <button className="mt-4 w-full p-2 btn-default justify-between" disabled={!selectedFormationLevel} onClick={handleClickingAddGroupButton}>
               Ajouter
             </button>
           </div>
@@ -153,8 +183,7 @@ const ManageGroups = () => {
                         key={subGroup.id}
                         className="flex items-center rounded-lg p-2 bg-white justify-between">
                         <span className="w-fit text-center font-semibold">{subGroup.name}</span>
-                        <button 
-                        className="size-6 flex justify-center items-center">
+                        <button className="size-6 flex justify-center items-center" onClick={() => handleClickingDeleteSubgroupButton(subGroup)}>
                           <img src="images/trash.svg" alt="Supprimer" className="size-6" />
                         </button>
                       </div>
@@ -163,7 +192,7 @@ const ManageGroups = () => {
                 </>
               )}
             </div>
-            <button className="mt-4 w-full p-2 btn-default justify-between" disabled={!selectedGroup}>
+            <button className="mt-4 w-full p-2 btn-default justify-between" disabled={!selectedGroup} onClick={handleClickingAddSubgroupButton}>
               Ajouter
             </button>
           </div>
@@ -179,11 +208,19 @@ const ManageGroups = () => {
       )}
 
       {addingGroup && (
-        <></>
+        <GroupAddingForm 
+          addGroup={addGroup}
+          isSaving={isSaving}
+          selectedFormationLevel={selectedFormationLevel}
+          setAddingGroup={setAddingGroup}/>
       )}
 
       {addingSubGroup && (
-        <></>
+        <SubgroupAddingForm 
+          addSubgroup={addSubgroup}
+          isSaving={isSaving}
+          selectedGroup={selectedGroup}
+          setAddingSubgroup={setAddingSubGroup}/>
       )}
 
       {deletingFormationLevel && (
@@ -195,11 +232,19 @@ const ManageGroups = () => {
       )}
 
       {deletingGroup && (
-        <></>
+        <GroupDeletingForm 
+          deleteGroup={deleteGroup}
+          group={deletedGroup}
+          isSaving={isSaving}
+          setDeletingGroup={setDeletingGroup}/>
       )}
 
       {deletingSubGroup && (
-        <></>
+        <SubgroupDeletingForm 
+          deleteSubgroup={deleteSubgroup}
+          isSaving={isSaving}
+          setDeletingSubgroup={setDeletingSubGroup}
+          subgroup={deletedSubGroup}/>
       )}
 
       {toast.visible && (

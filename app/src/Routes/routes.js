@@ -30,10 +30,10 @@ const routes = {
     groups: {
       addFormationLevel: (departmentId) => `${routes.dev.default}formation-levels/add/${departmentId}`,
       addGroup: (formationLevelId) => `${routes.dev.default}groups/add/${formationLevelId}`,
-      addSubGroups: () => `${routes.dev.default}groups/add/halfgroup`,
+      addSubGroup: (groupId) => `${routes.dev.default}subgroups/add/${groupId}`,
       deleteFormationLevel: (formationLevelId) => `${routes.dev.default}formation-levels/delete/${formationLevelId}`,
       deleteGroup: (groupId) => `${routes.dev.default}groups/delete/${groupId}`,
-      deleteSubGroup: (groupId) => `${routes.dev.default}groups/delete/halfgroup/${groupId}`,
+      deleteSubGroup: (subgroupId) => `${routes.dev.default}subgroups/delete/${subgroupId}`,
       getFormationLevels: (departmentId) => `${routes.dev.default}departments/${departmentId}/formation-levels`,
     },
     semesters: {

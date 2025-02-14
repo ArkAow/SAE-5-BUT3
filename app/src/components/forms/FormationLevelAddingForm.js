@@ -29,7 +29,6 @@ const FormationLevelAddingForm = ({selectedDepartment, addFormationLevel, setAdd
       departmentId: selectedDepartment.id,
       curriculumId: selectedCurriculum,
     };
-    console.log(payload);
     await addFormationLevel(payload);
     handleLeaving();
   }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import routes from "../Routes/routes";
 
-const useGroups = (departmentId = null, setToast) => {
+const useGroups = (department = null, setToast) => {
   const [formationLevels, setFormationLevels] = useState([]);
   const [isFormationLevelLoading, setIsFormationLevelLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -10,8 +10,8 @@ const useGroups = (departmentId = null, setToast) => {
     try {
       setIsFormationLevelLoading(true);
       console.log(`Chargement des promotions...`);
-      if (!departmentId) throw new Error("Aucun departmentId");
-      const response = await fetch(routes.dev.groups.getFormationLevels(departmentId));
+      if (!department) throw new Error("Aucun department");
+      const response = await fetch(routes.dev.groups.getFormationLevels(department.id));
       if (!response.ok) throw new Error("Erreur lors du chargement des promotions");
 
       const data = await response.json();
@@ -25,10 +25,10 @@ const useGroups = (departmentId = null, setToast) => {
   };
 
   useEffect(() => {
-    if (departmentId) {
+    if (department) {
       fetchFormationLevels();
     }
-  }, [departmentId]);
+  }, [department]);
 
   const getGroupList = () => {
     const groups = formationLevels.groups || [];
@@ -38,34 +38,6 @@ const useGroups = (departmentId = null, setToast) => {
       (group.subGroups || []).map((subGroup) => subGroup.name)
     );
     return ["Tous", ...mainGroups, ...subGroups];
-  };
-
-  const addGroup = async (newGroups, formationLevelID) => {
-    const groups = formationLevels.groups || [];
-    const filteredNewGroups = newGroups.filter(
-      (newGroup) => !groups.some((g) => g.name === newGroup.name)
-    );
-    if (filteredNewGroups.length === 0) return;
-
-    for (const group of filteredNewGroups) {
-      try {
-        setIsSaving(true);
-        await fetch(routes.dev.groups.addGroup(formationLevelID), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: group.name,
-            formationLevelID: formationLevelID,
-          }),
-        });
-      } catch (error) {
-        setToast({ message: "Erreur de connexion", type: "error", visible: true });
-      } finally {
-        setToast({ message: "Enseignement ajouté avec succès", type: "success", visible: true });
-        setIsSaving(false);
-        fetchFormationLevels();
-      }
-    }
   };
 
   const addFormationLevel = async (payload) => {
@@ -88,17 +60,15 @@ const useGroups = (departmentId = null, setToast) => {
     }
   };
 
-  const deleteFormationLevel = async (FormationId) => {
+  const deleteFormationLevel = async (formationId) => {
     try {
       setIsSaving(true);
-      await fetch(routes.dev.groups.deleteFormationLevel(FormationId), { 
+      await fetch(routes.dev.groups.deleteFormationLevel(formationId), { 
         method: "DELETE"
       });
     } catch (err) {
       setToast({
-        message: "Erreur lors de la suppréssion de la promotion",
-        type: "error",
-        visible: true,
+        message: "Erreur lors de la suppréssion de la promotion", type: "error", visible: true,
       });
     } finally {
       setToast({ message: "Promotion supprimé avec succès", type: "success", visible: true });
@@ -107,8 +77,81 @@ const useGroups = (departmentId = null, setToast) => {
     }
   };
 
+  const addGroup = async (payload) => {
+    try {
+      setIsSaving(true);
+      await fetch(routes.dev.groups.addGroup(payload.formationLevelID), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: payload.name,
+        }),
+      });
+    } catch (error) {
+      setToast({ message: "Erreur lors de l'ajout du groupe", type: "error", visible: true });
+    } finally {
+      setToast({ message: "Groupe ajouté avec succès", type: "success", visible: true });
+      setIsSaving(false);
+      fetchFormationLevels();
+    }
+  };
+
+  const deleteGroup = async (groupId) => {
+    try {
+      setIsSaving(true);
+      await fetch(routes.dev.groups.deleteGroup(groupId), { 
+        method: "DELETE"
+      });
+    } catch (err) {
+      setToast({
+        message: "Erreur lors de la suppréssion du groupe", type: "error", visible: true,
+      });
+    } finally {
+      setToast({ message: "Groupe supprimé avec succès", type: "success", visible: true });
+      setIsSaving(false);
+      fetchFormationLevels();
+    }
+  };
+
+  const addSubgroup = async (payload) => {
+    try {
+      setIsSaving(true);
+      await fetch(routes.dev.groups.addSubGroup(payload.groupID), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: payload.name,
+        }),
+      });
+    } catch (error) {
+      setToast({ message: "Erreur lors de l'ajout du sous-groupe", type: "error", visible: true });
+    } finally {
+      setToast({ message: "Sous-groupe ajouté avec succès", type: "success", visible: true });
+      setIsSaving(false);
+      fetchFormationLevels();
+    }
+  };
+
+  const deleteSubgroup = async (subgroupId) => {
+    try {
+      setIsSaving(true);
+      await fetch(routes.dev.groups.deleteSubGroup(subgroupId), { 
+        method: "DELETE"
+      });
+    } catch (err) {
+      setToast({
+        message: "Erreur lors de la suppréssion du sous-groupe", type: "error", visible: true,
+      });
+    } finally {
+      setToast({ message: "Sous-groupe supprimé avec succès", type: "success", visible: true });
+      setIsSaving(false);
+      fetchFormationLevels();
+    }
+  };
+
   return { formationLevels, isFormationLevelLoading, isSaving,
-    addGroup, addFormationLevel, deleteFormationLevel };
+    addGroup, addFormationLevel, deleteFormationLevel, deleteGroup, addSubgroup, deleteSubgroup,
+    getGroupList };
 };
 
 export default useGroups;
