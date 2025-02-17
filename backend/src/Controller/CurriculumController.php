@@ -6,6 +6,7 @@ use App\Repository\CurriculumRepository;
 use App\Repository\SemesterRepository;
 use App\Repository\SubjectRepository;
 use App\Entity\Curriculum;
+use App\Entity\Course;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,30 +14,84 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class CurriculumController extends AbstractController
 {
+    /**
+     * Formatte les données d'un cours pour la réponse JSON.
+     */
+    private function formatCourse(Course $course): array
+    {
+        $group = null;
+        if ($course->getFormationLevel()->count() > 0) {
+            $formationLevel = $course->getFormationLevel()->first();
+            $group = [
+                'groupType' => 'formation_level',
+                'groupID' => $formationLevel->getId(),
+            ];
+        } elseif ($course->getGroups()->count() > 0) {
+            $groupEntity = $course->getGroups()->first();
+            $group = [
+                'groupType' => 'group',
+                'groupID' => $groupEntity->getId(),
+            ];
+        } elseif ($course->getHalfGroups()->count() > 0) {
+            $halfGroup = $course->getHalfGroups()->first();
+            $group = [
+                'groupType' => 'half_group',
+                'groupID' => $halfGroup->getId(),
+            ];
+        }
+    
+        return [
+            'id' => $course->getId(),
+            'duration' => $course->getDuration(),
+            'weekPosition' => $course->getWeekPosition(),
+            'courseType' => $course->getCourseTypes()->first() ? [
+                'id' => $course->getCourseTypes()->first()->getId(),
+                'name' => $course->getCourseTypes()->first()->getName(),
+                'color' => $course->getCourseTypes()->first()->getColor(),
+            ] : null,
+            'teacher' => $course->getTeachers()->first() ? [
+                'id' => $course->getTeachers()->first()->getId(),
+                'firstName' => $course->getTeachers()->first()->getFirstName(),
+                'lastName' => $course->getTeachers()->first()->getLastName(),
+                'code' => $course->getTeachers()->first()->getCode(),
+            ] : null,
+            'subject' => $course->getSubjects()->first() ? [
+                'id' => $course->getSubjects()->first()->getId(),
+                'name' => $course->getSubjects()->first()->getName(),
+                'code' => $course->getSubjects()->first()->getCode(),
+            ] : null,
+            'group' => $group,
+        ];
+    }
+
     //Route et fonction permttant de récupérer les semestres d'un curriculum
     #[Route('/curriculum/{id}/semesters', name: 'api_get_semesters', methods: ['GET'])]
-    public function getSemesters(int $id, EntityManagerInterface $em): JsonResponse
+    public function getSemesters(int $id, CurriculumRepository $curriculumRepository, EntityManagerInterface $em): JsonResponse
     {
-        //Connexion à la BDD afin de récupérer les données
-        $connection = $em->getConnection();
-        //Requête SQL 
-        $sql = '
-            SELECT s.id, s.name 
-            FROM semester s
-            INNER JOIN curriculum_semester cursem ON cursem.semester_id = s.id
-            WHERE cursem.curriculum_id = :curriculumId
-        ';
-        //Execution de la requete SQL avec nos parametres
-        $stmt = $connection->prepare($sql);
-        $result = $stmt->executeQuery(['curriculumId' => $id])->fetchAllAssociative();
+        $curriculum = $curriculumRepository->find($id);
 
-        //Si aucun résultat n'est trouvé, alors une erreur est renvoyée
-        if (empty($result)) {
-            return $this->json(['error' => 'No semesters found for this curriculum'], 404);
+        if (!$curriculum) {
+            return $this->json(['error' => 'Cursus non trouvé'], 404);
         }
 
-        //On retourne les semestres sous forme de tableau en JSON
-        return $this->json($result, 200);
+        $semesters = $curriculum->getSemesters();
+
+        $data = [];
+        foreach ($semesters as $semester) {
+            $data[] = [
+                'id' => $semester->getId(),
+                'name' => $semester->getName(),
+                'subjects' => array_map(function ($s) {
+                    return [
+                        'id' => $s->getId(),
+                        'name' => $s->getName(),
+                        'courses' => array_map(fn($c) => $this->formatCourse($c), $s->getCourses()->toArray())
+                    ];
+                }, $semester->getSubjects()->toArray())
+            ];
+        }
+
+        return $this->json($data);
     }
 
     //Route et fonction afin de récupérer les curriculums disponibles
