@@ -163,6 +163,31 @@ class UserController extends AbstractController
                     'id' => $c->getId(),
                     'name' => $c->getName()
                 ], $d->getCurriculums()->toArray()),
+                'formationLevels' => array_map(fn($fl) => [
+                    'id' => $fl->getId(),
+                    'name' => $fl->getName(),
+                    'curriculums' => array_map(function ($c) {
+                        return [
+                            'id' => $c->getId(),
+                            'name' => $c->getName(),
+                        ];
+                    }, $fl->getCurriculums()->toArray()),
+                    'groups' => array_map(function ($g) {
+                        return [
+                            'id' => $g->getId(),
+                            'name' => $g->getName(),
+                            'subGroups' => array_map(function ($sg) {
+                                return [
+                                    'id' => $sg->getId(),
+                                    'name' => $sg->getName(),
+                                ];
+                            }, $g->getHalfGroups()->toArray()), // Obtenir les sous-groupes
+                        ];
+                    }, $fl->getGroups()->toArray())
+                ], $d->getFormationLevels()->toArray()),
+                'users' => array_map(fn($u) => [
+                    'id' => $u->getId()
+                ], $d->getUsers()->toArray())
             ], $user->getDepartments()->toArray()),
         ], Response::HTTP_OK);
     }

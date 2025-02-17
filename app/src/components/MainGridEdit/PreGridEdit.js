@@ -1,91 +1,142 @@
 import React, { useState } from "react";
 import Header from "../header/header";
 import { useNavigate } from "react-router-dom";
-import useCurriculums from "../../hooks/useCurriculums";
+import { useUserContext } from "../../contexts/UserContext.js";
 
 const PreGridEdit = () => {
-  const { curriculums, error, loading } = useCurriculums();
+  const { departments = [] } = useUserContext();
+  const [selectedDepartment, setSelectedDepartment] = useState(departments[0] ?? null);
+
+  const [formationLevels, setFormationLevels] = useState(selectedDepartment?.formationLevels ?? []);
+  const [selectedFormationLevel, setSelectedFormationLevel] = useState(null);
+  const [selectedGroups, setSelectedGroups] = useState([]);
   const [selectedCurriculum, setSelectedCurriculum] = useState(null);
+
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
 
-  const handleCurriculumChange = (e) => {
-    const selected = curriculums.find(
-      (curriculum) => curriculum.id === parseInt(e.target.value, 10)
-    );
-    setSelectedCurriculum(selected);
-  };
-
   const goToPreviEdit = () => {
-    if (selectedCurriculum) {
-      navigate("/PreviEdit", { state: { selectedCurriculum } });
+    if (selectedCurriculum && selectedDepartment && selectedGroups.length > 0) {
+      navigate("/PreviEdit", { state: { selectedDepartment, selectedCurriculum, selectedGroups } });
     }
   };
 
+  const handleFormationLevelChange = (e) => {
+    const selected = formationLevels.find(
+      (formationLevel) => formationLevel.id === parseInt(e.target.value, 10)
+    );
+    setSelectedFormationLevel(selected);
+
+    if (!selected?.groups || selected.groups.length === 0) {
+      setError(true);
+      setErrorMessage("Pas de groupes disponibles pour ce niveau de formation");
+      setSelectedGroups([]);
+      return;
+    } else {
+      setError(false);
+      setSelectedGroups(selected.groups);
+    }
+
+    if (!selected?.curriculums || selected.curriculums.length === 0) {
+      setError(true);
+      setErrorMessage("Pas de cursus associé à ce niveau de formation");
+      setSelectedCurriculum(null);
+      return;
+    } else {
+      setError(false);
+      setSelectedCurriculum(selected.curriculums[0]);
+    }
+  };
+
+  const handleChangeDepartment = (e) => {
+    const selectedDeptId = parseInt(e.target.value, 10);
+    const selectedDept = departments.find(dept => dept.id === selectedDeptId) ?? null;
+
+    setSelectedDepartment(selectedDept);
+    setSelectedFormationLevel(null);
+    setFormationLevels(selectedDept?.formationLevels ?? []);
+    setSelectedGroups([]);
+    setSelectedCurriculum(null);
+    setError(false);
+    setErrorMessage("");
+  };
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <>
       <Header />
-
-      <div className="flex flex-col items-center justify-center flex-1 space-y-10 py-10">
-        {error && (
-          <div className="text-primary text-3xl font-bold px-10 py-3 bg-white rounded-full">
-            Erreur lors du chargement des données
-          </div>
-        )}
-
-        {loading ? (
-          <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
-            <div className="spinner"></div>
-            <div className="text-white text-3xl font-bold mt-4">
-              Chargement des cursus...
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Sélecteur de cursus */}
-            <div className={`${error ? 'hidden' : 'flex space-x-8'}`}>
-              <div className="w-64">
-                <label
-                  htmlFor="curriculum-select"
-                  className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white">
-                  Cursus :
-                </label>
+      <div className="flex flex-col min-h-screen items-center justify-center flex-1 space-y-10 py-10">
+        <>
+          <div className={`flex space-x-8`}>
+            {/* Sélecteur de département */}
+            <div className="w-80">
+              <label className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white">
+                Département :
+              </label>
+              {departments.length > 1 ? (
                 <select
-                  id="curriculum-select"
-                  value={selectedCurriculum?.id || ""}
-                  onChange={handleCurriculumChange}
                   className="w-full min-w-48 h-28 p-3 text-2xl default-select focus:outline-none"
-                  aria-label="Sélectionner un cursus">
-                  <option value="" disabled>
-                    {curriculums.length > 0
-                      ? "Choisir un Cursus"
-                      : "Aucun Cursus"}
-                  </option>
-                  {curriculums.map((curriculum) => (
-                    <option key={curriculum.id} value={curriculum.id}>
-                      {curriculum.name}
+                  value={selectedDepartment?.id || ""}
+                  onChange={handleChangeDepartment}>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
                     </option>
                   ))}
                 </select>
-              </div>
+              ) : (
+                <div className="w-full min-w-48 h-28 p-3 text-2xl text-white font-bold bg-primary border border-white shadow-sm flex items-center justify-left rounded-lg">
+                  {selectedDepartment?.name ?? "Aucun département"}
+                </div>
+              )}
             </div>
 
-            {/* Bouton pour confirmer le choix */}
-            <button
-              type="button"
-              className={`w-1/5 min-w-40 px-6 py-3 text-white text-xl 
-                bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint 
-                focus:outline-none border border-white ${
-                  !selectedCurriculum ? "bg-primaryshade cursor-not-allowed" : ""}
-                ${error ? 'hidden' : ''}`}
-              onClick={goToPreviEdit}
-              disabled={!selectedCurriculum}
-              aria-disabled={!selectedCurriculum}>
-              Confirmer
-            </button>
-          </>
-        )}
+            {/* Sélecteur de formationlevel */}
+            <div className="w-80">
+              <label
+                htmlFor="curriculum-select"
+                className="pl-4 translate-y-12 z-10 block mb-2 text-xl text-white">
+                Niveau de formation :
+              </label>
+              <select
+                id="curriculum-select"
+                value={selectedFormationLevel?.id || ""}
+                onChange={handleFormationLevelChange}
+                className={`w-full min-w-48 h-28 p-3 default-select focus:outline-none ${selectedFormationLevel ? 'text-2xl' : 'text-lg'}`}
+                aria-label="Sélectionner un cursus">
+                <option value="" disabled>
+                  {formationLevels.length > 0 ? "Choisir un niveau de formation" : "Aucun niveau de formation"}
+                </option>
+                {formationLevels.map((formationLevel) => (
+                  <option key={formationLevel.id} value={formationLevel.id}>
+                    {formationLevel.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className={`text-primary text-sm font-bold px-2 py-1 bg-white rounded-full h-6 flex items-center justify-center transition-opacity duration-300 
+            ${error ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+            {errorMessage}
+          </div>
+
+          {/* Bouton confirmer */}
+          <button
+            type="button"
+            className={`w-1/5 min-w-40 px-6 py-3 text-white text-xl 
+              bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint 
+              focus:outline-none border border-white transition-all duration-300
+              ${error ? "bg-primaryshade cursor-not-allowed" : ""}`}
+            onClick={goToPreviEdit}
+            disabled={!(selectedCurriculum && selectedDepartment && selectedGroups.length > 0)}
+            aria-disabled={!(selectedCurriculum && selectedDepartment && selectedGroups.length > 0)}>
+            Confirmer
+          </button>
+        </>
       </div>
-    </div>
+    </>
   );
 };
 
