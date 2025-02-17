@@ -29,27 +29,26 @@ const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) =
     });
 
     const initialItems = {};
-    if (!courses.length > 0) {
-      setIsLoading(false);
-      return;
-    }
-    courses.forEach((course) => {
-      const row = course.pos.y;
-      const col = course.pos.x;
-      const positionKey = `${row}-${col}`;
+    if (courses.length > 0) {
+      courses.forEach((course) => {
+        const row = course.pos.y;
+        const col = course.pos.x;
+        const positionKey = `${row}-${col}`;
 
-      if (!initialItems[positionKey]) {
-        initialItems[positionKey] = [];
-      }
+        if (!initialItems[positionKey]) {
+          initialItems[positionKey] = [];
+        }
 
-      initialItems[positionKey].push({
-        color: course.courseType?.color || "#ffffff",
-        courseType: course.courseType?.name || "N/A",
-        teacher: course.teacher?.code || "N/A",
-        duration: course.duration || 1.0,
-        id: course.itemID || Date.now(),
+        initialItems[positionKey].push({
+          color: course.courseType?.color || "#ffffff",
+          courseType: course.courseType?.name || "N/A",
+          teacher: course.teacher?.code || "N/A",
+          duration: course.duration || 1.0,
+          id: course.itemID || Date.now(),
+        });
       });
-    });
+    }
+
     setIsLoading(false);
 
     setItems(initialItems);
