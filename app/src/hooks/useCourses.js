@@ -5,6 +5,7 @@ import { getCoursePosFromGroup } from "../services/courseGroupService.js";
 const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) => {
   const [items, setItems] = useState({});
   const [courses, setCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [modifiedCourses, setModifiedCourses] = useState([]);
   const [deletedCourses, setDeletedCourses] = useState([]);
 
@@ -15,6 +16,7 @@ const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) =
       setCourses([]);
       return;
     }
+    setIsLoading(true);
     setCourses([]);
     const rawCourses = selectedSubject.courses;
     rawCourses.forEach((rawCourse) => {
@@ -25,10 +27,12 @@ const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) =
       rawCourse.isRepeat = false;
       setCourses((prev) => [...prev, ...createCoursesFromData(rawCourse, selectedSubject, newItemID)]);
     });
-    console.log(courses);
 
     const initialItems = {};
-    if (!courses.length > 0) return;
+    if (!courses.length > 0) {
+      setIsLoading(false);
+      return;
+    }
     courses.forEach((course) => {
       const row = course.pos.y;
       const col = course.pos.x;
@@ -46,6 +50,7 @@ const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) =
         id: course.itemID || Date.now(),
       });
     });
+    setIsLoading(false);
 
     setItems(initialItems);
   }, [selectedSubject]);
@@ -160,6 +165,7 @@ const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) =
 
   return {
     items,
+    isLoading,
     modifiedCourses,
     deletedCourses,
     addItem,

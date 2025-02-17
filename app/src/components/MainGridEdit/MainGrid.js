@@ -29,7 +29,6 @@ const MainGrid = () => {
 
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [currentSubjectIndex, setCurrentSubjectIndex] = useState(0);
 
   const {courseTypes, setCourseTypes, isLoading: isCourseTypeLoading} = useCourseTypes();
 
@@ -45,7 +44,7 @@ const MainGrid = () => {
   };
 
   const {
-    items, courses, modifiedCourses, deletedCourses, addItem, deleteItem,
+    items, isLoading: isCoursesLoading, modifiedCourses, deletedCourses, addItem, deleteItem,
     modifItem, moveItem, updateCoursesForRemovedType, setDeletedCourses, setModifiedCourses
   } = useCourses(selectedSubject, teachers, courseTypes, groups, getGroupList());
 
@@ -62,7 +61,6 @@ const MainGrid = () => {
       setSelectedSemester(firstSemester);
       setSubjects(firstSemester.subjects);
       setSelectedSubject(firstSemester.subjects[0] || null);
-      setCurrentSubjectIndex(0);
     }
   }, [semesters, isSemesterLoading]);
 
@@ -104,14 +102,12 @@ const MainGrid = () => {
       setSubjects(selected.subjects);
       setSelectedSubject(selected.subjects[0] || null);
     }
-    setCurrentSubjectIndex(0);
   };
 
   const handleSubjectChange = (e) => {
     const subjectId = parseInt(e.target.value, 10);
     const selected = subjects.find((s) => s.id === subjectId);
     setSelectedSubject(selected);
-    console.log(selected);
   };
 
   const groupList = getGroupList();
@@ -255,61 +251,72 @@ const MainGrid = () => {
               </button>
             </div>
 
-            <>
-              {groups.length === 0 ? (
-                <div className="flex items-center justify-center w-full">
-                  <div className="w-2/3 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
-                    Il y a un problème de groupes, veuillez en ajouter pour consulter le tableau.
+            {isCoursesLoading ? (
+              <div className="flex items-center justify-center w-full mt-10">
+                <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
+                  <div className="spinner"></div>
+                  <div className="text-white text-3xl font-bold mt-4">
+                    Chargement des cours...
                   </div>
                 </div>
-              ) : (
-                <DndProvider backend={HTML5Backend}>
-                  <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
-                  mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
-                    <div
-                      className="grid"
-                      style={{
-                        gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
-                      }}>
-                      <div className="w-10 h-6"></div>
-                      {groupList.map((groupName, colIndex) => (
-                        <div
-                          key={`col-label-${colIndex}`}
-                          className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
-                          {groupName}
-                        </div>
-                      ))}
-                      {Array.from(
-                        { length: selectedSemester.week_duration || 20 }, // La durée par défaut est 20 si week_duration est indéfini
-                        (_, i) => (selectedSemester.week_start || 1) + i // La semaine de départ par défaut est 1 si week_start est indéfini
-                      ).map((week, rowIndex) => (
-                        <React.Fragment key={`row-${rowIndex}`}>
-                          <div className="h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
-                            S{week}
-                          </div>
-                          {groupList.map((_, colIndex) => {
-                            const positionKey = `${rowIndex}-${colIndex}`;
-                            const cellItems = items[positionKey] || [];
-                            return (
-                              <Node
-                                key={positionKey}
-                                positionKey={positionKey}
-                                items={cellItems}
-                                courseTypes={courseTypes}
-                                teachers={teachers}
-                                moveItem={moveItem}
-                                deleteItem={deleteItem}
-                                modifItem={modifItem}
-                              />
-                            );
-                          })}
-                        </React.Fragment>
-                      ))}
+              </div>
+            ) : (
+              <>
+                {groups.length === 0 ? (
+                  <div className="flex items-center justify-center w-full">
+                    <div className="w-2/3 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
+                      Il y a un problème de groupes, veuillez en ajouter pour consulter le tableau.
                     </div>
                   </div>
-                </DndProvider>
-              )}
-            </>
+                ) : (
+                  <DndProvider backend={HTML5Backend}>
+                    <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
+                    mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
+                      <div
+                        className="grid"
+                        style={{
+                          gridTemplateColumns: `40px repeat(${groupList.length}, minmax(5rem, 1fr))`,
+                        }}>
+                        <div className="w-10 h-6"></div>
+                        {groupList.map((groupName, colIndex) => (
+                          <div
+                            key={`col-label-${colIndex}`}
+                            className="w-full h-6 bg-gray-200 flex items-center justify-center text-black text-sm font-bold">
+                            {groupName}
+                          </div>
+                        ))}
+                        {Array.from(
+                          { length: selectedSemester.week_duration || 20 }, // La durée par défaut est 20 si week_duration est indéfini
+                          (_, i) => (selectedSemester.week_start || 1) + i // La semaine de départ par défaut est 1 si week_start est indéfini
+                        ).map((week, rowIndex) => (
+                          <React.Fragment key={`row-${rowIndex}`}>
+                            <div className={`h-20 w-10 bg-gray-200 flex items-center justify-center text-black text-sm font-bold`}>
+                              S{week}
+                            </div>
+                            {groupList.map((_, colIndex) => {
+                              const positionKey = `${rowIndex}-${colIndex}`;
+                              const cellItems = items[positionKey] || [];
+                              return (
+                                <Node
+                                  key={positionKey}
+                                  positionKey={positionKey}
+                                  items={cellItems}
+                                  courseTypes={courseTypes}
+                                  teachers={teachers}
+                                  moveItem={moveItem}
+                                  deleteItem={deleteItem}
+                                  modifItem={modifItem}
+                                />
+                              );
+                            })}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  </DndProvider>
+                )}
+              </>
+            )}
           </>
         )}
       </div>
