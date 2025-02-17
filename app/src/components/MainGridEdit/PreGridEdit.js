@@ -19,7 +19,8 @@ const PreGridEdit = () => {
 
   const goToPreviEdit = () => {
     if (selectedCurriculum && selectedDepartment && selectedGroups.length > 0) {
-      navigate("/PreviEdit", { state: { selectedDepartment, selectedCurriculum, selectedGroups } });
+      const payload = { selectedDepartment, selectedCurriculum, selectedGroups };
+      navigate("/PreviEdit", { state: payload });
     }
   };
 

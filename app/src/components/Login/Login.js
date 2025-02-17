@@ -57,7 +57,6 @@ const Login = ({ setIsAuthenticated }) => {
           return;
         }
         const logingInUser = await getUserByEmail(email);
-        console.log(logingInUser);
         if (!logingInUser) {
           setError("Compte non autorisé.");
           return;

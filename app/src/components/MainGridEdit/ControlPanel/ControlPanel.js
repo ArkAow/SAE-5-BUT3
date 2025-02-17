@@ -66,7 +66,7 @@ const ControlPanel = ({
             : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
 
-        <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isNoGroups || isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
+        <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
