@@ -1,12 +1,12 @@
 import React from "react";
 
-const UserDeletingForm = ({user, deleteUser, setDeletingUser, isSaving}) => {
+const GroupDeletingForm = ({group, deleteGroup, setDeletingGroup, isSaving}) => {
   const handleLeaving = () => {
-    setDeletingUser(false);
+    setDeletingGroup(false);
   }
 
-  const handleDeletingUser = async () => {
-    await deleteUser(user.id);
+  const handleDeleting = async () => {
+    await deleteGroup(group.id);
     handleLeaving()
   }
 
@@ -15,9 +15,9 @@ const UserDeletingForm = ({user, deleteUser, setDeletingUser, isSaving}) => {
       <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${isSaving ? 'cursor-wait' : ''}`}>
         <div className="tooltip-centered-bigger min-w-[450px] w-1/3">
           <h2 className="text-2xl text-center mb-4">
-            Voulez-vous vraiment <span className="text-red-500 font-bold">supprimer</span> l'utilisateur ayant pour adresse mail {user.email}?
+            Voulez-vous vraiment <span className="text-red-500 font-bold">supprimer</span> le groupe {group.name}?
           </h2>
-          <form onSubmit={handleDeletingUser} className="space-y-2">
+          <form onSubmit={handleDeleting} className="space-y-2">
             <div className="flex justify-center space-x-2 w-full">
               <button type="button" onClick={handleLeaving} className="btn-default p-2" disabled={isSaving}>
                   Retour
@@ -33,4 +33,4 @@ const UserDeletingForm = ({user, deleteUser, setDeletingUser, isSaving}) => {
   );
 };
 
-export default UserDeletingForm;
+export default GroupDeletingForm;

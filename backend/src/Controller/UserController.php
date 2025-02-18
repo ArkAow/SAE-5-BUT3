@@ -135,4 +135,60 @@ class UserController extends AbstractController
         return new JsonResponse(['message' => 'Utilisateur supprimé avec succès']);
     }
 
+    #[Route("/users/email", name: "get_user_by_email", methods: ["GET"])]
+    public function getUserByEmail(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $email = $request->query->get('email'); // Récupération depuis ?email=
+    
+        if (!$email) {
+            return new JsonResponse(['message' => 'Email non fourni'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $userRepository = $entityManager->getRepository(User::class);
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'fullname' => $user->getFullname(),
+            'email' => $user->getEmail(),
+            'role' => $user->getRole(),
+            'departments' => array_map(fn($d) => [
+                'id' => $d->getId(),
+                'name' => $d->getName(),
+                'curriculums' => array_map(fn($c) => [
+                    'id' => $c->getId(),
+                    'name' => $c->getName()
+                ], $d->getCurriculums()->toArray()),
+                'formationLevels' => array_map(fn($fl) => [
+                    'id' => $fl->getId(),
+                    'name' => $fl->getName(),
+                    'curriculums' => array_map(function ($c) {
+                        return [
+                            'id' => $c->getId(),
+                            'name' => $c->getName(),
+                        ];
+                    }, $fl->getCurriculums()->toArray()),
+                    'groups' => array_map(function ($g) {
+                        return [
+                            'id' => $g->getId(),
+                            'name' => $g->getName(),
+                            'subGroups' => array_map(function ($sg) {
+                                return [
+                                    'id' => $sg->getId(),
+                                    'name' => $sg->getName(),
+                                ];
+                            }, $g->getHalfGroups()->toArray()), // Obtenir les sous-groupes
+                        ];
+                    }, $fl->getGroups()->toArray())
+                ], $d->getFormationLevels()->toArray()),
+                'users' => array_map(fn($u) => [
+                    'id' => $u->getId()
+                ], $d->getUsers()->toArray())
+            ], $user->getDepartments()->toArray()),
+        ], Response::HTTP_OK);
+    }
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
+import Navigation from "./Navigation.js";
 import useDepartments from "../../hooks/useDepartments.js";
 import UserAddingForm from "../forms/UserAddingForm.js";
 import useUsers from "../../hooks/useUsers.js";
@@ -19,15 +19,6 @@ const ManageUsers = () => {
   const [updatedUser, setUpdatedUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(false);
   const [deletedUser, setDeletedUser] = useState(null);
-  const navigate = useNavigate();
-
-  const goToHomePage = () => {
-    navigate("/homePage");
-  }; 
-
-  const goToManageData = () => {
-    navigate("/ManageData");
-  };
 
   const handleClickingAddButton = () => {
     setAddingUser(true);
@@ -46,30 +37,11 @@ const ManageUsers = () => {
   return (
     <>
       <Header />
-
-      {/* Navigation */}
-      <div className="absolute flex flex-row items-center top-16 left-10 space-x-2">
-        <div 
-          className="flex flex-row items-center py-4 px-4
-          bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
-          onClick={goToHomePage}>
-          <img 
-              src="/images/home.svg"
-              className="size-8"/>
-        </div>
-        <div 
-          className="flex flex-row items-center py-4 px-4
-          bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
-          onClick={goToManageData}>
-          <img 
-              src="/images/options.svg"
-              className="size-8"/>
-        </div>
-      </div>
+      <Navigation />
 
       <div className="flex flex-col min-h-screen">
         <div className="flex justify-center w-full mt-40">
-          <div className="w-full mx-10 h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg flex flex-col">
+          <div className="min-w-[1000px] w-full mx-10 h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg flex flex-col">
               <h2 className="text-white text-center text-lg font-bold mb-4">
                 Utilisateurs
               </h2>
@@ -88,23 +60,32 @@ const ManageUsers = () => {
                       {users.map((user) => (
                         <li key={user.id} className="flex items-center bg-white rounded-lg p-2">
                           <div className="text-base text-black w-full flex flex-row ml-2 mr-12">
-                            <span 
-                              className="w-[25%] truncate text-left font-semibold" 
-                              title={user.fullname}>
-                                {user.fullname}
-                            </span>
+                            {user.fullname ? (
+                              <span 
+                                className="w-[20%] truncate text-left font-semibold" 
+                                title={user.fullname}>
+                                  {user.fullname}
+                              </span>                              
+                            ) : (
+                              <span 
+                                className="w-[30%] truncate text-left font-semibold text-red-500" 
+                                title="Nécessite une première connexion">
+                                  Nécessite une première connexion
+                              </span>   
+                            )}
+                            
                             <span 
                               className="w-[25%] truncate text-center"
                               title={user.email}>
                                 {user.email}
                             </span>
                             <span 
-                              className="w-[25%] truncate text-center"
+                              className="w-[20%] truncate text-center"
                               title={user.role}>
                                 {user.role}
                             </span>
                             <span 
-                              className={`w-[20%] truncate text-left ${!user.departments?.length ? "text-red-500" : ""}`}>
+                              className={`w-[25%] truncate text-right ${!user.departments?.length ? "text-red-500" : ""}`}>
                               {user.departments?.length > 1
                                 ? `${user.departments.length} départements`
                                 : user.departments?.length === 1

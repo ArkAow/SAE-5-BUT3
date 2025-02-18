@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Import de useLocation pour détecter la route actuelle
-import { useUser } from "../../contexts/UserContext"; // Import du UserContext
+import { useUserContext } from "../../contexts/UserContext"; // Import du UserContext
 
 const Header = () => {
-  const { fullName } = useUser(); // Récupère fullName depuis le contexte
+  const { fullName } = useUserContext(); // Récupère fullName depuis le contexte
   const navigate = useNavigate();
   const location = useLocation(); // Pour détecter la route actuelle
 
@@ -23,9 +23,10 @@ const Header = () => {
   const isLoginPage = location.pathname === "/";
 
   const getShortName = (fullName) => {
+    if (fullName === "Administrateur") { return "Admin"; }
     const regex = /\b\w+\s\w/;
     const match = fullName.match(regex);
-    return match ? match[0] : "";
+    return match ? match[0] : "Profil";
   };
 
   return (
@@ -53,7 +54,7 @@ const Header = () => {
           <>
             <img src="/images/profile.svg" alt="User" className="size-8 mr-2" />
             <p className="text-white text-lg font-semibold text-right mr-4">
-              {getShortName(fullName)}.
+              {getShortName(fullName)}
             </p>
           </>
         )}

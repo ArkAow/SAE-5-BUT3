@@ -1,18 +1,17 @@
 import React, { createContext, useState, useContext } from "react";
 
-// Créer le contexte
 const UserContext = createContext();
-
-// Fournisseur du contexte
 export const UserProvider = ({ children }) => {
-  const [fullName, setFullName] = useState(""); // Stocke fullName
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [role, setRole] = useState([]);
 
   return (
-    <UserContext.Provider value={{ fullName, setFullName }}>
+    <UserContext.Provider value={{ fullName, setFullName, email, setEmail, departments, setDepartments, role, setRole }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-// Hook pour utiliser le contexte
-export const useUser = () => useContext(UserContext);
+export const useUserContext = () => useContext(UserContext);

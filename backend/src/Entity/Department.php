@@ -19,8 +19,10 @@ class Department
     #[ORM\Column(type: "string", name: "name", nullable: true)]
     private string $name;
     
-    #[ORM\ManyToMany(targetEntity: FormationLevel::class)]
+    #[ORM\ManyToMany(targetEntity: FormationLevel::class, inversedBy: 'departments')]
     #[ORM\JoinTable(name: "department_formationLevel")]
+    #[ORM\JoinColumn(name: "department_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\InverseJoinColumn(name: "formationLevel_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private Collection $formationLevels;
 
     #[ORM\ManyToMany(targetEntity: Teacher::class, inversedBy: 'departments')]
@@ -63,7 +65,6 @@ class Department
     {
         return $this->formationLevels;
     }
-
 
     public function addFormationLevel(FormationLevel $formationLevel): self
     {

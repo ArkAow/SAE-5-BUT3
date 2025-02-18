@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { CourseButton } from "./CourseButton";
-import { GroupButton } from "./GroupButton";
 import { PrintButton } from "./PrintButton";
 import { CourseTypeButton } from "./CourseTypeButton";
 import { SaveButton } from "./SaveButton";
@@ -8,17 +7,15 @@ import { SaveButton } from "./SaveButton";
 const ControlPanel = ({
   isExpanded,
   setIsExpanded,
-  curriculum,
+
+  fetchSemesters,
   selectedSemester,
+
   setToast,
   teachers,
 
   groups,
   groupList,
-  addGroups,
-  addSubGroups,
-  deleteGroups,
-  deleteHalfGroups,
 
   courseTypes,
   setCourseTypes,
@@ -72,7 +69,7 @@ const ControlPanel = ({
             : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
         disabled={isButtonDisabled}>
 
-        <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isNoGroups || isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
+        <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
         </span>
@@ -101,19 +98,11 @@ const ControlPanel = ({
           setCourseTypes={setCourseTypes}
           updateCoursesForRemovedType={updateCoursesForRemovedType}/>
 
-        <GroupButton 
-          curriculum={curriculum}
-          groups={groups}
-          isNoGroups={isNoGroups}
-          addGroups={addGroups}
-          addSubGroups={addSubGroups}
-          deleteGroups={deleteGroups}
-          deleteHalfGroups={deleteHalfGroups}/>
-
         <PrintButton />
 
         <SaveButton
           isNoGroups={isNoGroups}
+          fetchSemesters={fetchSemesters}
           modifiedCourses={modifiedCourses}
           setModifiedCourses={setModifiedCourses}
           isModifiedCourses={isModifiedCourses}

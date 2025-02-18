@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
+import Navigation from "./Navigation.js";
 import useDepartments from "../../hooks/useDepartments.js";
 import useCurriculums from "../../hooks/useCurriculums.js";
 import DepartmentAddingForm from "../forms/DepartmentAddingForm.js";
@@ -19,15 +19,6 @@ const ManageDepartments = () => {
   const [updatedDepartment, setUpdatedDepartment] = useState(null);
   const [deletingDepartment, setDeletingDepartment] = useState(false);
   const [deletedDepartment, setDeletedDepartment] = useState(null);
-  const navigate = useNavigate();
-
-  const goToHomePage = () => {
-    navigate("/homePage");
-  }; 
-
-  const goToManageData = () => {
-    navigate("/ManageData");
-  }; 
 
   const handleClickingAddButton = () => {
     setAddingDepartment(true);
@@ -46,26 +37,7 @@ const ManageDepartments = () => {
   return (
     <>
       <Header />
-
-      {/* Navigation */}
-      <div className="absolute flex flex-row items-center top-16 left-10 space-x-2">
-        <div 
-          className="flex flex-row items-center py-4 px-4
-          bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
-          onClick={goToHomePage}>
-          <img 
-              src="/images/home.svg"
-              className="size-8"/>
-        </div>
-        <div 
-          className="flex flex-row items-center py-4 px-4
-          bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
-          onClick={goToManageData}>
-          <img 
-              src="/images/options.svg"
-              className="size-8"/>
-        </div>
-      </div>
+      <Navigation />
 
       <div className="flex flex-col min-h-screen">
         <div className="flex justify-center w-full mt-40">

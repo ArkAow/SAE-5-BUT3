@@ -262,7 +262,7 @@ final class Version20241120093708 extends AbstractMigration
         
         // Table Department - FormationLevel
         
-        $department_formationLevel = $schema->createTable('department_formation_Level');
+        $department_formationLevel = $schema->createTable('department_formationLevel');
         $department_formationLevel->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
         $department_formationLevel->addColumn('formationLevel_id','integer', ['unsigned' => true, 'notnull' => true]);
         $department_formationLevel->setPrimaryKey(['department_id', 'formationLevel_id']);

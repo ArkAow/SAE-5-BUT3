@@ -29,6 +29,28 @@ class DepartmentController extends AbstractController
                     'id' => $c->getId(),
                     'name' => $c->getName()
                 ], $department->getCurriculums()->toArray()),
+                'formationLevels' => array_map(fn($fl) => [
+                    'id' => $fl->getId(),
+                    'name' => $fl->getName(),
+                    'curriculums' => array_map(function ($c) {
+                        return [
+                            'id' => $c->getId(),
+                            'name' => $c->getName(),
+                        ];
+                    }, $fl->getCurriculums()->toArray()),
+                    'groups' => array_map(function ($g) {
+                        return [
+                            'id' => $g->getId(),
+                            'name' => $g->getName(),
+                            'subGroups' => array_map(function ($sg) {
+                                return [
+                                    'id' => $sg->getId(),
+                                    'name' => $sg->getName(),
+                                ];
+                            }, $g->getHalfGroups()->toArray()), // Obtenir les sous-groupes
+                        ];
+                    }, $fl->getGroups()->toArray())
+                ], $department->getFormationLevels()->toArray()),
                 'users' => array_map(fn($u) => [
                     'id' => $u->getId()
                 ], $department->getUsers()->toArray())
@@ -141,5 +163,89 @@ class DepartmentController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Département supprimé avec succès'], 200);
+    }
+
+    #[Route('/department/{departmentId}/subjects', name: 'get_department_subjects', methods: ['GET'])]
+    public function getDepartmentSubjects(
+        int $departmentId,
+        DepartmentRepository $departmentRepository
+    ): JsonResponse {
+        $department = $departmentRepository->find($departmentId);
+
+        if (!$department) {
+            return new JsonResponse(['error' => 'Département non trouvé.'], 404);
+        }
+
+        $data = [];
+
+        foreach ($department->getCurriculums() as $curriculum) {
+            $curriculumData = [
+                'id' => $curriculum->getId(),
+                'name' => $curriculum->getName(),
+                'semesters' => []
+            ];
+
+            foreach ($curriculum->getSemesters() as $semester) {
+                $semesterData = [
+                    'id' => $semester->getId(),
+                    'name' => $semester->getName(),
+                    'subjects' => []
+                ];
+
+                foreach ($semester->getSubjects() as $subject) {
+                    $semesterData['subjects'][] = [
+                        'id' => $subject->getId(),
+                        'name' => $subject->getName(),
+                        'code' => $subject->getCode(),
+                    ];
+                }
+
+                $curriculumData['semesters'][] = $semesterData;
+            }
+
+            $data[] = $curriculumData;
+        }
+
+        return new JsonResponse($data, 200);
+    }
+
+    #[Route('/departments/{id}/formation-levels', name: 'get_department_formation_levels', methods: ['GET'])]
+    public function getFormationLevels(DepartmentRepository $departmentRepository, int $id): JsonResponse
+    {
+        $department = $departmentRepository->find($id);
+
+        if (!$department) {
+            return $this->json(['error' => 'Département non trouvé'], 404);
+        }
+
+        $formationLevels = $department->getFormationLevels();
+
+        $data = [];
+        foreach ($formationLevels as $formationLevel) {
+            $data[] = [
+                'id' => $formationLevel->getId(),
+                'name' => $formationLevel->getName(),
+                'curriculums' => array_map(function ($c) {
+                    return [
+                        'id' => $c->getId(),
+                        'name' => $c->getName(),
+                    ];
+                }, $formationLevel->getCurriculums()->toArray()),
+                'groups' => array_map(function ($g) {
+                    return [
+                        'id' => $g->getId(),
+                        'name' => $g->getName(),
+                        'subGroups' => array_map(function ($sg) {
+                            return [
+                                'id' => $sg->getId(),
+                                'name' => $sg->getName(),
+                            ];
+                        }, $g->getHalfGroups()->toArray()), // Obtenir les sous-groupes
+                    ];
+                }, $formationLevel->getGroups()->toArray())
+            ];
+        }
+
+        return $this->json($data);
     }
 }

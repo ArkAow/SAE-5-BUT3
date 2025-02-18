@@ -1,22 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../header/header.js";
+import Navigation from "./Navigation.js";
 import Toast from "../Toast/Toast.js";
 
 const InsertM3C = () => {
   const [file, setFile] = useState(null);
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [loading, setLoading] = useState(false)
-
-  const navigate = useNavigate();
-
-  const goToHomePage = () => {
-    navigate("/homePage");
-  }; 
-
-  const goToManageData = () => {
-    navigate("/ManageData");
-  }; 
 
   const handleFileUpload = (e) => {
     const uploadedFile = e.target.files[0];
@@ -84,32 +74,7 @@ const InsertM3C = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      {toast.visible && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast({ ...toast, visible: false })}
-        />
-      )}
-      {/* Navigation */}
-      <div className="absolute flex flex-row items-center top-16 left-10 space-x-2">
-        <div 
-          className="flex flex-row items-center py-4 px-4
-          bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
-          onClick={goToHomePage}>
-          <img 
-              src="/images/home.svg"
-              className="size-8"/>
-        </div>
-        <div 
-          className="flex flex-row items-center py-4 px-4
-          bg-black bg-opacity-70 text-xl space-x-4 w-fit rounded-lg cursor-pointer"
-          onClick={goToManageData}>
-          <img 
-              src="/images/options.svg"
-              className="size-8"/>
-        </div>
-      </div>
+      <Navigation />
 
       <div className="flex flex-col items-center justify-center flex-1 space-y-5 py-10">
         <div className="flex flex-row w-[70vw] min-w-80 max-w-[55rem] items-start bg-black bg-opacity-75 p-10 rounded-lg justify-between space-x-10">
@@ -136,6 +101,13 @@ const InsertM3C = () => {
           </div>
         </div>
       </div>
+      {toast.visible && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, visible: false })}
+        />
+      )}
     </div>
   );
 };
