@@ -3,15 +3,16 @@ import routes from "../../../Routes/routes";
 
 export const SaveButton = ({ 
   isNoGroups,
-   modifiedCourses,
-   setModifiedCourses,
-   deletedCourses,
-   setDeletedCourses,
-   setToast,
-   isSaving,
-   isModifiedCourses,
-   isDeletedCourses,
-   setSaving
+  fetchSemesters,
+  modifiedCourses,
+  setModifiedCourses,
+  deletedCourses,
+  setDeletedCourses,
+  setToast,
+  isSaving,
+  isModifiedCourses,
+  isDeletedCourses,
+  setSaving
   }) => {  
   const handleSave = async () => {
     if (!isModifiedCourses && !isDeletedCourses) {
@@ -20,6 +21,7 @@ export const SaveButton = ({
     }
     setSaving(true);
     let hasError = false;
+    console.log(modifiedCourses);
 
     try {
       for (const course of modifiedCourses) {
@@ -51,6 +53,7 @@ export const SaveButton = ({
       console.error("Erreur inattendue :", error);
     } finally {
       setModifiedCourses([]); //On vide la liste des cours à sauvegarder
+      fetchSemesters();
     }
 
     try {
@@ -71,6 +74,7 @@ export const SaveButton = ({
       console.error("Erreur inattendue :", error);
     } finally {
       setDeletedCourses([]); //On vide la liste des cours à supprimer
+      fetchSemesters();
     }
 
     setToast({

@@ -7,155 +7,115 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Department;
 use App\Entity\FormationLevel;
 use App\Entity\Groups;
 use App\Entity\HalfGroup;
+use App\Entity\Curriculum;
 use PHPUnit\TextUI\XmlConfiguration\Group;
 
 class GroupController extends AbstractController
 {
-    #[Route('groups/{formationLevelID}', name: "get_all_groups_by_promo", methods: ['GET'])]
-    public function getAllGroupsByPromo(int $formationLevelID, EntityManagerInterface $entityManager): JsonResponse
-    {
-        // Recherche des groupes via la relation avec les classes liées à une promotion donnée
-        $groupsRepository = $entityManager->getRepository(Groups::class);
-        $groups = $groupsRepository->createQueryBuilder('g')
-            ->join('g.formationLevels', 'c')
-            ->where('c.id = :formationLevelID')
-            ->setParameter('formationLevelID', $formationLevelID)
-            ->getQuery()
-            ->getResult();
+    #[Route('/formation-levels/add/{departmentID}', name: 'add_formation_level_to_department', methods: ['POST'])]
+    public function addFormationLevelToDepartment(
+        int $departmentID, 
+        Request $request, 
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $department = $entityManager->getRepository(Department::class)->find($departmentID);
 
-        if (!$groups) {
-            return new JsonResponse(['error' => 'Aucun groupe trouvé pour cette promotion.'], 404);
+        if (!$department) {
+            return new JsonResponse(['error' => 'Department introuvable'], 404);
         }
 
-        // Construire la réponse avec les sous-groupes
-        $data = array_map(function ($group) {
-            return [
-                'id' => $group->getId(),
-                'name' => $group->getName(),
-                'subGroups' => array_map(function ($subGroup) {
-                    return [
-                        'id' => $subGroup->getId(),
-                        'name' => $subGroup->getName(),
-                    ];
-                }, $group->getHalfGroups()->toArray()), // Obtenir les sous-groupes
-            ];
-        }, $groups);
-
-        return new JsonResponse($data, 200);
-    }
-
-    #[Route('groups/{id}/half_group', name: "get_halfgroup_of_a_group", methods: ['GET'])]
-    public function getHalfGroup(EntityManagerInterface $entityManager, int $id): JsonResponse
-    {
-        $groupRepository = $entityManager->getRepository(Groups::class);
-        $group = $groupRepository->find($id);
-
-        if (!$group) {
-            return new JsonResponse(['error' => 'Groupe introuvable ou inexistant.'], 404);
-        }
-
-        $halfGroups = $group->getHalfGroups();
-
-        $data = array_map(function ($halfGroup) {
-            return [
-                'id' => $halfGroup->getId(),
-                'name' => $halfGroup->getName(),
-            ];
-        }, $halfGroups->toArray());
-
-        return new JsonResponse($data, 200);
-    }
-
-    #[Route('groups/add', name: 'add_group', methods: ['POST'])]
-    public function addGroup(Request $request, EntityManagerInterface $entityManager): JsonResponse
-    {
-        // On récupère le JSON donné à partir du Frontend
         $data = json_decode($request->getContent(), true);
-        $groupRepository = $entityManager->getRepository(Groups::class);
-
-        // Si le nom du groupe est vide, on renvoie une erreur.
         if (!isset($data['name']) || empty(trim($data['name']))) {
-            return new JsonResponse(['error' => 'Le nom du groupe est obligatoire.'], 400);
+            return new JsonResponse(['error' => 'Le nom de la formation est requis'], 400);
         }
-        if (!isset($data['formationLevelID']) || empty(trim($data['formationLevelID']))) {
-            return new JsonResponse(['error' => 'Le groupe doit être lié à une promotion.'], 400);
-        }
-
-        $groupName = trim($data['name']);       // Nom du groupe à ajouter
-        $halfgroupsData = $data['halfgroups'] ?? [];    // Tous les half_groups liés au groupe (id et name)
-        $formationLevelID = $data['formationLevelID'];           // ID de la classe parente du nouveau groupe
-
-        // Récupération de la promotion
-        $formationLevelRepository = $entityManager->getRepository(FormationLevel::class);
-        $formationLevel = $formationLevelRepository->find($formationLevelID);
-
-        if (!$formationLevel) {
-            return new JsonResponse(['error' => 'Promotion introuvable'], 404);
+        if (!isset($data['curriculumId'])) {
+            return new JsonResponse(['error' => 'Le choix d’un curriculum est requis'], 400);
         }
 
-        // Vérification si un groupe avec le même nom existe dans cette classe
-        foreach ($formationLevel->getGroups() as $existingGroup) {
-            if ($existingGroup->getName() === $groupName) {
-                return new JsonResponse(['error' => 'Un groupe avec ce nom existe déjà dans cette promotion.'], 409);
-            }
+        $curriculum = $entityManager->getRepository(Curriculum::class)->find($data['curriculumId']);
+        if (!$curriculum) {
+            return new JsonResponse(['error' => 'Curriculum introuvable'], 404);
         }
 
-        // On créé le nouveau groupe.  
-        $group = new Groups();
-        $group->setName($groupName);
-        $formationLevel->addGroup($group);
-        $entityManager->persist($group, $formationLevel);
-        // Récupération de l'id de la promotion
-    
-        $formationLevelRepository = $entityManager->getRepository(FormationLevel::class);
-        $formationLevel = $formationLevelRepository->find($formationLevelID);
-        //  Associer le groupe à la promotion si elle existe
-        //  Sinon on retourne une erreur
+        $formationLevel = new FormationLevel();
+        $formationLevel->setName($data['name']);
+        $formationLevel->addDepartment($department);
+        $formationLevel->addCurriculum($curriculum);
 
-        
-        if ($formationLevel) {                           
-            $group->addFormationLevel($formationLevel);   
-        } else {
-            return new JsonResponse(['error' => 'Promotion introuvable'], 404);
-        }
-            
-        // Gestion des halfgroups
-        foreach ($halfgroupsData as $halfgroupData) {
-            
-            // Si un half_group n'a pas de nom, on renvoie une erreur.
-            if (!isset($halfgroupData['name']) || empty(trim($halfgroupData['name']))) {
-                return new JsonResponse(['error' => 'Chaque halfgroup doit avoir un nom valide.'], 400);
-            }
-
-            $halfgroupName = trim($halfgroupData['name']);
-            $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);
-            $existingHalfgroup = $halfgroupRepository->findOneBy(['name' => $halfgroupName]);
-
-            if (!$existingHalfgroup) { // Si le halfgroup n'existe pas alors on le créé
-                $halfgroup = new HalfGroup();
-                $halfgroup->setName($halfgroupName);
-                $entityManager->persist($halfgroup);
-            } else {
-                $halfgroup = $existingHalfgroup; // Si le halfgroup existe déjà alors on l'utilise
-            }
-            // Si un halfgroup n'est pas associé au groupe, alors on l'ajoute
-            if (!$group->getHalfGroups()->contains($halfgroup)) {
-                $group->addHalfGroup($halfgroup);
-            }
-        }
-
-        // Ajouter le nouveau groupe dans la BDD
+        $entityManager->persist($formationLevel);
         $entityManager->flush();
 
-        //Réponse JSON pour dire que l'ajout du groupe (class) et de ses halfgroups a fonctionné
         return new JsonResponse([
-            'message' => 'Groupe ajouté avec succès.',
+            'message' => 'FormationLevel ajouté avec succès',
+            'formationLevel' => [
+                'id' => $formationLevel->getId(), 
+                'name' => $formationLevel->getName(),
+                'curriculum' => $curriculum->getName(),
+            ]
         ], 201);
-        // Capture des erreurs et retour d'un message d'erreur avec le statut HTTP 500
-        //$return new JsonResponse(['error' => 'Erreur lors de l`ajout : ' . $e->getMessage()], 500);
+    }
+    
+    #[Route('/formation-levels/delete/{id}', name: 'delete_formation_level', methods: ['DELETE'])]
+    public function deleteFormationLevel(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $formationLevel = $entityManager->getRepository(FormationLevel::class)->find($id);
+
+        if (!$formationLevel) {
+            return new JsonResponse(['error' => 'FormationLevel introuvable'], 404);
+        }
+
+        foreach ($formationLevel->getGroups() as $group) {
+            $formationLevel->removeGroup($group);
+        }
+        foreach ($formationLevel->getCurriculums() as $curriculum) {
+            $formationLevel->removeCurriculum($curriculum);
+        }
+        foreach ($formationLevel->getCourses() as $course) {
+            $formationLevel->removeCourse($course);
+        }
+
+        $entityManager->remove($formationLevel);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'FormationLevel supprimé avec succès'], 200);
+    }
+
+    #[Route('/groups/add/{formationLevelID}', name: 'add_group_to_formationlevel', methods: ['POST'])]
+    public function addGroupToFormationLevel(
+        int $formationLevelID, 
+        Request $request, 
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $formationLevel = $entityManager->getRepository(FormationLevel::class)->find($formationLevelID);
+
+        if (!$formationLevel) {
+            return new JsonResponse(['error' => 'FormationLevel introuvable'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['name']) || empty(trim($data['name']))) {
+            return new JsonResponse(['error' => 'Le nom du groupe est requis'], 400);
+        }
+
+        // Création du groupe
+        $group = new Groups();
+        $group->setName($data['name']);
+
+        // Association avec le FormationLevel
+        $formationLevel->addGroup($group);
+
+        // Sauvegarde en base de données
+        $entityManager->persist($group);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Groupe ajouté avec succès',
+            'group' => ['id' => $group->getId(), 'name' => $group->getName()]
+        ], 201);
     }
 
     #[Route('/groups/delete/{id}', name: 'delete_group', methods: ['DELETE'])]
@@ -185,72 +145,52 @@ class GroupController extends AbstractController
         return new JsonResponse(['status' => 'Groupe et ses HalfGroup supprimés avec succès'], 200);
     }
 
-    #[Route('/groups/delete/halfgroup/{id}', name: 'delete_halfgroup', methods: ['DELETE'])]
-    public function deletehalfGroup(EntityManagerInterface $entityManager, string $id) : JsonResponse
+    #[Route('/subgroups/delete/{id}', name: 'delete_subgroup', methods: ['DELETE'])]
+    public function deleteSubGroup(EntityManagerInterface $entityManager, string $id): JsonResponse
     {
-        $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);
-        $halfgroup = $halfgroupRepository->findOneBy(['id' => $id]);
-
-        if (!$halfgroup) {
-            return new JsonResponse(['error' => 'Erreur HalfGroup introuvable'], 404);
-        }else {
-            $entityManager->remove($halfgroup);
-            $entityManager->flush();
+        $subGroupRepository = $entityManager->getRepository(HalfGroup::class);
+        $subGroup = $subGroupRepository->find($id);
+    
+        if (!$subGroup) {
+            return new JsonResponse(['error' => 'Sous-groupe introuvable.'], 404);
         }
-        return new JsonResponse(['status' => 'HalfGroup supprimé avec succès'], 200);
+    
+        $entityManager->remove($subGroup);
+        $entityManager->flush();
+    
+        return new JsonResponse(['message' => 'Sous-groupe supprimé avec succès.'], 200);
     }
 
-    #[Route('/groups/add/halfgroup', name: 'add_halfgroup', methods: ['POST'])]
-    public function addHalfGroup(EntityManagerInterface $entityManager, Request $request): JsonResponse
+    #[Route('/subgroups/add/{groupID}', name: 'add_subgroup', methods: ['POST'])]
+    public function addSubGroup(int $groupID, EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
-        // Décodage des données JSON envoyées dans la requête
         $data = json_decode($request->getContent(), true);
-
-        // Vérification de la présence et de la validité des champs requis
+    
         if (!isset($data['name']) || empty(trim($data['name']))) {
-            return new JsonResponse(['error' => 'Le nom du halfgroup est obligatoire.'], 400);
+            return new JsonResponse(['error' => 'Le nom du sous-groupe est obligatoire.'], 400);
         }
-
-        if (!isset($data['group_id']) || empty($data['group_id'])) {
-            return new JsonResponse(['error' => 'L\'ID du groupe est obligatoire.'], 400);
-        }
-
-        $halfgroupName = trim($data['name']);
-        $groupId = $data['group_id'];
-
-        // Récupération des repositories
-        $halfgroupRepository = $entityManager->getRepository(HalfGroup::class);
+        $subGroupName = trim($data['name']);
+    
         $groupRepository = $entityManager->getRepository(Groups::class);
-
-        // Récupération du Group correspondant à l'ID fourni
-        $group = $groupRepository->find($groupId);
+        $group = $groupRepository->find($groupID);
+    
         if (!$group) {
             return new JsonResponse(['error' => 'Groupe introuvable.'], 404);
         }
-
-        // Récupération du Group correspondant à l'ID fourni
-        $group = $groupRepository->find($groupId);
-        if (!$group) {
-            return new JsonResponse(['error' => 'Groupe introuvable.'], 404);
-        }
-
-        // Vérification si le nom du HalfGroup existe déjà parmi les sous-groupes du même groupe
+    
         foreach ($group->getHalfGroups() as $existingSubGroup) {
-            if ($existingSubGroup->getName() === $halfgroupName) {
+            if ($existingSubGroup->getName() === $subGroupName) {
                 return new JsonResponse(['error' => 'Un sous-groupe avec ce nom existe déjà dans ce groupe.'], 409);
             }
         }
-
-        // Création du HalfGroup
-        $halfgroup = new HalfGroup();
-        $halfgroup->setName($halfgroupName);
-        $halfgroup->addGroup($group); // Association au groupe
-
-        // Persistance du HalfGroup
-        $entityManager->persist($halfgroup);
+    
+        $subGroup = new HalfGroup();
+        $subGroup->setName($subGroupName);
+        $subGroup->addGroup($group);
+    
+        $entityManager->persist($subGroup);
         $entityManager->flush();
-
-        // Réponse JSON en cas de succès
-        return new JsonResponse(['message' => 'HalfGroup ajouté avec succès.'], 201);
+    
+        return new JsonResponse(['message' => 'Sous-groupe ajouté avec succès.'], 201);
     }
 }

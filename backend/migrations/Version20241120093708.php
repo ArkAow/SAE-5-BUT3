@@ -78,8 +78,8 @@ final class Version20241120093708 extends AbstractMigration
         $semester = $schema->createTable('semester');
         $semester->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
         $semester->addColumn('name', 'string', ['length' => 100]);
-        $semester->addColumn('week_start', 'integer');
-        $semester->addColumn('week_duration', 'integer');
+        $semester->addColumn('week_start', 'integer', ['notnull' => false]);
+        $semester->addColumn('week_duration', 'integer', ['notnull' => false]);
         $semester->setPrimaryKey(['id']);
         
         // Table Semester - Curriculum
@@ -247,8 +247,10 @@ final class Version20241120093708 extends AbstractMigration
 
         $user = $schema->createTable('user');
         $user->addColumn('id', 'integer', ['autoincrement' => true, 'unsigned' => true]);
-        $user->addColumn('email', 'string', ['length' => 150]);
-        $user->addColumn('password', 'string', ['length' => 150]);
+        $user->addColumn('fullname', 'string', ['length' => 255]);
+        $user->addColumn('email', 'string', ['length' => 255]);
+        $user->addColumn('role', 'string', ['length' => 20]);
+        $user->addOption('CHECK', "role IN ('superadmin', 'admin', 'extendedviewer', 'restrictedviewer')");        
         $user->setPrimaryKey(['id']);
 
         // Table Department
@@ -260,7 +262,7 @@ final class Version20241120093708 extends AbstractMigration
         
         // Table Department - FormationLevel
         
-        $department_formationLevel = $schema->createTable('department_formation_Level');
+        $department_formationLevel = $schema->createTable('department_formationLevel');
         $department_formationLevel->addColumn('department_id','integer', ['unsigned' => true, 'notnull' => true]);
         $department_formationLevel->addColumn('formationLevel_id','integer', ['unsigned' => true, 'notnull' => true]);
         $department_formationLevel->setPrimaryKey(['department_id', 'formationLevel_id']);
@@ -385,6 +387,7 @@ final class Version20241120093708 extends AbstractMigration
         $schema->dropTable('user_department');
         $schema->dropTable('archive');
         $schema->dropTable('archive_department');
-        $schema->dropTable('course_formation_level'); 
+        $schema->dropTable('course_formation_level');
+        $schema->dropTable('archive_semester');
     }
 }

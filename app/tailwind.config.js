@@ -12,6 +12,8 @@ module.exports = {
         primaryshade: "#800911",
         primarytint: "#CB5B63",
         accept: "#0D6E0A",
+        darklogin: "#1A2035",
+        darklogintint: "#202940",
         "black-100": "#100d25",
         "black-200": "#090325",
         "white-100": "#f3f3f3",
