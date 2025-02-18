@@ -7,19 +7,20 @@ import useTeachers from "../../hooks/useTeachers.js";
 import useSemesters from "../../hooks/useSemesters.js";
 import useCourseTypes from "../../hooks/useCourseTypes.js";
 import useCourses from "../../hooks/useCourses.js";
+import Statistics from "../statistics/Statistics.js";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useLocation } from "react-router-dom";
 
 const MainGrid = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const payload = location.state || {};
   const department = payload.selectedDepartment;
   const groups = payload.selectedGroups;
   const curriculum = payload.selectedCurriculum;
+
+  const [showStatistics, setShowStatistics] = useState(true);
 
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
@@ -56,8 +57,8 @@ const MainGrid = () => {
     return createPortal(children, document.getElementById("portal-root"));
   };
 
-  const goToStatistics = () => {
-    navigate("/Statistics");
+  const handleShowStatistics = () => {
+    setShowStatistics(!showStatistics);
   };
 
   useEffect(() => {
@@ -180,6 +181,7 @@ const MainGrid = () => {
               <div className="absolute top-6">
                 <ControlPanel
                   setToast={setToast}
+                  showStatistics={showStatistics}
                   isExpanded={isControlPanelExpanded}
                   setIsExpanded={setIsControlPanelIsExpanded}
 
@@ -240,34 +242,24 @@ const MainGrid = () => {
 
               {/* Bouton suivant */}
               <button
-                onClick={() => {
-                  goToNextSubject();
-                }}
-                disabled={
-                  !selectedSubject ||
-                  subjects.indexOf(selectedSubject) >=
-                    subjects.length - 1
-                }
+                onClick={() => {goToNextSubject()}}
+                disabled={!selectedSubject || subjects.indexOf(selectedSubject) >= subjects.length - 1}
                 className={`flex w-48 h-10 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full
                   shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none
-                  ${
-                    !selectedSubject ||
-                    subjects.indexOf(selectedSubject) >=
-                      subjects.length - 1
-                      ? "bg-primaryshade cursor-not-allowed"
-                      : ""
-                  }`}>
+                  ${!selectedSubject || subjects.indexOf(selectedSubject) >= subjects.length - 1 ? "bg-primaryshade cursor-not-allowed" : ""}`}>
                 Passer au suivant
                 <img
                   src="/images/right-arrow.svg"
                   alt="Right Arrow"
                   className="ml-2 w-4 h-4"/>
               </button>
-                          {/* Bouton Statistiques */}
+
+              {/* Bouton Statistiques */}
               <button
-                onClick={goToStatistics}
-                className={`flex w-fit h-10 mt-2 items-center px-10 py-2 text-white bg-primary rounded-full
-                  shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none`}
+                onClick={handleShowStatistics}
+                className={`flex w-fit h-10 mt-2 items-center px-10 py-2 text-white bg-primary rounded-3xl
+                  shadow-md hover:bg-primaryshade border border-white focus:outline-none
+                  ${showStatistics ? 'bg-primarytint ring-2 ring-white' : ''}`}
                 title="Accèder aux statistiques">
                 <img
                   src="/images/graph-bar.svg"
@@ -285,6 +277,10 @@ const MainGrid = () => {
                   </div>
                 </div>
               </div>
+            ) : showStatistics ? ( 
+              <>
+                <Statistics />
+              </>
             ) : (
               <>
                 {groups.length === 0 ? (
@@ -296,7 +292,7 @@ const MainGrid = () => {
                 ) : (
                   <DndProvider backend={HTML5Backend}>
                     <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
-                    mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
+                    mt-8 rounded-lg overflow-auto max-h-[65vh] min-h-[25rem] -z-10 transform duration-500`}>
                       <div
                         className="grid"
                         style={{
@@ -342,6 +338,9 @@ const MainGrid = () => {
                 )}
               </>
             )}
+            <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"} text-white w-full transform duration-500`}>
+              Total des heures par élève pour cette enseignement : 
+            </div>
           </>
         )}
       </div>

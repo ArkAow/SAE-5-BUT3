@@ -7,11 +7,12 @@ import { SaveButton } from "./SaveButton";
 const ControlPanel = ({
   isExpanded,
   setIsExpanded,
+  showStatistics,
+  setToast,
 
   fetchSemesters,
   selectedSemester,
 
-  setToast,
   teachers,
 
   groups,
@@ -42,6 +43,9 @@ const ControlPanel = ({
   useEffect(() => {
     setIsDeletedCourses(deletedCourses.length > 0);
   }, [deletedCourses]);
+  useEffect(() => {
+    if (showStatistics && isExpanded) handleToggleExpand();
+  }, [showStatistics]);
 
   const handleToggleExpand = () => {
     if (isButtonDisabled) return;
@@ -66,8 +70,8 @@ const ControlPanel = ({
         className={`${
           isExpanded
             ? "size-10 bg-primaryshade rounded-full flex items-center justify-center"
-            : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
-        disabled={isButtonDisabled}>
+            : "size-10 bg-white rounded-lg flex items-center justify-center disabled:bg-primaryshade disabled:cursor-not-allowed transition-colors duration-300"}`}
+        disabled={isButtonDisabled || showStatistics}>
 
         <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>

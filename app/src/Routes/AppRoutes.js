@@ -15,7 +15,6 @@ import ManageDepartments from  "../components/ManageData/ManageDepartments";
 import ManageUsers from  "../components/ManageData/ManageUsers";
 import ManageTeachers from "../components/ManageData/ManageTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
-import Statistics from "../components/statistics/Statistics";
 import ManageGroups from "../components/ManageData/ManageGroups";
 import MainGrid from "../components/MainGridEdit/MainGrid";
 
@@ -113,14 +112,6 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <PreGridEdit />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/Statistics"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <Statistics />
             </ProtectedRoute>
           }
         />
