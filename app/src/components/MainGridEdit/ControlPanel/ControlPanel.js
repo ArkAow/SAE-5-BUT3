@@ -64,7 +64,7 @@ const ControlPanel = ({
 
   return (
     <div
-      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[84.5vh] w-20" : "h-20 w-20"}`}>
+      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[calc(80px+65vh+2rem)] w-20" : "h-20 w-20"}`}>
       <button
         onClick={handleToggleExpand}
         className={`${

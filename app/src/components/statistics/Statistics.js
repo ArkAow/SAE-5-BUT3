@@ -12,12 +12,12 @@ const Statistics = () => {
 
           <div className="flex flex-col justify-between items-left ml-6 relative">
             <div className="flex flex-row">
-              <div className="h-[20vh] w-1/2 rounded-lg bg-white shadow-lg p-4">
+              <div className="h-[24vh] w-1/2 rounded-lg bg-white shadow-lg p-4">
                 Légende du graph
               </div>
             </div>
 
-            <div className="h-[35vh] w-[20vw] min-w-64 rounded-lg bg-white shadow-lg p-4">
+            <div className="h-[39vh] w-[20vw] min-w-64 rounded-lg bg-white shadow-lg p-4">
               Graph répartition des heures
             </div>
           </div>
