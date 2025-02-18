@@ -7,7 +7,10 @@ import { SaveButton } from "./SaveButton";
 const ControlPanel = ({
   isExpanded,
   setIsExpanded,
+
+  fetchSemesters,
   selectedSemester,
+
   setToast,
   teachers,
 
@@ -99,6 +102,7 @@ const ControlPanel = ({
 
         <SaveButton
           isNoGroups={isNoGroups}
+          fetchSemesters={fetchSemesters}
           modifiedCourses={modifiedCourses}
           setModifiedCourses={setModifiedCourses}
           isModifiedCourses={isModifiedCourses}

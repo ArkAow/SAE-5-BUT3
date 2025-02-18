@@ -4,54 +4,51 @@ import { getCoursePosFromGroup } from "../services/courseGroupService.js";
 
 const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) => {
   const [items, setItems] = useState({});
-  const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modifiedCourses, setModifiedCourses] = useState([]);
   const [deletedCourses, setDeletedCourses] = useState([]);
 
-  // Charger les cours et transformer leur format pour `items`
-  useEffect(() => {
-    if (!selectedSubject) {
-      setItems({});
-      setCourses([]);
-      return;
-    }
-    setIsLoading(true);
-    setCourses([]);
-    const rawCourses = selectedSubject.courses;
-    rawCourses.forEach((rawCourse) => {
-      const { x, y } = getCoursePosFromGroup(rawCourse, groups, groupList);
-      const newItemID = Date.now()+rawCourse.id;
-      rawCourse.col = x;
-      rawCourse.row = y;
-      rawCourse.isRepeat = false;
-      setCourses((prev) => [...prev, ...createCoursesFromData(rawCourse, selectedSubject, newItemID)]);
-    });
+const setCoursesItems = async () => {
+  if (!selectedSubject) {
+    setItems({});
+    return;
+  }
+  setIsLoading(true);
+  const rawCourses = selectedSubject.courses;
+  let courses = [];
+  rawCourses.forEach((rawCourse) => {
+    const { x, y } = getCoursePosFromGroup(rawCourse, groups, groupList);
+    const newItemID = Date.now()+rawCourse.id;
+    rawCourse.col = x;
+    rawCourse.row = y;
+    rawCourse.isRepeat = false;
+    courses = [...courses, ...(createCoursesFromData(rawCourse, selectedSubject, newItemID))];
+  });
+  const initialItems = {};
 
-    const initialItems = {};
-    if (courses.length > 0) {
-      courses.forEach((course) => {
-        const row = course.pos.y;
-        const col = course.pos.x;
-        const positionKey = `${row}-${col}`;
-
-        if (!initialItems[positionKey]) {
-          initialItems[positionKey] = [];
-        }
-
-        initialItems[positionKey].push({
-          color: course.courseType?.color || "#ffffff",
-          courseType: course.courseType?.name || "N/A",
-          teacher: course.teacher?.code || "N/A",
-          duration: course.duration || 1.0,
-          id: course.itemID || Date.now(),
-        });
+  if (courses.length > 0) {
+    courses.forEach((course) => {
+      const row = course.pos.y;
+      const col = course.pos.x;
+      const positionKey = `${row}-${col}`;
+      if (!initialItems[positionKey]) {
+        initialItems[positionKey] = [];
+      }
+      initialItems[positionKey].push({
+        color: course.courseType?.color || "#ffffff",
+        courseType: course.courseType?.name || "N/A",
+        teacher: course.teacher?.code || "N/A",
+        duration: course.duration || 1.0,
+        id: course.itemID || Date.now(),
       });
-    }
+    });
+  }
+  setItems(initialItems);
+  setIsLoading(false);
+}
 
-    setIsLoading(false);
-
-    setItems(initialItems);
+  useEffect(() => {
+    setCoursesItems();
   }, [selectedSubject]);
 
   // Ajouter un item
@@ -122,24 +119,18 @@ const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) =
       const fromItems = [...(prev[fromKey] || [])];
       const toItems = [...(prev[toKey] || [])];
       const itemIndex = fromItems.findIndex((item) => item.id === id);
-
       if (itemIndex === -1) return prev;
-
       const [draggedItem] = fromItems.splice(itemIndex, 1);
-      setModifiedCourses((prev) =>
-        prev.map((course) =>
-          course.itemID === id ? {
-                ...course,
-                pos: { x: parseInt(toKey.split("-")[1], 10), y: parseInt(toKey.split("-")[0], 10) },
-              } : course)
-      );
-
       return {
         ...prev,
         [fromKey]: fromItems,
         [toKey]: [...toItems, draggedItem],
       };
     });
+    setModifiedCourses((prev) =>
+      prev.map((course) =>
+        course.itemID === id ? {...course, pos: { x: parseInt(toKey.split("-")[1], 10), y: parseInt(toKey.split("-")[0], 10) }} : course)
+    );
   };
 
   // Met à jour les cours en cas de suppression d'un type de cours

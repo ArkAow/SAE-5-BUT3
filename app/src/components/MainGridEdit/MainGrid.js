@@ -24,7 +24,7 @@ const MainGrid = () => {
 
   const { teachers } = useTeachers(setToast, department);
 
-  const { semesters, isLoading: isSemesterLoading } = useSemesters(curriculum.id);
+  const { semesters, isLoading: isSemesterLoading, fetchSemesters } = useSemesters(curriculum.id);
   const [selectedSemester, setSelectedSemester] = useState(null);
 
   const [subjects, setSubjects] = useState([]);
@@ -165,11 +165,15 @@ const MainGrid = () => {
             <div className="flex items-center justify-start gap-5 h-20 px-10">
               <div className="absolute top-6">
                 <ControlPanel
+                  setToast={setToast}
                   isExpanded={isControlPanelExpanded}
                   setIsExpanded={setIsControlPanelIsExpanded}
+
                   curriculum={curriculum}
+
+                  fetchSemesters={fetchSemesters}
                   selectedSemester={selectedSemester}
-                  setToast={setToast}
+
                   teachers={teachers}
 
                   groups={groups}
@@ -178,11 +182,13 @@ const MainGrid = () => {
                   courseTypes={courseTypes}
                   setCourseTypes={setCourseTypes}
                   updateCoursesForRemovedType={updateCoursesForRemovedType}
+
                   addItem={addItem}
                   modifiedCourses={modifiedCourses}
                   setModifiedCourses={setModifiedCourses}
                   deletedCourses={deletedCourses}
                   setDeletedCourses={setDeletedCourses}
+
                   isSaving={isSaving}
                   setSaving={setSaving}
                 />
@@ -225,9 +231,10 @@ const MainGrid = () => {
                     subjects.findIndex((s) => s.id === selectedSubject?.id) +
                     1;
                   if (nextSubjectIndex < subjects.length) {
-                    const nextSubject = subjects[nextSubjectIndex];
+                    const nextSubject = subjects[nextSubjectIndex];console.log();
                     setSelectedSubject(nextSubject);
                   }
+                  
                 }}
                 disabled={
                   !selectedSubject ||
