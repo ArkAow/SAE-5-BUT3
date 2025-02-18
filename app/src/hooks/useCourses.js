@@ -4,6 +4,8 @@ import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../serv
 
 const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) => {
   const [items, setItems] = useState({});
+  const [courses, setCourses] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [modifiedCourses, setModifiedCourses] = useState([]);
   const [deletedCourses, setDeletedCourses] = useState([]);
@@ -15,19 +17,19 @@ const setCoursesItems = async () => {
   }
   setIsLoading(true);
   const rawCourses = selectedSubject.courses;
-  let courses = [];
+  let newCourses = [];
   rawCourses.forEach((rawCourse) => {
     const { x, y } = getCoursePosFromGroup(rawCourse, groups, groupList);
     const newItemID = Date.now()+rawCourse.id;
     rawCourse.col = x;
     rawCourse.row = y;
     rawCourse.isRepeat = false;
-    courses = [...courses, ...(createCoursesFromData(rawCourse, selectedSubject, newItemID))];
+    newCourses = [...newCourses, ...(createCoursesFromData(rawCourse, selectedSubject, newItemID))];
   });
   const initialItems = {};
 
-  if (courses.length > 0) {
-    courses.forEach((course) => {
+  if (newCourses.length > 0) {
+    newCourses.forEach((course) => {
       const row = course.pos.y;
       const col = course.pos.x;
       const positionKey = `${row}-${col}`;
@@ -43,6 +45,7 @@ const setCoursesItems = async () => {
       });
     });
   }
+  setCourses(newCourses);
   setItems(initialItems);
   setIsLoading(false);
 }
@@ -70,21 +73,25 @@ const setCoursesItems = async () => {
 
   // Supprimer un item
   const deleteItem = (positionKey, id) => {
-    setItems((prev) => {
-      const updatedItems = { ...prev };
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
       if (updatedItems[positionKey]) {
         updatedItems[positionKey] = updatedItems[positionKey].filter((item) => item.id !== id);
-        if (updatedItems[positionKey].length === 0) delete updatedItems[positionKey];
+        if (updatedItems[positionKey].length === 0) {
+          delete updatedItems[positionKey];
+        }
       }
       return updatedItems;
     });
-
-    setDeletedCourses((prev) => [
-      ...prev,
-      ...selectedSubject.courses.filter((course) => course.itemID === id && course.id),
+    setDeletedCourses((prevDeletedCourses) => [
+      ...prevDeletedCourses,
+      ...courses.filter(
+        (course) => course.itemID === id && course.id
+      ),
     ]);
-
-    setModifiedCourses((prev) => prev.filter((course) => course.itemID !== id));
+    setModifiedCourses((prevModifiedCourses) =>
+      prevModifiedCourses.filter((course) => course.itemID !== id)
+    );
   };
 
   // Modifier un item
@@ -92,9 +99,8 @@ const setCoursesItems = async () => {
     const { positionKey, id, teacher, courseType, duration } = payload;
     const selectedTeacher = findTeacherByCode(teacher, teachers);
     const selectedCourseType = findCourseTypeByName(courseType, courseTypes);
-
-    setItems((prev) => {
-      const updatedItems = { ...prev };
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
       if (updatedItems[positionKey]) {
         updatedItems[positionKey] = updatedItems[positionKey].map((item) =>
           item.id === id ? { ...item, teacher, courseType, duration, color: selectedCourseType.color } : item
@@ -102,31 +108,28 @@ const setCoursesItems = async () => {
       }
       return updatedItems;
     });
-    setModifiedCourses((prev) =>
-      prev.map((course) =>
-        course.itemID === id ? {
-          ...course,
-          teacher: selectedTeacher || course.teacher,
-          courseType: selectedCourseType || course.courseType,
-          duration: duration || course.duration,
-        } : course)
-    );
-  };
+    setModifiedCourses((prevModifiedCourses) => [
+      ...prevModifiedCourses.filter((course) => course.itemID !== payload.id),
+      ...courses.filter(
+        (course) => course.itemID === payload.id
+      ).map((course) => ({
+        ...course,
+        teacher: selectedTeacher || course.teacher,
+        courseType: selectedCourseType || course.courseType,
+        duration: duration ? duration : course.duration,
+      })),
+    ]);
+  }
 
   // Déplacer un item
   const moveItem = (fromKey, toKey, id) => {
-    setItems((prev) => {
-      const fromItems = [...(prev[fromKey] || [])];
-      const toItems = [...(prev[toKey] || [])];
+    setItems((prevItems) => {
+      const fromItems = [...(prevItems[fromKey] || [])];
+      const toItems = [...(prevItems[toKey] || [])];
       const itemIndex = fromItems.findIndex((item) => item.id === id);
-  
-      if (itemIndex === -1) {
-        return prev;
-      }
-  
+      if (itemIndex === -1) return prevItems; // Si l'élément n'existe pas, ne rien faire
       const [draggedItem] = fromItems.splice(itemIndex, 1);
-      
-      selectedSubject.courses.map((course) => {
+      courses.map((course) => {
         if (course.itemID === draggedItem.id) {
           const xPos = parseInt(toKey.split("-")[1], 10);
           const yPos = parseInt(toKey.split("-")[0], 10);
@@ -138,23 +141,16 @@ const setCoursesItems = async () => {
               groupID: getGroupID(xPos, groups, groupList),
             },
           }; 
-          setModifiedCourses((prev) => {
-            const indexInModified = prev.findIndex((course) => course.itemID === id);     
-            if (indexInModified === -1) {
-              return [...prev, updatedCourse];
-            } else {
-              const newModifiedCourses = [...prev];
-              newModifiedCourses[indexInModified] = {
-                ...newModifiedCourses[indexInModified],
-                pos: { x: xPos, y: yPos },
-              };
-              return newModifiedCourses;
-            }
-          });
+          setModifiedCourses((prevModifiedCourses) => [
+            ...prevModifiedCourses,
+            updatedCourse,
+          ]);
+          return updatedCourse;
         }
+        return course;
       });
       return {
-        ...prev,
+        ...prevItems,
         [fromKey]: fromItems,
         [toKey]: [...toItems, draggedItem],
       };
@@ -192,7 +188,8 @@ const setCoursesItems = async () => {
     moveItem,
     updateCoursesForRemovedType,
     setDeletedCourses,
-    setModifiedCourses
+    setModifiedCourses,
+    setIsLoading
   };
 };
 

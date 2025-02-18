@@ -45,10 +45,9 @@ const MainGrid = () => {
 
   const {
     items, isLoading: isCoursesLoading, modifiedCourses, deletedCourses, addItem, deleteItem,
-    modifItem, moveItem, updateCoursesForRemovedType, setDeletedCourses, setModifiedCourses
+    modifItem, moveItem, updateCoursesForRemovedType, setDeletedCourses, setModifiedCourses, setIsLoading: setIsCoursesLoading
   } = useCourses(selectedSubject, teachers, courseTypes, groups, getGroupList());
 
-  const [isSaving, setSaving] = useState(false);
   const [isLoading, setLoading] = useState(true);
   
   const NodePortal = ({ children }) => {
@@ -65,7 +64,7 @@ const MainGrid = () => {
   }, [semesters, isSemesterLoading]);
 
   useEffect(() => {
-    if (!isSemesterLoading && !isCourseTypeLoading) {
+    if ((semesters || !isSemesterLoading) && !isCourseTypeLoading) {
       setLoading(false);
     } else {
       setLoading(true);
@@ -110,12 +109,21 @@ const MainGrid = () => {
     setSelectedSubject(selected);
   };
 
+  const goToNextSubject = () => {
+    const nextSubjectIndex = subjects.findIndex((s) => s.id === selectedSubject?.id) +
+      1;
+    if (nextSubjectIndex < subjects.length) {
+      const nextSubject = subjects[nextSubjectIndex]; console.log();
+      setSelectedSubject(nextSubject);
+    }
+  }
+
   const groupList = getGroupList();
 
   return (
     <>
       <Header />
-      <div className={`min-h-screen py-10 ${isSaving ? 'cursor-wait' : 'cursor-default'}`}>
+      <div className={`min-h-screen py-10 cursor-default`}>
         {isLoading ? (
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] space-y-10">
             <div className="flex flex-col items-center bg-black bg-opacity-75 p-10 rounded-lg">
@@ -189,8 +197,8 @@ const MainGrid = () => {
                   deletedCourses={deletedCourses}
                   setDeletedCourses={setDeletedCourses}
 
-                  isSaving={isSaving}
-                  setSaving={setSaving}
+                  isSaving={isCoursesLoading}
+                  setSaving={setIsCoursesLoading}
                 />
               </div>
 
@@ -227,14 +235,7 @@ const MainGrid = () => {
               {/* Bouton suivant */}
               <button
                 onClick={() => {
-                  const nextSubjectIndex =
-                    subjects.findIndex((s) => s.id === selectedSubject?.id) +
-                    1;
-                  if (nextSubjectIndex < subjects.length) {
-                    const nextSubject = subjects[nextSubjectIndex];console.log();
-                    setSelectedSubject(nextSubject);
-                  }
-                  
+                  goToNextSubject();
                 }}
                 disabled={
                   !selectedSubject ||
