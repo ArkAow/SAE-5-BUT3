@@ -58,9 +58,9 @@ const routes = {
       getByEmail: (email) => `${routes.dev.default}users/email?email=${email}`,
       update: () => `${routes.dev.default}users/update`,
     },
+    insertData: (fileId) => `http://localhost:8600/insert-data/${fileId}`,
+    insertM3C: () => `http://localhost:8600/insertM3C`,
   },
-  insertData: "http://localhost:8600/insert-data",
-  insertM3C: "http://localhost:8600/insertM3C",
 };
 
 export default routes;
