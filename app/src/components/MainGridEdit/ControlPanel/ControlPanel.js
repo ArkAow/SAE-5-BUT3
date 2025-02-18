@@ -15,7 +15,7 @@ const ControlPanel = ({
 
   teachers,
 
-  groups,
+  formationLevel,
   groupList,
 
   courseTypes,
@@ -35,8 +35,8 @@ const ControlPanel = ({
   const [isDeletedCourses, setIsDeletedCourses] = useState(false);
 
   useEffect(() => {
-    setIsNoGroups(groups.length === 0);
-  }, [groups]);
+    setIsNoGroups(formationLevel.groups.length === 0);
+  }, [formationLevel]);
   useEffect(() => {
     setIsModifiedCourses(modifiedCourses.length > 0);
   }, [modifiedCourses]);
@@ -89,7 +89,7 @@ const ControlPanel = ({
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton
           isNoGroups={isNoGroups}
-          groups={groups}
+          formationLevel={formationLevel}
           groupList={groupList}
           selectedSemester={selectedSemester}
           courseTypes={courseTypes}

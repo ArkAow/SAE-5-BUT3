@@ -17,10 +17,10 @@ const MainGrid = () => {
   const location = useLocation();
   const payload = location.state || {};
   const department = payload.selectedDepartment;
-  const groups = payload.selectedGroups;
+  const formationLevel = payload.selectedFormationLevel;
   const curriculum = payload.selectedCurriculum;
 
-  const [showStatistics, setShowStatistics] = useState(true);
+  const [showStatistics, setShowStatistics] = useState(false);
 
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
@@ -39,6 +39,7 @@ const MainGrid = () => {
   const [pendingSemesterId, setPendingSemesterId] = useState(null);
 
   const getGroupList = () => {
+    const groups = formationLevel.groups;
     const mainGroups = groups.map((group) => group.name);
     const subGroups = groups.flatMap((group) =>
       (group.subGroups || []).map((subGroup) => subGroup.name)
@@ -49,7 +50,7 @@ const MainGrid = () => {
   const {
     items, isLoading: isCoursesLoading, modifiedCourses, deletedCourses, addItem, deleteItem,
     modifItem, moveItem, updateCoursesForRemovedType, setDeletedCourses, setModifiedCourses, setIsLoading: setIsCoursesLoading
-  } = useCourses(selectedSubject, teachers, courseTypes, groups, getGroupList());
+  } = useCourses(selectedSubject, teachers, courseTypes, formationLevel, getGroupList());
 
   const [isLoading, setLoading] = useState(true);
   
@@ -192,7 +193,7 @@ const MainGrid = () => {
 
                   teachers={teachers}
 
-                  groups={groups}
+                  formationLevel={formationLevel}
                   groupList={groupList}
 
                   courseTypes={courseTypes}
@@ -283,7 +284,7 @@ const MainGrid = () => {
               </>
             ) : (
               <>
-                {groups.length === 0 ? (
+                {formationLevel.groups.length === 0 ? (
                   <div className="flex items-center justify-center w-full">
                     <div className="w-2/3 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
                       Il y a un problème de groupes, veuillez en ajouter pour consulter le tableau.
@@ -336,11 +337,11 @@ const MainGrid = () => {
                     </div>
                   </DndProvider>
                 )}
+                <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"} text-white w-full transform duration-500`}>
+                  Total des heures par élève pour cette enseignement : 
+                </div>
               </>
             )}
-            <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"} text-white w-full transform duration-500`}>
-              Total des heures par élève pour cette enseignement : 
-            </div>
           </>
         )}
       </div>

@@ -9,7 +9,6 @@ const PreGridEdit = () => {
 
   const [formationLevels, setFormationLevels] = useState(selectedDepartment?.formationLevels ?? []);
   const [selectedFormationLevel, setSelectedFormationLevel] = useState(null);
-  const [selectedGroups, setSelectedGroups] = useState([]);
   const [selectedCurriculum, setSelectedCurriculum] = useState(null);
 
   const [error, setError] = useState(false);
@@ -18,8 +17,8 @@ const PreGridEdit = () => {
   const navigate = useNavigate();
 
   const goToPreviEdit = () => {
-    if (selectedCurriculum && selectedDepartment && selectedGroups.length > 0) {
-      const payload = { selectedDepartment, selectedCurriculum, selectedGroups };
+    if (selectedCurriculum && selectedDepartment && selectedFormationLevel.groups.length > 0) {
+      const payload = { selectedDepartment, selectedCurriculum, selectedFormationLevel };
       navigate("/PreviEdit", { state: payload });
     }
   };
@@ -33,11 +32,9 @@ const PreGridEdit = () => {
     if (!selected?.groups || selected.groups.length === 0) {
       setError(true);
       setErrorMessage("Pas de groupes disponibles pour ce niveau de formation");
-      setSelectedGroups([]);
       return;
     } else {
       setError(false);
-      setSelectedGroups(selected.groups);
     }
 
     if (!selected?.curriculums || selected.curriculums.length === 0) {
@@ -58,7 +55,6 @@ const PreGridEdit = () => {
     setSelectedDepartment(selectedDept);
     setSelectedFormationLevel(null);
     setFormationLevels(selectedDept?.formationLevels ?? []);
-    setSelectedGroups([]);
     setSelectedCurriculum(null);
     setError(false);
     setErrorMessage("");
@@ -128,11 +124,11 @@ const PreGridEdit = () => {
             type="button"
             className={`w-1/5 min-w-40 px-6 py-3 text-white text-xl 
               bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint 
-              focus:outline-none border border-white transition-all duration-300
+              focus:outline-none border border-white transition-all duration-300 disabled:bg-primaryshade
               ${error ? "bg-primaryshade cursor-not-allowed" : ""}`}
             onClick={goToPreviEdit}
-            disabled={!(selectedCurriculum && selectedDepartment && selectedGroups.length > 0)}
-            aria-disabled={!(selectedCurriculum && selectedDepartment && selectedGroups.length > 0)}>
+            disabled={!(selectedCurriculum && selectedDepartment && selectedFormationLevel.groups.length > 0)}
+            aria-disabled={!(selectedCurriculum && selectedDepartment && selectedFormationLevel.groups.length > 0)}>
             Confirmer
           </button>
         </>
