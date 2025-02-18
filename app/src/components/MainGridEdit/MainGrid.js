@@ -51,7 +51,7 @@ const MainGrid = () => {
   const [isLoading, setLoading] = useState(true);
   
   const NodePortal = ({ children }) => {
-      return createPortal(children, document.getElementById("portal-root"));
+    return createPortal(children, document.getElementById("portal-root"));
   };
 
   useEffect(() => {
