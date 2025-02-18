@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../services/courseService.js";
-import { getCoursePosFromGroup } from "../services/courseGroupService.js";
+import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../services/courseGroupService.js";
 
 const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) => {
   const [items, setItems] = useState({});
@@ -105,11 +105,11 @@ const setCoursesItems = async () => {
     setModifiedCourses((prev) =>
       prev.map((course) =>
         course.itemID === id ? {
-              ...course,
-              teacher: selectedTeacher || course.teacher,
-              courseType: selectedCourseType || course.courseType,
-              duration: duration || course.duration,
-            } : course)
+          ...course,
+          teacher: selectedTeacher || course.teacher,
+          courseType: selectedCourseType || course.courseType,
+          duration: duration || course.duration,
+        } : course)
     );
   };
 
@@ -119,18 +119,46 @@ const setCoursesItems = async () => {
       const fromItems = [...(prev[fromKey] || [])];
       const toItems = [...(prev[toKey] || [])];
       const itemIndex = fromItems.findIndex((item) => item.id === id);
-      if (itemIndex === -1) return prev;
+  
+      if (itemIndex === -1) {
+        return prev;
+      }
+  
       const [draggedItem] = fromItems.splice(itemIndex, 1);
+      
+      selectedSubject.courses.map((course) => {
+        if (course.itemID === draggedItem.id) {
+          const xPos = parseInt(toKey.split("-")[1], 10);
+          const yPos = parseInt(toKey.split("-")[0], 10);
+          const updatedCourse = {
+            ...course,
+            pos: { x: xPos, y: yPos },
+            group: {
+              groupType: determineCourseGroup(xPos, groups, groupList),
+              groupID: getGroupID(xPos, groups, groupList),
+            },
+          }; 
+          setModifiedCourses((prev) => {
+            const indexInModified = prev.findIndex((course) => course.itemID === id);     
+            if (indexInModified === -1) {
+              return [...prev, updatedCourse];
+            } else {
+              const newModifiedCourses = [...prev];
+              newModifiedCourses[indexInModified] = {
+                ...newModifiedCourses[indexInModified],
+                pos: { x: xPos, y: yPos },
+              };
+              return newModifiedCourses;
+            }
+          });
+        }
+      });
       return {
         ...prev,
         [fromKey]: fromItems,
         [toKey]: [...toItems, draggedItem],
       };
     });
-    setModifiedCourses((prev) =>
-      prev.map((course) =>
-        course.itemID === id ? {...course, pos: { x: parseInt(toKey.split("-")[1], 10), y: parseInt(toKey.split("-")[0], 10) }} : course)
-    );
   };
 
   // Met à jour les cours en cas de suppression d'un type de cours
