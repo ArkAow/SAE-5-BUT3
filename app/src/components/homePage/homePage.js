@@ -8,12 +8,12 @@ const HomePage = () => {
 
   const { fullName } = useUserContext(); // Récupère fullName depuis le contexte
 
-  const goToPreviEdit = () => {
+  const goToPreGridEdit = () => {
     navigate("/PreGridEdit");
   };
 
-  const goToSeePrevi = () => {
-    navigate("/SeePrevi");
+  const goToPreSeeGrid = () => {
+    navigate("/PreSeeGrid");
   };
 
   const goToManageData = () => {
@@ -33,7 +33,7 @@ const HomePage = () => {
           {/* Modify Previ Block */}
           <div
             className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
-            onClick={goToPreviEdit}>
+            onClick={goToPreGridEdit}>
             <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <img
                 src="/images/previ-edit.svg"
@@ -63,8 +63,8 @@ const HomePage = () => {
 
           {/* See Previ Block */}
           <div
-            className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 cursor-not-allowed"
-            disabled>
+            className="bg-black bg-opacity-70 rounded-2xl transform transition-transform duration-200 hover:scale-105"
+            onClick={goToPreSeeGrid}>
             <div className="size-[100px] md:size-[200px] lg:size-[300px] m-7 bg-primary flex justify-center items-center rounded-2xl shadow-lg cursor-pointer">
               <img
                 src="/images/previ-see.svg"

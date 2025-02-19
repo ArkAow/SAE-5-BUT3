@@ -17,6 +17,7 @@ import ManageTeachers from "../components/ManageData/ManageTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
 import ManageGroups from "../components/ManageData/ManageGroups";
 import MainGrid from "../components/MainGridEdit/MainGrid";
+import PreSeeGrid from "../components/SeePrevi/PreSeeGrid";
 
 const AppRoutes = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -112,6 +113,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <PreGridEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/PreSeeGrid"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <PreSeeGrid />
             </ProtectedRoute>
           }
         />
