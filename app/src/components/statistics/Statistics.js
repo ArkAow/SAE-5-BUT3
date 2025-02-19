@@ -204,14 +204,14 @@ const Statistics = ({ selectedSemester, selectedSubject, groups, teachers }) => 
             <div className="flex items-center mb-2 text-xs">
               <div className="w-4 h-4 bg-[#38B6FF] mr-2"></div> <span>TP (Travaux Pratiques)</span>
             </div>
-            <div className="flex items-center text-xs">
+            <div className="flex items-center mb-4 text-xs">
               <div className="w-4 h-4 bg-[#57B440] mr-2"></div> <span>SAE (Situation d’Apprentissage et d’Évaluation)</span>
             </div>
           </div>
 
           <div className="flex flex-col h-fit w-full min-w-64 justify-start rounded-lg shadow-lg bg-white items-left relative">
             <div className="h-2/3 w-full px-4 justify-center mt-2">
-              <p className="font-bold mb-2 text-center">Répartition des heures parmis les groupes:</p>
+              <p className="font-bold mb-2 text-center">Répartition des heures parmis<br/>les groupes pour le semestre:</p>
               {totalHoursData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={120}>
                   <BarChart data={totalHoursData}>
@@ -222,7 +222,7 @@ const Statistics = ({ selectedSemester, selectedSubject, groups, teachers }) => 
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-xs text-gray-500 text-center">Chargement...</p>
+                <p className="text-xs m-5 text-gray-500 text-center">Chargement...</p>
               )}
             </div>
 
