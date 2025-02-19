@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Department;
+use App\Service\MailService;
 
 class UserController extends AbstractController
 {
@@ -37,7 +38,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/add', name: 'add_users', methods: ['POST'])]
-    public function addUser(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function addUser(Request $request, MailService $mailService, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -58,6 +59,9 @@ class UserController extends AbstractController
         }
         $entityManager->persist($user);
         $entityManager->flush();
+
+        // Envoie un mail au nouvel utilisateur
+        $mailService->sendWelcomeEmail($data['email'], $data['fullname']);
 
         return new JsonResponse([
             'message' => 'Utilisateur ajouté avec succès',
