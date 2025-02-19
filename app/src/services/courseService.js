@@ -98,3 +98,47 @@ export const findTeacherByCode = (code, teachers) => {
   const teacher = teachers.find((teacher) => teacher.code === code) || null;
   return teacher ? { ...teacher } : null;
 };
+
+export const getAverageHourPerStudent = (subject, groupList) => {
+  if (!subject?.courses || subject.courses.length === 0) return 0;
+
+  let groupHours = {};
+  let groupCounts = {};
+
+  groupList.forEach((group) => {
+    groupHours[group.id] = 0;
+    groupCounts[group.id] = group.subGroups?.length || 1;
+  });
+
+  subject.courses.forEach((course) => {
+    const { duration, group } = course;
+    if (!group) return;
+
+    const { groupID, groupType } = group;
+    let parentGroup = groupID;
+
+    if (groupType === "half_group") {
+      const parent = groupList.find((g) => g.subGroups?.some((sg) => sg.id === groupID));
+      if (parent) parentGroup = parent.id;
+    }
+
+    if (groupType === "formation_level" || groupType === "group") {
+      groupHours[parentGroup] += duration;
+    } else if (groupType === "half_group") {
+      groupHours[parentGroup] += duration;
+    }
+  });
+
+  let totalWeightedHours = 0;
+  let totalStudents = 0;
+
+  Object.keys(groupHours).forEach((parentGroup) => {
+    const hours = groupHours[parentGroup];
+    const count = groupCounts[parentGroup];
+
+    totalWeightedHours += hours / count;
+    totalStudents++;
+  });
+
+  return totalStudents > 0 ? Math.ceil(totalWeightedHours / totalStudents) : 0;
+};
