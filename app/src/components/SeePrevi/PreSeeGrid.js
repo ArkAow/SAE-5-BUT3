@@ -3,7 +3,7 @@ import Header from "../header/header";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext.js";
 
-const PreGridEdit = () => {
+const PreSeeGrid = () => {
   const { departments = [] } = useUserContext();
   const [selectedDepartment, setSelectedDepartment] = useState(departments[0] ?? null);
 
@@ -16,10 +16,10 @@ const PreGridEdit = () => {
 
   const navigate = useNavigate();
 
-  const goToPreviEdit = () => {
+  const goToPreviSee = () => {
     if (selectedCurriculum && selectedDepartment && selectedFormationLevel.groups.length > 0) {
       const payload = { selectedDepartment, selectedCurriculum, selectedFormationLevel };
-      navigate("/PreviEdit", { state: payload });
+      navigate("/SeePrevi", { state: payload });
     }
   };
 
@@ -126,7 +126,7 @@ const PreGridEdit = () => {
               bg-primary rounded-full shadow-md hover:bg-primaryshade focus:bg-primarytint 
               focus:outline-none border border-white transition-all duration-300 disabled:bg-primaryshade
               ${error ? "bg-primaryshade cursor-not-allowed" : ""}`}
-            onClick={goToPreviEdit}
+            onClick={goToPreviSee}
             disabled={!(selectedCurriculum && selectedDepartment && selectedFormationLevel.groups.length > 0)}
             aria-disabled={!(selectedCurriculum && selectedDepartment && selectedFormationLevel.groups.length > 0)}>
             Confirmer
@@ -137,4 +137,4 @@ const PreGridEdit = () => {
   );
 };
 
-export default PreGridEdit;
+export default PreSeeGrid;

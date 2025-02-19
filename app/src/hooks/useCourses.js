@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createCoursesFromData, createItemsFromData, findCourseTypeByName, findTeacherByCode } from "../services/courseService.js";
 import { getCoursePosFromGroup, determineCourseGroup, getGroupID } from "../services/courseGroupService.js";
 
-const useCourses = (selectedSubject, teachers, courseTypes, groups, groupList) => {
+const useCourses = (selectedSubject, teachers, courseTypes, formationLevel, groupList) => {
   const [items, setItems] = useState({});
   const [courses, setCourses] = useState([]);
 
@@ -19,7 +19,7 @@ const setCoursesItems = async () => {
   const rawCourses = selectedSubject.courses;
   let newCourses = [];
   rawCourses.forEach((rawCourse) => {
-    const { x, y } = getCoursePosFromGroup(rawCourse, groups, groupList);
+    const { x, y } = getCoursePosFromGroup(rawCourse, formationLevel.groups, groupList);
     const newItemID = Date.now()+rawCourse.id;
     rawCourse.col = x;
     rawCourse.row = y;
@@ -137,8 +137,8 @@ const setCoursesItems = async () => {
             ...course,
             pos: { x: xPos, y: yPos },
             group: {
-              groupType: determineCourseGroup(xPos, groups, groupList),
-              groupID: getGroupID(xPos, groups, groupList),
+              groupType: determineCourseGroup(xPos, formationLevel.groups, groupList),
+              groupID: getGroupID(xPos, formationLevel, groupList),
             },
           }; 
           setModifiedCourses((prevModifiedCourses) => [

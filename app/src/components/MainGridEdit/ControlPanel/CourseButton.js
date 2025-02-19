@@ -4,7 +4,7 @@ import { determineCourseGroup, getGroupID } from "../../../services/courseGroupS
 
 export const CourseButton = ({
     isNoGroups,
-    groups,
+    formationLevel,
     groupList,
     selectedSemester,
     courseTypes,
@@ -78,8 +78,8 @@ export const CourseButton = ({
         setError("");
 
         const selectedTeacher = teachers.find((teacher) => teacher.code === selectedTeacherCode);
-        const groupType = determineCourseGroup(selectedCol, groups, groupList);
-        const groupID = getGroupID(selectedCol, groups, groupList);
+        const groupType = determineCourseGroup(selectedCol, formationLevel.groups, groupList);
+        const groupID = getGroupID(selectedCol, formationLevel, groupList);
 
         const payload = {
             teacher: selectedTeacher,
