@@ -6,8 +6,14 @@
     .btn-default {
       @apply bg-primary text-white rounded hover:bg-primaryshade active:bg-primarytint transition-colors duration-200;
     }
+    .btn-default:disabled {
+      @apply bg-primaryshade cursor-not-allowed;
+    }
     .btn-login {
-      @apply w-[220px] py-2 mt-6 bg-primary text-white font-bold text-lg rounded-md transform hover:scale-105;
+      @apply w-[220px] py-2 mt-6 bg-primary hover:bg-primaryshade active:bg-primarytint text-white font-bold text-lg rounded-md transform hover:scale-105 transition duration-300;
+    }
+    .btn-login:disabled  {
+      @apply bg-primaryshade cursor-not-allowed;
     }
     .btn-header {
       @apply w-6 h-6 cursor-pointer hover:opacity-50 ;
@@ -26,6 +32,9 @@
     }
     .tooltip-centered {
       @apply bg-white p-5 rounded-lg shadow-lg text-xs border-2 border-gray-300
+    }
+    .tooltip-centered-bigger {
+      @apply bg-white p-7 rounded-lg shadow-lg text-lg border-4 border-gray-300
     }
     .tooltip-select {
       @apply w-full p-1 border rounded-full bg-primary text-white
@@ -92,4 +101,15 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+@keyframes dots {
+  0% { content: "."; }
+  33% { content: ".."; }
+  66% { content: "..."; }
+}
+
+.dots::after {
+  content: ".";
+  animation: dots 1.5s infinite steps(1);
 }

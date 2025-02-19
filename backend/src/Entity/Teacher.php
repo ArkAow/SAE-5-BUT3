@@ -33,7 +33,8 @@ class Teacher
     #[ORM\ManyToMany(targetEntity: Course::class, mappedBy: 'teachers')]
     private Collection $courses;    
 
-    #[ORM\ManyToMany(targetEntity:Subject::class, inversedBy: 'teachers')]
+    #[ORM\ManyToMany(targetEntity: Subject::class, inversedBy: 'teachers')]
+    #[ORM\JoinTable(name: 'subject_teacher')]
     private Collection $subjects;
 
     #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'teachers')]
@@ -47,7 +48,7 @@ class Teacher
         $this->courses = new ArrayCollection();
         $this->subjects = new ArrayCollection();
         $this->departments = new ArrayCollection();
-        $this->expected_duration = new ArrayCollection();
+        $this->expectedDurations = new ArrayCollection();
     }
 
     public function getId(): int
@@ -182,8 +183,8 @@ class Teacher
 
     public function addExpectedDuration(ExpectedDuration $expectedDuration): self
     {
-        if (!$this->expected_duration->contains($expectedDuration)) {
-            $this->expected_duration->add($expectedDuration);
+        if (!$this->expectedDurations->contains($expectedDuration)) {
+            $this->expectedDurations->add($expectedDuration);
             $expectedDuration->addTeacher($this);
         }
         return $this;
@@ -191,7 +192,7 @@ class Teacher
 
     public function removeExpectedDuration(ExpectedDuration $expectedDuration): self
     {
-        if ($this->expected_duration->removeElement($expectedDuration)) {
+        if ($this->expectedDurations->removeElement($expectedDuration)) {
             $expectedDuration->removeTeacher($this);
         }
         return $this;

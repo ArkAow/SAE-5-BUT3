@@ -8,12 +8,15 @@ import {
 import Login from "../components/Login/Login";
 import HomePage from "../components/homePage/homePage";
 import PreGridEdit from "../components/MainGridEdit/PreGridEdit";
-import PreviEdit from "../components/MainGridEdit/PreviEdit";
 import SeePrevi from "../components/SeePrevi/SeePrevi";
 import InsertM3C from "../components/ManageData/InsertM3C";
 import ManageData from "../components/ManageData/ManageData";
-import ModifyTeachers from "../components/ManageData/ModifyTeachers";
+import ManageDepartments from  "../components/ManageData/ManageDepartments";
+import ManageUsers from  "../components/ManageData/ManageUsers";
+import ManageTeachers from "../components/ManageData/ManageTeachers";
 import ProtectedRoute from "./ProtectedRoutes";
+import ManageGroups from "../components/ManageData/ManageGroups";
+import MainGrid from "../components/MainGridEdit/MainGrid";
 
 const AppRoutes = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -44,7 +47,7 @@ const AppRoutes = () => {
           path="/PreviEdit"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <PreviEdit />
+              <MainGrid />
             </ProtectedRoute>
           }
         />
@@ -65,10 +68,34 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/ModifyTeachers"
+          path="/ManageTeachers"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <ModifyTeachers />
+              <ManageTeachers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageGroups"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ManageGroups />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageDepartments"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ManageDepartments />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageUsers"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ManageUsers />
             </ProtectedRoute>
           }
         />

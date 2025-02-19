@@ -7,12 +7,48 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Teacher;
+use App\Entity\Department;
+use App\Repository\TeacherRepository;
+use App\Repository\DepartmentRepository;
+use App\Repository\SubjectRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 class TeacherController extends AbstractController
 {
-    #[Route('/teacher/add', name: 'add_teacher', methods: ['POST'])]
-    public function addTeacher(EntityManagerInterface $entityManager, Request $request): JsonResponse
+    #[Route('/teacher/department/{departmentId}', name: 'get_teachers_by_department', methods: ['GET'])]
+    public function getTeachersByDepartment(int $departmentId, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $departmentRepository = $entityManager->getRepository(Department::class);
+        $department = $departmentRepository->find($departmentId);
+
+        if (!$department) {
+            return new JsonResponse(['message' => 'Département non trouvé'], 404);
+        }
+
+        $teachers = $department->getTeachers(); // Récupère les enseignants du département
+
+        $data = array_map(function($teacher){
+            return [
+                'id' => $teacher->getId(),
+                'firstName' => $teacher->getFirstName(),
+                'lastName' => $teacher->getLastName(),
+                'code' => $teacher->getCode(),
+                'subjects' => array_map(fn($s) => [
+                    'id' => $s->getId(),
+                    'name' => $s->getName(),
+                    'code' => $s->getCode(),
+                ], $teacher->getSubjects()->toArray()),
+                'courses' => $teacher->getCourses(),
+                'timeConstraints' => $teacher->getTimeConstraints(),
+                'isPartimeTutor' => $teacher->getIsPartimeTutor(),
+            ];
+        }, $teachers->toArray());
+
+        return new JsonResponse($data, 200);
+    }
+
+    #[Route('/teacher/add/department/{departmentId}', name: 'add_teacher', methods: ['POST'])]
+    public function addTeacher(int $departmentId, EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
     
@@ -26,9 +62,17 @@ class TeacherController extends AbstractController
         $teacherFirstname = trim($data['firstName']);
         $teacherLastname = trim($data['lastName']);
         $teacher_timeConstraints = $data['constraint'] ?? 0;
-        $teacher_is_partimetutor = $data['is_partimetutor'] ?? 0;
+        $teacher_is_partimetutor = $data['is_partimetutor'] ?? false;
     
-        // Vérification si un professeur existe déjà par le nom ET le prénom
+        // Vérification si le département existe
+        $departmentRepository = $entityManager->getRepository(Department::class);
+        $department = $departmentRepository->find($departmentId);
+    
+        if (!$department) {
+            return new JsonResponse(['error' => 'Département non trouvé.'], 404);
+        }
+    
+        // Vérification si l'enseignant existe déjà (même nom, prénom et code)
         $teacherRepository = $entityManager->getRepository(Teacher::class);
         $existingTeacher = $teacherRepository->findOneBy([
             'firstName' => $teacherFirstname,
@@ -36,80 +80,111 @@ class TeacherController extends AbstractController
         ]);
     
         if ($existingTeacher !== null) {
-            return new JsonResponse(['error' => 'Professeur déjà existant (même nom, prénom et code).'], 409);
+            // Vérifier si le département est déjà assigné à cet enseignant
+            if ($existingTeacher->getDepartments()->contains($department)) {
+                return new JsonResponse(['message' => 'L\'enseignant est déjà associé à ce département.'], 200);
+            }
+    
+            // Ajouter le département à l'enseignant existant
+            $existingTeacher->addDepartment($department);
+            $entityManager->persist($existingTeacher);
+            $entityManager->flush();
+    
+            return new JsonResponse([
+                'message' => 'Département ajouté à l\'enseignant existant.',
+                'teacherId' => $existingTeacher->getId(),
+                'code' => $existingTeacher->getCode(),
+            ], 200);
         }
     
-        // Création d'un nouveau professeur
-        $teacher = new Teacher();
-    
-        //Génération d'un code unique pour le professeur
+        // Génération d'un code unique pour le professeur
         $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0]);
         $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
     
-        $index = 1; // Compteur pour différencier les codes
+        $index = 1;
         while ($existingCodeTeacher !== null) {
-            // Si le code existe, on ajoute des lettres supplémentaires pour rendre le code unique el CO et COD
             $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0] . substr($teacherLastname, $index, 1));
             $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
             $index++;
-            
-            // Si on dépasse la longueur du nom, on passe aux lettres du prénom pour différencier les codes mais arrive très peu de fois
-            $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0] . substr($teacherLastname, 1, $index - strlen($teacherLastname)));
-            $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
+    
+            if ($index >= strlen($teacherLastname)) {
+                $teacherCode = strtoupper($teacherFirstname[0] . $teacherLastname[0] . substr($teacherFirstname, 1, $index - strlen($teacherLastname)));
+                $existingCodeTeacher = $teacherRepository->findOneBy(['code' => $teacherCode]);
+            }
         }
     
+        // Création d'un nouvel enseignant
+        $teacher = new Teacher();
         $teacher->setCode($teacherCode);
         $teacher->setFirstname($teacherFirstname);
         $teacher->setLastname($teacherLastname);
-        $teacher->setTimeConstraints($teacher_timeConstraints ?? 0);
-        $teacher->setIsPartimeTutor($teacher_is_partimetutor ?? false);
+        $teacher->setTimeConstraints($teacher_timeConstraints);
+        $teacher->setIsPartimeTutor($teacher_is_partimetutor);
+        $teacher->addDepartment($department);
     
         $entityManager->persist($teacher);
         $entityManager->flush();
     
-        return new JsonResponse(['message' => 'Professeur ajouté avec succès.', 'code' => $teacherCode], 201);
+        return new JsonResponse([
+            'message' => 'Professeur ajouté avec succès et assigné au département.',
+            'teacherId' => $teacher->getId(),
+            'code' => $teacherCode,
+        ], 201);
     }
 
-    #[Route('/teacher', name: 'get_teachers', methods: ['GET'])]
-    public function getTeachers(EntityManagerInterface $entityManager): JsonResponse
-    {
-        $teacherRepository = $entityManager->getRepository(Teacher::class);
-        $teachers = $teacherRepository->findAll();
-        
-        // Affichage de TOUS les professeurs en liste avec TOUTES leurs données
+    #[Route('/teacher/delete/{id}/{departmentId}', name: 'remove_teacher_department', methods: ['DELETE'])]
+    public function removeTeacherDepartment(
+        int $id, 
+        int $departmentId, 
+        TeacherRepository $teacherRepository, 
+        DepartmentRepository $departmentRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $teacher = $teacherRepository->find($id);
+        $department = $departmentRepository->find($departmentId);
 
-        $data = array_map(function($teacher){
-            return [
-                'id' => $teacher->getId(),
-                'firstName' => $teacher->getFirstName(),
-                'lastName' => $teacher->getLastName(),
-                'code' => $teacher->getCode(),
-                'subjects' => $teacher->getSubjects(),
-                'courses' => $teacher->getCourses(),
-                'timeConstraints' => $teacher->getTimeConstraints(),
-                'isPartimeTutor' => $teacher->getIsPartimeTutor(),
-            ];
-        }, $teachers);
-    
-        return new JsonResponse($data, 200);
-    }
-
-    #[Route('/teacher/delete', name: 'delete_teacher', methods: ['DELETE'])]
-    public function deleteTeacher(EntityManagerInterface $entityManager, Request $request) : JsonResponse
-    {
-        $teacherId = json_decode($request->getContent(), true)['id'];
-    
-        $teacherRepository = $entityManager->getRepository(Teacher::class);
-        $teacher = $teacherRepository->findOneBy(['id' => $teacherId]);
-    
-        if ($teacher === null) {
+        if (!$teacher) {
             return new JsonResponse(['error' => 'Professeur non trouvé.'], 404);
         }
-    
-        $entityManager->remove($teacher);
+
+        if (!$department) {
+            return new JsonResponse(['error' => 'Département non trouvé.'], 404);
+        }
+
+        // Vérifier si le professeur est bien dans ce département
+        if (!$teacher->getDepartments()->contains($department)) {
+            return new JsonResponse(['error' => 'Le professeur n\'est pas associé à ce département.'], 400);
+        }
+
+        // Supprimer l'association entre le professeur et le département
+        $department->removeTeacher($teacher);
+        $teacher->removeDepartment($department);
+        $entityManager->persist($department);
+        $entityManager->persist($teacher);
+
+        // Vérifier s'il reste des départements associés
+        if ($teacher->getDepartments()->isEmpty()) {
+            // Supprimer manuellement toutes les entrées de la table pivot
+            $connection = $entityManager->getConnection();
+            $connection->executeStatement('DELETE FROM department_teacher WHERE teacher_id = :teacherId', [
+                'teacherId' => $teacher->getId()
+            ]);
+
+            $connection2 = $entityManager->getConnection();
+            $connection2->executeStatement('DELETE FROM teacher WHERE id = :teacherId', [
+                'teacherId' => $teacher->getId()
+            ]);
+
+            // Supprimer définitivement le professeur
+            $entityManager->remove($teacher);
+            $message = 'Professeur supprimé car il n\'avait plus de départements.';
+        } else {
+            $message = 'Département retiré avec succès du professeur.';
+        }
+
         $entityManager->flush();
-    
-        return new JsonResponse(['message' => 'Professeur supprimé avec succès.'], 200);
+
+        return new JsonResponse(['message' => $message], 200);
     }
 
     #[Route('/teacher/update', name: 'update_teachers', methods: ['PUT'])]
@@ -120,8 +195,8 @@ class TeacherController extends AbstractController
         $id = $data['id'] ?? null;
         $firstName = $data['firstName'] ?? null;
         $lastName = $data['lastName'] ?? null;
-        $timeConstraints = $data['time_constraints'] ?? null;
-        $isPartimeTutor = $data['is_partimetutor'] ?? null;
+        $timeConstraints = $data['constraint'] ?? null;
+        $isPartimeTutor = $data['isPartimeTutor'] ?? null;
 
         if (!$id || !$firstName || !$lastName) {
             return new JsonResponse(['error' => 'Données invalides'], 400);
@@ -140,6 +215,86 @@ class TeacherController extends AbstractController
 
         $entityManager->flush();
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'message' => 'Enseignant mis à jour avec succès',
+            'teacher' => [
+                'id' => $teacher->getId(),
+                'firstName' => $teacher->getFirstName(),
+                'lastName' => $teacher->getLastName(),
+                'code' => $teacher->getCode(),
+                'subjects' => $teacher->getSubjects(),
+                'courses' => $teacher->getCourses(),
+                'timeConstraints' => $teacher->getTimeConstraints(),
+                'isPartimeTutor' => $teacher->getIsPartimeTutor(),
+            ]
+        ], 200);
+    }
+
+    #[Route('/teacher/{teacherId}/add-subject/{subjectId}', name: 'add_subject_to_teacher', methods: ['POST'])]
+    public function addSubjectToTeacher(
+        int $teacherId,
+        int $subjectId,
+        TeacherRepository $teacherRepository,
+        SubjectRepository $subjectRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $teacher = $teacherRepository->find($teacherId);
+        $subject = $subjectRepository->find($subjectId);
+
+        if (!$teacher) {
+            return new JsonResponse(['error' => 'Enseignant non trouvé.'], 404);
+        }
+
+        if (!$subject) {
+            return new JsonResponse(['error' => 'Matière non trouvée.'], 404);
+        }
+
+        if ($teacher->getSubjects()->contains($subject)) {
+            return new JsonResponse(['error' => 'Cette matière est déjà assignée à cet enseignant.'], 400);
+        }
+
+        $teacher->addSubject($subject);
+        $entityManager->persist($teacher);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Matière ajoutée avec succès à l\'enseignant.',
+            'teacherId' => $teacher->getId(),
+            'subjectId' => $subject->getId(),
+        ], 200);
+    }
+
+    #[Route('/teacher/{teacherId}/remove-subject/{subjectId}', name: 'remove_subject_from_teacher', methods: ['DELETE'])]
+    public function removeSubjectFromTeacher(
+        int $teacherId,
+        int $subjectId,
+        TeacherRepository $teacherRepository,
+        SubjectRepository $subjectRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $teacher = $teacherRepository->find($teacherId);
+        $subject = $subjectRepository->find($subjectId);
+
+        if (!$teacher) {
+            return new JsonResponse(['error' => 'Enseignant non trouvé.'], 404);
+        }
+
+        if (!$subject) {
+            return new JsonResponse(['error' => 'Matière non trouvée.'], 404);
+        }
+
+        if (!$teacher->getSubjects()->contains($subject)) {
+            return new JsonResponse(['error' => 'Cette matière n\'est pas assignée à cet enseignant.'], 400);
+        }
+
+        $teacher->removeSubject($subject);
+        $entityManager->persist($teacher);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Matière supprimée avec succès de l\'enseignant.',
+            'teacherId' => $teacher->getId(),
+            'subjectId' => $subject->getId(),
+        ], 200);
     }
 }

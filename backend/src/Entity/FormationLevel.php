@@ -18,6 +18,12 @@ class FormationLevel
     #[ORM\Column(type: "string", length: 100)]
     private string $name;
 
+    #[ORM\ManyToMany(targetEntity: Department::class, mappedBy: 'formationLevels')]
+    #[ORM\JoinTable(name: "department_formationLevel")]
+    #[ORM\JoinColumn(name: "formationLevel_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\InverseJoinColumn(name: "department_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private Collection $departments;
+
     #[ORM\ManyToMany(targetEntity: Groups::class, inversedBy: "formationLevels")]
     #[ORM\JoinTable(name: "formation_Level_group")]
     #[ORM\JoinColumn(name: "formationLevel_id", referencedColumnName: "id", onDelete: "CASCADE")]
@@ -35,6 +41,7 @@ class FormationLevel
         $this->groups = new ArrayCollection();
         $this->curriculums = new ArrayCollection();
         $this->courses = new ArrayCollection();
+        $this->departments = new ArrayCollection();
     }
 
     public function getId(): int
@@ -81,6 +88,7 @@ class FormationLevel
     {
         if (!$this->curriculums->contains($curriculum)) {
             $this->curriculums[] = $curriculum;
+            $curriculum->addFormationLevel($this);
         }
         return $this;
     }
@@ -109,6 +117,28 @@ class FormationLevel
     {
         if ($this->courses->removeElement($course)) {
             $course->removeFormationLevel($this);
+        }
+        return $this;
+    }
+
+    public function getDepartments(): Collection
+    {
+        return $this->departments;
+    }
+
+    public function addDepartment(Department $department): self
+    {
+        if (!$this->departments->contains($department)) {
+            $this->departments[] = $department;
+            $department->addFormationLevel($this);
+        }
+        return $this;
+    }
+
+    public function removeDepartment(Department $department): self
+    {
+        if ($this->departments->removeElement($department)) {
+            $department->removeFormationLevel($this);
         }
         return $this;
     }
