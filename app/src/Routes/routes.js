@@ -40,7 +40,8 @@ const routes = {
       get: (curriculumId) => `${routes.dev.default}curriculum/${curriculumId}/semesters`,
     },
     statistics: {
-      getHoursForTeacherSubjects: (teacheId) =>`${routes.dev.default}week_request/${teacheId}`,
+      getCoursesForTeacher: (teacheId) =>`${routes.dev.default}week_request/${teacheId}`,
+      getCoursesForHalfGroup: (halfGroupId) =>`${routes.dev.default}week_request/half_group/${halfGroupId}`
     },
     subjects: {
       getFromSemester: (semesterId) => `${routes.dev.default}semester/${semesterId}/subjects`,

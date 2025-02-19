@@ -11,14 +11,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Course;
 use App\Entity\Subject;
 use App\Entity\Semester;
+use App\Entity\HalfGroup;
 
 class RequestController extends AbstractController
 {
-    #[Route('/week_request/{id}', name: 'app_request')]
-    public function getCourse_by_teacher(int $id, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/week_request/{teacherId}', name: 'app_request', methods: ['GET'])]
+    public function getCourse_by_teacher(int $teacherId, EntityManagerInterface $entityManager): JsonResponse
     {
         $teacherRepository = $entityManager->getRepository(Teacher::class);
-        $teacher = $teacherRepository->find($id);
+        $teacher = $teacherRepository->find($teacherId);
 
         if (!$teacher) {
             return new JsonResponse(['error' => 'Teacher not found'], Response::HTTP_NOT_FOUND);
@@ -62,6 +63,67 @@ class RequestController extends AbstractController
             }
         }
 
+        return new JsonResponse($weeklyCourses);
+    }
+
+    #[Route('/week_request/half_group/{halfGroupId}', name: 'app_request_half_group', methods: ['GET'])]
+    public function getCourse_by_half_group(int $halfGroupId, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $halfGroupRepository = $entityManager->getRepository(HalfGroup::class);
+        $halfGroup = $halfGroupRepository->find($halfGroupId);
+    
+        if (!$halfGroup) {
+            return new JsonResponse(['error' => 'Half Group not found'], Response::HTTP_NOT_FOUND);
+        }
+    
+        // Récupération des cours du demi-groupe
+        $allCourses = $halfGroup->getCourses()->toArray();
+    
+        // Récupérer les groupes parents et leurs cours
+        foreach ($halfGroup->getGroups() as $group) {
+            $allCourses = array_merge($allCourses, $group->getCourses()->toArray());
+            foreach ($group->getFormationLevel() as $formationLevel) {
+                $allCourses = array_merge($allCourses, $formationLevel->getCourses()->toArray());
+            }
+        }
+    
+        $weeklyCourses = [];
+    
+        foreach ($allCourses as $course) {
+            $weekNumber = $course->getWeekPosition();
+            $subjects = $course->getSubjects();
+            $courseTypes = $course->getCourseTypes();
+    
+            foreach ($subjects as $subject) {
+                $subjectName = $subject->getName();
+    
+                foreach ($courseTypes as $courseType) {
+                    $courseTypeName = $courseType->getName();
+    
+                    if (!isset($weeklyCourses[$weekNumber])) {
+                        $weeklyCourses[$weekNumber] = [];
+                    }
+    
+                    if (!isset($weeklyCourses[$weekNumber][$subjectName])) {
+                        $weeklyCourses[$weekNumber][$subjectName] = [];
+                    }
+    
+                    if (!isset($weeklyCourses[$weekNumber][$subjectName][$courseTypeName])) {
+                        $weeklyCourses[$weekNumber][$subjectName][$courseTypeName] = [
+                            'total_duration' => 0,
+                            'courses' => []
+                        ];
+                    }
+    
+                    $weeklyCourses[$weekNumber][$subjectName][$courseTypeName]['total_duration'] += $course->getDuration();
+                    $weeklyCourses[$weekNumber][$subjectName][$courseTypeName]['courses'][] = [
+                        'id' => $course->getId(),
+                        'duration' => $course->getDuration(),
+                    ];
+                }
+            }
+        }
+    
         return new JsonResponse($weeklyCourses);
     }
 
