@@ -15,6 +15,7 @@ const Statistics = () => {
               <div className="h-[24vh] w-1/2 rounded-lg bg-white shadow-lg p-4">
                 Légende du graph
               </div>
+              Bouton prof ou groupe
             </div>
 
             <div className="h-[39vh] w-[20vw] min-w-64 rounded-lg bg-white shadow-lg p-4">

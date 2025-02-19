@@ -5,8 +5,8 @@ const Toast = ({ message, type, onClose }) => {
   const toastStyle = type === "success" ? "bg-accept" : "bg-primaryshade";
 
   useEffect(() => {
-    const duration = 4000;
-    const interval = 30;
+    const duration = 3000;
+    const interval = 10;
     const decrement = (interval / duration) * 100;
 
     const timer = setTimeout(() => {

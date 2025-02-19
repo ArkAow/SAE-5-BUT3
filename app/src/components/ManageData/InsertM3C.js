@@ -10,9 +10,7 @@ const InsertM3C = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
 
-  const [selectedSheet, setSelectedSheet] = useState("");
-  const [selectedCurriculum, setSelectedCurriculum] = useState("");
-  const [selectedSemester, setSelectedSemester] = useState("");
+  const [expanded, setExpanded] = useState({});
 
   const handleFileUpload = (e) => {
     const uploadedFile = e.target.files[0];
@@ -63,7 +61,6 @@ const InsertM3C = () => {
       }
 
       setData(insertData.sheets);
-      console.log(insertData.sheets);
       setToast({
         message: "Données insérées avec succès !",
         type: "success",
@@ -78,7 +75,11 @@ const InsertM3C = () => {
     } finally {
       setLoading(false);
     }
-  };  
+  };
+
+  const toggleExpand = (key) => {
+    setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   return (
     <>
@@ -88,118 +89,78 @@ const InsertM3C = () => {
       <div className="flex flex-col min-h-screen">
         <div className="flex justify-center w-full mt-40">
           <div className="w-full mx-10 h-[70vh] min-h-[200px] bg-black bg-opacity-70 rounded-2xl p-6 shadow-lg flex flex-col">
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-center space-y-4">
               <h1 className="text-white text-lg font-bold mt-1">Insérez votre fichier M3C</h1>
               <input
                 type="file"
                 accept=".csv, .xls, .xlsx"
                 onChange={handleFileUpload}
                 className="my-4 text-gray-300"/>
-              <button
-                onClick={handleSubmit}
-                className="btn-default p-2">
+              <button onClick={handleSubmit} className="btn-default p-2">
                 Envoyer le fichier
               </button>
             </div>
-  
-            <div className={`flex flex-col h-full mt-4 items-center justify-center bg-black bg-opacity-75 p-6 rounded-lg 
-              transition-opacity duration-300`}>
-              { loading ? (
+
+            <div
+              className={`flex flex-col h-full mt-4 items-center bg-black bg-opacity-75 p-6 rounded-lg 
+              transition-opacity duration-300 overflow-y-auto ${!loading || !data ? 'justify-center' : 'justify-start'}`}>
+              {loading ? (
                 <>
                   <div className="spinner"></div>
-                  <div className="text-white text-3xl font-bold mt-4">
-                    Envoie des données...
-                  </div>                   
+                  <div className="text-white text-3xl font-bold mt-4">Envoie des données...</div>
                 </>
-                  ) : data ? (
-                    <div className="w-full text-white">
-                      <h2 className="text-lg font-bold mb-2">Sélectionnez les données :</h2>
+              ) : data ? (
+                <div className="w-full h-full text-white justify-start">
+                  <h2 className="text-lg font-bold mb-2">Données disponibles :</h2>
+                  
+                  {Object.entries(data).map(([key, value]) => {
+                    const curriculumName = Object.keys(value)[0] || key;
 
-                      {/* Dropdown pour les feuilles */}
-                      <label className="block">Feuille :</label>
-                      <select
-                        className="w-full p-2 rounded bg-gray-800 text-white mb-2"
-                        value={selectedSheet}
-                        onChange={(e) => {
-                          setSelectedSheet(e.target.value);
-                          setSelectedCurriculum("");
-                          setSelectedSemester("");
-                        }}
-                      >
-                        <option value="">Sélectionnez une feuille</option>
-                        {Object.keys(data).map((sheet) => (
-                          <option key={sheet} value={sheet}>
-                            {sheet}
-                          </option>
-                        ))}
-                      </select>
+                    return (
+                      <div key={key} className="mb-4">
+                        {/* Cursus */}
+                        <button
+                          onClick={() => toggleExpand(key)}
+                          className="w-full text-left bg-gray-700 px-4 py-2 rounded-md font-bold">
+                          {curriculumName} {expanded[key] ? "▲" : "▼"}
+                        </button>
 
-                      {/* Dropdown pour les curriculums */}
-                      {selectedSheet && (
-                        <>
-                          <label className="block">Cursus :</label>
-                          <select
-                            className="w-full p-2 rounded bg-gray-800 text-white mb-2"
-                            value={selectedCurriculum}
-                            onChange={(e) => {
-                              setSelectedCurriculum(e.target.value);
-                              setSelectedSemester("");
-                            }}
-                          >
-                            <option value="">Sélectionnez un curriculum</option>
-                            {Object.keys(data[selectedSheet] || {}).map((curriculum) => (
-                              <option key={curriculum} value={curriculum}>
-                                {curriculum}
-                              </option>
-                            ))}
-                          </select>
-                        </>
-                      )}
+                        {expanded[key] &&
+                          Object.entries(value[curriculumName] || {}).map(([semester, subjects]) => (
+                            <div key={semester} className="ml-6 mt-2">
+                              {/* Semestre */}
+                              <button
+                                onClick={() => toggleExpand(`${key}-${semester}`)}
+                                className="w-full text-left bg-gray-600 px-4 py-2 rounded-md">
+                                {semester} {expanded[`${key}-${semester}`] ? "▲" : "▼"}
+                              </button>
 
-                      {/* Dropdown pour les semestres */}
-                      {selectedCurriculum && (
-                        <>
-                          <label className="block">Semestre :</label>
-                          <select
-                            className="w-full p-2 rounded bg-gray-800 text-white mb-2"
-                            value={selectedSemester}
-                            onChange={(e) => setSelectedSemester(e.target.value)}
-                          >
-                            <option value="">Sélectionnez un semestre</option>
-                            {Object.keys(data[selectedSheet][selectedCurriculum] || {}).map(
-                              (semester) => (
-                                <option key={semester} value={semester}>
-                                  {semester}
-                                </option>
-                              )
-                            )}
-                          </select>
-                        </>
-                      )}
-
-                      {/* Affichage des matières */}
-                      {selectedSemester && (
-                        <div className="mt-4">
-                          <h3 className="text-md font-bold">Matières du {selectedSemester} :</h3>
-                          <ul className="list-disc ml-6">
-                            {data[selectedSheet][selectedCurriculum][selectedSemester].map(
-                              (subject, index) => (
-                                <li key={index}>{subject.intitule || "Matière inconnue"}</li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
+                              {expanded[`${key}-${semester}`] && (
+                                <ul className="list-disc ml-8 mt-2">
+                                  {/* Matières */}
+                                  {subjects.map((subject, index) => (
+                                    <li key={index} className="text-gray-300">
+                                      {subject.intitule || "Matière inconnue"}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
                 <div className="text-white text-3xl font-bold mt-4">
-                  Envoyez des données pour les voir apparaitre ici
-                </div>  
+                  Envoyez des données pour les voir apparaître ici
+                </div>
               )}
             </div>
           </div>
         </div>
       </div>
+
       {toast.visible && (
         <Toast
           message={toast.message}
