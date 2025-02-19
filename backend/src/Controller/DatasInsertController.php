@@ -115,6 +115,8 @@ class DatasInsertController extends AbstractController
             // Création du Semester et de ses datas et ajout dans la BDD (persist)
             $semester = new Semester();
             $semester->setName($name);
+            $semester->setWeekStart(1);
+            $semester->setWeekDuration(20);
             $this->entityManager->persist($semester);
         }
 

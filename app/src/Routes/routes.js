@@ -39,6 +39,9 @@ const routes = {
     semesters: {
       get: (curriculumId) => `${routes.dev.default}curriculum/${curriculumId}/semesters`,
     },
+    statistics: {
+      getHoursForTeacherSubjects: (teacheId) =>`${routes.dev.default}week_request/${teacheId}`,
+    },
     subjects: {
       getFromSemester: (semesterId) => `${routes.dev.default}semester/${semesterId}/subjects`,
       getFromDepartment: (departmentId) => `${routes.dev.default}department/${departmentId}/subjects`

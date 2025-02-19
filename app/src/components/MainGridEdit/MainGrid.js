@@ -281,7 +281,11 @@ const MainGrid = () => {
               </div>
             ) : showStatistics ? ( 
               <>
-                <Statistics />
+                <Statistics 
+                  selectedSemester={selectedSemester}
+                  selectedSubject={selectedSubject}
+                  teachers={teachers}
+                  groups={formationLevel.groups}/>
               </>
             ) : (
               <>
