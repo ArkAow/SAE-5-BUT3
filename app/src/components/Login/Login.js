@@ -8,7 +8,7 @@ import { useUserContext } from "../../contexts/UserContext"; // Import du UserCo
 
 const Login = ({ setIsAuthenticated }) => {
   const { getUserByEmail, updateUser } = useUsers();
-  const { departments } = useDepartments();
+  const { departments, isLoading: isDepartmentLoading } = useDepartments();
   const [username, setUsername] = useState(""); // Champ "username"
   const [password, setPassword] = useState(""); // Champ "password"
   const [error, setError] = useState(""); // Gestion des erreurs
@@ -82,7 +82,16 @@ const Login = ({ setIsAuthenticated }) => {
       } else {
         setEmail(`admin@root`);
         setFullName(`Administrateur`);
-        setDepartments(departments);
+        if (!isDepartmentLoading) {
+          setDepartments(departments);
+        } else {
+          const interval = setInterval(() => {
+            if (!isDepartmentLoading) {
+              setDepartments(departments);
+              clearInterval(interval);
+            }
+          }, 100);
+        }
         setRole("superadmin");
       }
   

@@ -32,8 +32,7 @@ const Header = () => {
   return (
     <div
       className="flex w-full fixed top-0 z-20 justify-between items-center bg-primary p-2"
-      style={{ WebkitAppRegion: "drag" }}
-    >
+      style={{ WebkitAppRegion: "drag" }}>
       <div className="flex items-center">
         <img
           src="/images/Universite_de_Limoges_white.png"
@@ -42,6 +41,7 @@ const Header = () => {
           className="size-[6%] mr-2 cursor-pointer hover:opacity-50"
           onClick={goToHomePage}
           draggable="false"
+          title="Naviguer vers le menu principal"
         />
         <h1 className="font-normal text-base text-white mt-1">
           Prévisionnel IUT du Limousin

@@ -81,6 +81,8 @@ class CurriculumController extends AbstractController
             $data[] = [
                 'id' => $semester->getId(),
                 'name' => $semester->getName(),
+                'week_duration' => $semester->getWeekDuration(),
+                'week_start' => $semester->getWeekStart(),
                 'subjects' => array_map(function ($s) {
                     return [
                         'id' => $s->getId(),

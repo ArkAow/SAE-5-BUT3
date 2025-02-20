@@ -82,17 +82,6 @@ class DatasInsertController extends AbstractController
             $curriculum = new Curriculum();
             $curriculum->setName($name);
             $this->entityManager->persist($curriculum);
-
-            // Si le nom du curriculum contient le mot "BUT" alors on ajoute le niveau de formation correspondant
-            if (preg_match('/BUT\s+(\d+)/i', $name, $matches)) {
-                $classNumber = $matches[1];
-                $formationLevelName = "A" . $classNumber;
-
-                $formationLevel = $this->getOrCreateFormationLevel($formationLevelName);
-
-                $curriculum->addFormationLevel($formationLevel);
-                $formationLevel->addCurriculum($curriculum);
-            }
         }
 
         return $curriculum;
@@ -126,6 +115,8 @@ class DatasInsertController extends AbstractController
             // Création du Semester et de ses datas et ajout dans la BDD (persist)
             $semester = new Semester();
             $semester->setName($name);
+            $semester->setWeekStart(1);
+            $semester->setWeekDuration(20);
             $this->entityManager->persist($semester);
         }
 

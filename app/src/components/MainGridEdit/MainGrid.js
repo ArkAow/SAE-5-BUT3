@@ -7,17 +7,21 @@ import useTeachers from "../../hooks/useTeachers.js";
 import useSemesters from "../../hooks/useSemesters.js";
 import useCourseTypes from "../../hooks/useCourseTypes.js";
 import useCourses from "../../hooks/useCourses.js";
+import Statistics from "../statistics/Statistics.js";
 import { createPortal } from "react-dom";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useLocation } from "react-router-dom";
+import { getAverageHourPerStudent } from "../../services/courseService.js";
 
 const MainGrid = () => {
   const location = useLocation();
   const payload = location.state || {};
   const department = payload.selectedDepartment;
-  const groups = payload.selectedGroups;
+  const formationLevel = payload.selectedFormationLevel;
   const curriculum = payload.selectedCurriculum;
+
+  const [showStatistics, setShowStatistics] = useState(false);
 
   const [toast, setToast] = useState({ message: "", type: "", visible: false });
   const [isControlPanelExpanded, setIsControlPanelIsExpanded] = useState(true);
@@ -36,6 +40,7 @@ const MainGrid = () => {
   const [pendingSemesterId, setPendingSemesterId] = useState(null);
 
   const getGroupList = () => {
+    const groups = formationLevel.groups;
     const mainGroups = groups.map((group) => group.name);
     const subGroups = groups.flatMap((group) =>
       (group.subGroups || []).map((subGroup) => subGroup.name)
@@ -46,12 +51,16 @@ const MainGrid = () => {
   const {
     items, isLoading: isCoursesLoading, modifiedCourses, deletedCourses, addItem, deleteItem,
     modifItem, moveItem, updateCoursesForRemovedType, setDeletedCourses, setModifiedCourses, setIsLoading: setIsCoursesLoading
-  } = useCourses(selectedSubject, teachers, courseTypes, groups, getGroupList());
+  } = useCourses(selectedSubject, teachers, courseTypes, formationLevel, getGroupList());
 
   const [isLoading, setLoading] = useState(true);
   
   const NodePortal = ({ children }) => {
     return createPortal(children, document.getElementById("portal-root"));
+  };
+
+  const handleShowStatistics = () => {
+    setShowStatistics(!showStatistics);
   };
 
   useEffect(() => {
@@ -174,6 +183,7 @@ const MainGrid = () => {
               <div className="absolute top-6">
                 <ControlPanel
                   setToast={setToast}
+                  showStatistics={showStatistics}
                   isExpanded={isControlPanelExpanded}
                   setIsExpanded={setIsControlPanelIsExpanded}
 
@@ -184,7 +194,7 @@ const MainGrid = () => {
 
                   teachers={teachers}
 
-                  groups={groups}
+                  formationLevel={formationLevel}
                   groupList={groupList}
 
                   courseTypes={courseTypes}
@@ -234,28 +244,29 @@ const MainGrid = () => {
 
               {/* Bouton suivant */}
               <button
-                onClick={() => {
-                  goToNextSubject();
-                }}
-                disabled={
-                  !selectedSubject ||
-                  subjects.indexOf(selectedSubject) >=
-                    subjects.length - 1
-                }
+                onClick={() => {goToNextSubject()}}
+                disabled={!selectedSubject || subjects.indexOf(selectedSubject) >= subjects.length - 1}
                 className={`flex w-48 h-10 mt-2 items-center px-4 py-2 text-white bg-primary rounded-full
                   shadow-md hover:bg-primaryshade focus:bg-primarytint border border-white focus:outline-none
-                  ${
-                    !selectedSubject ||
-                    subjects.indexOf(selectedSubject) >=
-                      subjects.length - 1
-                      ? "bg-primaryshade cursor-not-allowed"
-                      : ""
-                  }`}>
+                  ${!selectedSubject || subjects.indexOf(selectedSubject) >= subjects.length - 1 ? "bg-primaryshade cursor-not-allowed" : ""}`}>
                 Passer au suivant
                 <img
                   src="/images/right-arrow.svg"
                   alt="Right Arrow"
                   className="ml-2 w-4 h-4"/>
+              </button>
+
+              {/* Bouton Statistiques */}
+              <button
+                onClick={handleShowStatistics}
+                className={`flex w-fit h-10 mt-2 items-center px-10 py-2 text-white bg-primary rounded-3xl
+                  shadow-md hover:bg-primaryshade border border-white focus:outline-none
+                  ${showStatistics ? 'bg-primarytint ring-2 ring-white' : ''}`}
+                title="Accèder aux statistiques">
+                <img
+                  src="/images/graph-bar.svg"
+                  alt="Graph Bar Stacked"
+                  className="size-6"/>
               </button>
             </div>
 
@@ -268,9 +279,17 @@ const MainGrid = () => {
                   </div>
                 </div>
               </div>
+            ) : showStatistics ? ( 
+              <>
+                <Statistics 
+                  selectedSemester={selectedSemester}
+                  selectedSubject={selectedSubject}
+                  teachers={teachers}
+                  groups={formationLevel.groups}/>
+              </>
             ) : (
               <>
-                {groups.length === 0 ? (
+                {formationLevel.groups.length === 0 ? (
                   <div className="flex items-center justify-center w-full">
                     <div className="w-2/3 text-center text-primary mt-16 text-lg font-bold p-2 bg-white rounded-full">
                       Il y a un problème de groupes, veuillez en ajouter pour consulter le tableau.
@@ -279,7 +298,7 @@ const MainGrid = () => {
                 ) : (
                   <DndProvider backend={HTML5Backend}>
                     <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"}
-                    mt-8 rounded-lg overflow-auto max-h-[71vh] min-h-[25rem] -z-10 transform duration-500`}>
+                    mt-8 rounded-lg overflow-auto max-h-[65vh] min-h-[10rem] -z-10 transform duration-500`}>
                       <div
                         className="grid"
                         style={{
@@ -323,6 +342,9 @@ const MainGrid = () => {
                     </div>
                   </DndProvider>
                 )}
+                <div className={`${isControlPanelExpanded ? "ml-36 max-w-[85vw]" : "ml-10 max-w-[93vw]"} bg-black bg-opacity-50 rounded-lg px-2 text-white w-fit transform duration-500`}>
+                  Moyenne total des heures par élève pour cette enseignement : {getAverageHourPerStudent(selectedSubject, formationLevel.groups)}h
+                </div>
               </>
             )}
           </>

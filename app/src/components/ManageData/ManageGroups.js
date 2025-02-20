@@ -83,6 +83,8 @@ const ManageGroups = () => {
     setDeletingSubGroup(true);
   }
 
+  console.log(formationLevels);
+
   return (
     <>
       <Header />
@@ -106,6 +108,8 @@ const ManageGroups = () => {
                   <div className="spinner"></div>
                   <div className="text-white text-xl font-bold text-center mt-4 max-h-[300px] h-max">Chargement des promotions...</div>
                 </div>
+              ) : formationLevels.length === 0 ? (
+                <p className="text-white text-center">Aucun niveau de formation pour le département {selectedDepartment.name}</p>
               ) : (
                 formationLevels.map((formationLevel) => (
                   <div

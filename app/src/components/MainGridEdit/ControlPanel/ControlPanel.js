@@ -7,14 +7,15 @@ import { SaveButton } from "./SaveButton";
 const ControlPanel = ({
   isExpanded,
   setIsExpanded,
+  showStatistics,
+  setToast,
 
   fetchSemesters,
   selectedSemester,
 
-  setToast,
   teachers,
 
-  groups,
+  formationLevel,
   groupList,
 
   courseTypes,
@@ -34,14 +35,17 @@ const ControlPanel = ({
   const [isDeletedCourses, setIsDeletedCourses] = useState(false);
 
   useEffect(() => {
-    setIsNoGroups(groups.length === 0);
-  }, [groups]);
+    setIsNoGroups(formationLevel.groups.length === 0);
+  }, [formationLevel]);
   useEffect(() => {
     setIsModifiedCourses(modifiedCourses.length > 0);
   }, [modifiedCourses]);
   useEffect(() => {
     setIsDeletedCourses(deletedCourses.length > 0);
   }, [deletedCourses]);
+  useEffect(() => {
+    if (showStatistics && isExpanded) handleToggleExpand();
+  }, [showStatistics]);
 
   const handleToggleExpand = () => {
     if (isButtonDisabled) return;
@@ -60,14 +64,14 @@ const ControlPanel = ({
 
   return (
     <div
-      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[84.5vh] w-20" : "h-20 w-20"}`}>
+      className={`relative z-0 mr-5 mt-10 p-5 bg-primary rounded-3xl shadow-md transition-all duration-300 flex flex-col place-items-center ${isExpanded ? "h-[calc(80px+65vh+2rem)] w-20" : "h-20 w-20"}`}>
       <button
         onClick={handleToggleExpand}
         className={`${
           isExpanded
             ? "size-10 bg-primaryshade rounded-full flex items-center justify-center"
-            : "size-10 bg-white rounded-lg flex items-center justify-center"}`}
-        disabled={isButtonDisabled}>
+            : "size-10 bg-white rounded-lg flex items-center justify-center disabled:bg-primaryshade disabled:cursor-not-allowed transition-colors duration-300"}`}
+        disabled={isButtonDisabled || showStatistics}>
 
         <span className={`absolute right-4 top-4 flex h-3 w-3 ${!(isModifiedCourses || isDeletedCourses) || isExpanded ? "hidden" : ""}`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
@@ -85,7 +89,7 @@ const ControlPanel = ({
         ${delayedExpanded ? "duration-300 opacity-100 scale-100" : "duration-0 absolute opacity-0 scale-0"}`}>
         <CourseButton
           isNoGroups={isNoGroups}
-          groups={groups}
+          formationLevel={formationLevel}
           groupList={groupList}
           selectedSemester={selectedSemester}
           courseTypes={courseTypes}
